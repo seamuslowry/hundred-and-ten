@@ -7,7 +7,7 @@ on:
       # - "main"
 
 jobs:
-  build-n-publish:
+  publish:
     name: Build and publish
     runs-on: ubuntu-latest
     steps:
@@ -15,7 +15,6 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: "3.9"
-      - run:
       - run: pip install -r requirements-publish.txt
       - run: python -m build
       - run: python -m twine upload --repository testpypi --skip-existing dist/* -u "__token__" -p ${{ secrets.TEST_PYPI_API_TOKEN }}
