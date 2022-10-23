@@ -17,7 +17,7 @@ class Game:
         '''Invite a player to the game'''
         self.player_data.invitees.append(invitee)
 
-    def join_game(self, player):
+    def join(self, player):
         '''Add a player to the game'''
 
         below_player_cap = len(self.player_data.players) < 4
