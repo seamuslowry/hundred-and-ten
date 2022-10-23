@@ -2,3 +2,5 @@
 [![100% Coverage](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml/badge.svg?branch=main)](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml)
 
 # hundred-and-ten
+
+A package that plays the game Hundred and Ten
