@@ -38,7 +38,7 @@ class TestCreateGame(TestCase):
         self.assertTrue(invitee in map(lambda i: i.identifier, game.players))
 
     def test_join_too_many_players(self):
-        '''Test inviting a player to a game'''
+        '''Test joining a full game'''
         invitee = 'invitee'
         game = Game(
             list(map(lambda i: Person(str(i),
@@ -48,14 +48,14 @@ class TestCreateGame(TestCase):
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_private(self):
-        '''Test inviting a player to a game'''
+        '''Test joining a private game without an invite'''
         invitee = 'invitee'
         game = Game(accessibility='PRIVATE')
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_public(self):
-        '''Test inviting a player to a game'''
+        '''Test joining a public game without an invite'''
         invitee = 'invitee'
         game = Game()
 
