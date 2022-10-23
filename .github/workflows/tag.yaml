@@ -1,0 +1,17 @@
+name: Bump version
+on:
+  push:
+    branches:
+      - chore/setup
+jobs:
+  tag:
+    name: Tag Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+        uses: anothrNick/github-tag-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
