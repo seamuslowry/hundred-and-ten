@@ -67,7 +67,7 @@ class Game:
         '''
         Find a person with the given identifier
         '''
-        return next(iter(p for p in self.people if p.identifier == identifier))
+        return next(iter([p for p in self.people if p.identifier == identifier]), None)
 
     def __find_people_by_role(self, role):
         '''

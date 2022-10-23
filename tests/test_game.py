@@ -22,11 +22,11 @@ class TestCreateGame(TestCase):
         invitee = 'invitee'
         game = Game()
 
-        self.assertFalse(invitee in map(lambda i: i.idendifier, game.invitees))
+        self.assertFalse(invitee in map(lambda i: i.identifier, game.invitees))
 
         game.invite(invitee)
 
-        self.assertTrue(invitee in map(lambda i: i.idendifier, game.invitees))
+        self.assertTrue(invitee in map(lambda i: i.identifier, game.invitees))
 
     def test_join(self):
         '''Test a player joining a game'''
@@ -61,4 +61,4 @@ class TestCreateGame(TestCase):
 
         game.join(invitee)
 
-        self.assertTrue(invitee in game.players)
+        self.assertTrue(invitee in map(lambda i: i.identifier, game.players))
