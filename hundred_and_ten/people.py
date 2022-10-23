@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class GamePlayers:
+class People:
     '''A class to keep track of player data'''
 
     def __init__(self, organizer: str, players=None, invitees=None):
