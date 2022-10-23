@@ -18,8 +18,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.9',
-    # py_modules=["quicksample"],             # Name of the python package
-    # package_dir={'': 'quicksample/src'},     # Directory of the source code of the package
-    # install_requires=[]                     # Install other dependencies if any
+    python_requires='>=3.9'
 )
