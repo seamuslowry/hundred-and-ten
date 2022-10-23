@@ -1,11 +1,24 @@
-name: Publish
+name: Tag and Publish
 
 on:
   push:
-    tags:
-      - "*"
+    branches:
+      - chore/setup
 
 jobs:
+  tag:
+    name: Tag Version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+      - uses: anothrNick/github-tag-action@1.52.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          DEFAULT_BUMP: patch
+
   publish:
     name: Build and publish
     runs-on: ubuntu-latest
