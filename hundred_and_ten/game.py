@@ -8,25 +8,25 @@ from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
 class Game:
     '''A Game of Hundred and Ten'''
 
-    def __init__(self, players, accessibility=PUBLIC, uuid=None):
+    def __init__(self, people, accessibility=PUBLIC, uuid=None):
         self.uuid = uuid or uuid4()
         self.accessibility = accessibility
-        self.players = players
+        self.people = people
 
     def invite(self, invitee):
         '''Invite a player to the game'''
-        self.players.invitees.append(invitee)
+        self.people.invitees.append(invitee)
 
     def join(self, player):
         '''Add a player to the game'''
 
-        below_player_cap = len(self.players.players) < 4
+        below_player_cap = len(self.people.players) < 4
         waiting_for_players = self.status == GameStatus.WAITING_FOR_PLAYERS
         public_game = self.accessibility == PUBLIC
-        invited = player in [self.players.organizer] + self.players.invitees
+        invited = player in [self.people.organizer] + self.people.invitees
 
         if waiting_for_players and below_player_cap and (public_game or invited):
-            self.players.players.append(player)
+            self.people.players.append(player)
         else:
             raise HundredAndTenError(
                 ("Cannot join this game."

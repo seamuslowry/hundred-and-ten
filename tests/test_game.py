@@ -17,18 +17,18 @@ class TestCreateGame(TestCase):
 
         self.assertIsNotNone(game.uuid)
         self.assertEqual(game.status, GameStatus.WAITING_FOR_PLAYERS)
-        self.assertTrue(game.players.organizer in game.players.players)
+        self.assertTrue(game.people.organizer in game.people.players)
 
     def test_invite(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
         game = Game(People(''))
 
-        self.assertFalse(game.players.invitees)
+        self.assertFalse(game.people.invitees)
 
         game.invite(invitee)
 
-        self.assertTrue(invitee in game.players.invitees)
+        self.assertTrue(invitee in game.people.invitees)
 
     def test_join(self):
         '''Test inviting a player to a game'''
@@ -37,7 +37,7 @@ class TestCreateGame(TestCase):
 
         game.join(invitee)
 
-        self.assertTrue(invitee in game.players.players)
+        self.assertTrue(invitee in game.people.players)
 
     def test_join_too_many_players(self):
         '''Test inviting a player to a game'''
@@ -60,4 +60,4 @@ class TestCreateGame(TestCase):
 
         game.join(invitee)
 
-        self.assertTrue(invitee in game.players.players)
+        self.assertTrue(invitee in game.people.players)
