@@ -1,10 +1,10 @@
 '''Game unit tests'''
 from unittest import TestCase
 
-from hundred_and_ten.constants import GameStatus
+from hundred_and_ten.constants import GameStatus, PersonRole
 from hundred_and_ten.game import Game
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
-from hundred_and_ten.people import People
+from hundred_and_ten.person import Person
 
 
 class TestCreateGame(TestCase):
@@ -12,52 +12,53 @@ class TestCreateGame(TestCase):
 
     def test_default_init(self):
         '''Test init a game with minimal info'''
-        organizer = 'organizer'
-        game = Game(People(organizer))
+        game = Game()
 
         self.assertIsNotNone(game.uuid)
         self.assertEqual(game.status, GameStatus.WAITING_FOR_PLAYERS)
-        self.assertTrue(game.people.organizer in game.people.players)
 
     def test_invite(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(People(''))
+        game = Game()
 
-        self.assertFalse(game.people.invitees)
+        self.assertFalse(invitee in map(lambda i: i.idendifier, game.invitees))
 
         game.invite(invitee)
 
-        self.assertTrue(invitee in game.people.invitees)
+        self.assertTrue(invitee in map(lambda i: i.idendifier, game.invitees))
 
     def test_join(self):
-        '''Test inviting a player to a game'''
+        '''Test a player joining a game'''
         invitee = 'invitee'
-        game = Game(People('', invitees=['invitee']))
+        game = Game([Person(invitee, [PersonRole.INVITEE])])
 
         game.join(invitee)
 
-        self.assertTrue(invitee in game.people.players)
+        self.assertTrue(invitee in map(lambda i: i.identifier, game.players))
 
     def test_join_too_many_players(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(People('', players=list(range(4)), invitees=['invitee']))
+        game = Game(
+            list(map(lambda i: Person(str(i),
+                                      [PersonRole.PLAYER]),
+                     range(4))) + [Person(invitee)])
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_private(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(People(''), accessibility='PRIVATE')
+        game = Game(accessibility='PRIVATE')
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_public(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(People(''))
+        game = Game()
 
         game.join(invitee)
 
-        self.assertTrue(invitee in game.people.players)
+        self.assertTrue(invitee in game.players)
