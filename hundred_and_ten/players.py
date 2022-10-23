@@ -6,7 +6,7 @@ from dataclasses import dataclass
 class Players:
     '''A class to keep track of player data'''
 
-    def __init__(self, organizer: str, players=None, invitees=None):
+    def __init__(self, organizer: str, joined=None, invitees=None):
         self.organizer = organizer
-        self.players = players or [organizer]
+        self.joined = joined or [organizer]
         self.invitees = invitees or []
