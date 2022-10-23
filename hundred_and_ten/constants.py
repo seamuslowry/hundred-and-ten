@@ -7,3 +7,10 @@ PUBLIC = "PUBLIC"
 class GameStatus(Enum):
     '''The statuses the game can be in'''
     WAITING_FOR_PLAYERS = 1
+
+
+class PersonRole(Enum):
+    '''The roles a person can have'''
+    PLAYER = 1
+    ORGANIZER = 2
+    INVITEE = 3

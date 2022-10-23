@@ -1,10 +1,10 @@
 '''Game unit tests'''
 from unittest import TestCase
 
-from hundred_and_ten.constants import GameStatus
+from hundred_and_ten.constants import GameStatus, PersonRole
 from hundred_and_ten.game import Game
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
-from hundred_and_ten.people import People
+from hundred_and_ten.person import Person
 
 
 class TestCreateGame(TestCase):
@@ -12,52 +12,82 @@ class TestCreateGame(TestCase):
 
     def test_default_init(self):
         '''Test init a game with minimal info'''
-        organizer = 'organizer'
-        game = Game(People(organizer))
+        game = Game()
 
         self.assertIsNotNone(game.uuid)
         self.assertEqual(game.status, GameStatus.WAITING_FOR_PLAYERS)
-        self.assertTrue(game.people.organizer in game.people.players)
 
     def test_invite(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(People(''))
+        inviter = 'inviter'
+        game = Game([Person(inviter, roles={PersonRole.PLAYER})])
 
-        self.assertFalse(game.people.invitees)
+        self.assertFalse(invitee in map(lambda i: i.identifier, game.invitees))
 
-        game.invite(invitee)
+        game.invite(inviter, invitee)
 
-        self.assertTrue(invitee in game.people.invitees)
+        self.assertTrue(invitee in map(lambda i: i.identifier, game.invitees))
+
+    def test_invite_as_non_player(self):
+        '''Test inviting a player without being in the game yourself'''
+        invitee = 'invitee'
+        inviter = 'inviter'
+        game = Game()
+
+        self.assertRaises(HundredAndTenError, game.invite, inviter, invitee)
 
     def test_join(self):
-        '''Test inviting a player to a game'''
+        '''Test a player joining a game'''
         invitee = 'invitee'
-        game = Game(People('', invitees=['invitee']))
+        game = Game([Person(invitee, {PersonRole.INVITEE})])
 
         game.join(invitee)
 
-        self.assertTrue(invitee in game.people.players)
+        self.assertTrue(invitee in map(lambda i: i.identifier, game.players))
 
     def test_join_too_many_players(self):
-        '''Test inviting a player to a game'''
+        '''Test joining a full game'''
         invitee = 'invitee'
-        game = Game(People('', players=list(range(4)), invitees=['invitee']))
+        game = Game(
+            list(map(lambda i: Person(str(i),
+                                      [PersonRole.PLAYER]),
+                     range(4))) + [Person(invitee)])
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_private(self):
-        '''Test inviting a player to a game'''
+        '''Test joining a private game without an invite'''
         invitee = 'invitee'
-        game = Game(People(''), accessibility='PRIVATE')
+        game = Game(accessibility='PRIVATE')
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_public(self):
-        '''Test inviting a player to a game'''
+        '''Test joining a public game without an invite'''
         invitee = 'invitee'
-        game = Game(People(''))
+        game = Game()
 
         game.join(invitee)
 
-        self.assertTrue(invitee in game.people.players)
+        self.assertTrue(invitee in map(lambda i: i.identifier, game.players))
+
+    def test_determines_organizer(self):
+        '''Test finding organizer'''
+        organizer = 'organizer'
+        game = Game([Person(identifier=organizer, roles={PersonRole.ORGANIZER})])
+
+        self.assertEqual(game.organizer.identifier, organizer)
+
+    def test_determines_organizer_without_one(self):
+        '''Test finding organizer when no one has the role specifically'''
+        organizer = 'organizer'
+        game = Game([Person(identifier=organizer)])
+
+        self.assertEqual(game.organizer.identifier, organizer)
+
+    def test_determines_organizer_with_no_players(self):
+        '''Test finding organizer when there are no players'''
+        game = Game()
+
+        self.assertIsNotNone(game.organizer)
