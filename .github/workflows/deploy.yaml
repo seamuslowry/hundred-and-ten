@@ -13,11 +13,11 @@ jobs:
       tag: ${{ steps.tag-version.outputs.tag }}
     steps:
       - id: checkout
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
         with:
           fetch-depth: "0"
       - id: tag-version
-      - uses: anothrNick/github-tag-action@1.52.0
+        uses: anothrNick/github-tag-action@1.52.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: false
