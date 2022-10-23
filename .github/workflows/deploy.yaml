@@ -21,6 +21,7 @@ jobs:
 
   publish:
     name: Build and publish
+    needs: tag
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
