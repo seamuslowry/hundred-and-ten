@@ -4,7 +4,7 @@ from unittest import TestCase
 from hundred_and_ten.constants import GameStatus
 from hundred_and_ten.game import Game
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
-from hundred_and_ten.players import Players
+from hundred_and_ten.people import People
 
 
 class TestCreateGame(TestCase):
@@ -13,7 +13,7 @@ class TestCreateGame(TestCase):
     def test_default_init(self):
         '''Test init a game with minimal info'''
         organizer = 'organizer'
-        game = Game(Players(organizer))
+        game = Game(People(organizer))
 
         self.assertIsNotNone(game.uuid)
         self.assertEqual(game.status, GameStatus.WAITING_FOR_PLAYERS)
@@ -22,7 +22,7 @@ class TestCreateGame(TestCase):
     def test_invite(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(Players(''))
+        game = Game(People(''))
 
         self.assertFalse(game.players.invitees)
 
@@ -33,7 +33,7 @@ class TestCreateGame(TestCase):
     def test_join(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(Players('', invitees=['invitee']))
+        game = Game(People('', invitees=['invitee']))
 
         game.join(invitee)
 
@@ -42,21 +42,21 @@ class TestCreateGame(TestCase):
     def test_join_too_many_players(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(Players('', joined=list(range(4)), invitees=['invitee']))
+        game = Game(People('', joined=list(range(4)), invitees=['invitee']))
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_private(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(Players(''), accessibility='PRIVATE')
+        game = Game(People(''), accessibility='PRIVATE')
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_public(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game(Players(''))
+        game = Game(People(''))
 
         game.join(invitee)
 
