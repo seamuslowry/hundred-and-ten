@@ -20,13 +20,22 @@ class TestCreateGame(TestCase):
     def test_invite(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = Game()
+        inviter = 'inviter'
+        game = Game([Person(inviter, roles={PersonRole.PLAYER})])
 
         self.assertFalse(invitee in map(lambda i: i.identifier, game.invitees))
 
-        game.invite(invitee)
+        game.invite(inviter, invitee)
 
         self.assertTrue(invitee in map(lambda i: i.identifier, game.invitees))
+
+    def test_invite_as_non_player(self):
+        '''Test inviting a player without being in the game yourself'''
+        invitee = 'invitee'
+        inviter = 'inviter'
+        game = Game()
+
+        self.assertRaises(HundredAndTenError, game.invite, inviter, invitee)
 
     def test_join(self):
         '''Test a player joining a game'''

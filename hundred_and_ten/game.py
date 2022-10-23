@@ -14,8 +14,12 @@ class Game:
         self.accessibility = accessibility
         self.people = people or []
 
-    def invite(self, invitee):
+    def invite(self, inviter, invitee):
         '''Invite a player to the game'''
+
+        if not self.__find_or_create_person(inviter) in self.players:
+            raise HundredAndTenError("You cannot invite a player to a game you aren't a part of.")
+
         self.people = self.__upsert_person(self.__find_or_create_person(
             invitee, PersonRole.INVITEE))
 
@@ -33,7 +37,7 @@ class Game:
                 player, PersonRole.PLAYER))
         else:
             raise HundredAndTenError(
-                ("Cannot join this game."
+                ("You cannot join this game."
                  " It is either at capacity or you have not received an invitation."))
 
     @property
