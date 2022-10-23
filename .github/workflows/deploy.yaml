@@ -22,14 +22,13 @@ jobs:
   publish:
     name: Build and publish
     needs: tag
-    env:
-      RELEASE_VERSION: ${{ jobs.tag.outputs.tag }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: 3.9
+      - run: RELEASE_VERSION=${{ jobs.tag.outputs.tag }}
       - run: pip install -r requirements.txt
       - run: pip install -r requirements-publish.txt
       - run: python -m build
