@@ -13,14 +13,14 @@ jobs:
       tag: ${{ steps.tag-version.outputs.tag }}
     steps:
       - id: tag-version
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: "0"
-      - uses: anothrNick/github-tag-action@1.52.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: false
-          DEFAULT_BUMP: patch
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: "0"
+        - uses: anothrNick/github-tag-action@1.52.0
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            WITH_V: false
+            DEFAULT_BUMP: patch
 
   publish:
     name: Build and publish
