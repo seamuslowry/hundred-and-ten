@@ -31,7 +31,7 @@ class TestCreateGame(TestCase):
     def test_join(self):
         '''Test a player joining a game'''
         invitee = 'invitee'
-        game = Game([Person(invitee, [PersonRole.INVITEE])])
+        game = Game([Person(invitee, {PersonRole.INVITEE})])
 
         game.join(invitee)
 

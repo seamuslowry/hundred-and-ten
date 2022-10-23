@@ -54,14 +54,14 @@ class Game:
         """
         The invitees to the game
         """
-        return next(iter(self.__find_people_by_role(PersonRole.INVITEE)), [])
+        return self.__find_people_by_role(PersonRole.INVITEE) or []
 
     @property
     def players(self):
         """
         The players of the game
         """
-        return next(iter(self.__find_people_by_role(PersonRole.PLAYER)), [])
+        return self.__find_people_by_role(PersonRole.PLAYER) or []
 
     def __find_person_by_identifier(self, identifier):
         '''
@@ -73,7 +73,7 @@ class Game:
         '''
         Find a person with the given identifier
         '''
-        return next((p for p in self.people if role in p.roles), [])
+        return [p for p in self.people if role in p.roles] or []
 
     def __find_or_create_person(self, identifier, *roles):
         '''
@@ -81,7 +81,7 @@ class Game:
         Provided roles will append, not overwrite
         '''
         person = self.__find_person_by_identifier(identifier) or Person(identifier=identifier)
-        person.roles.add(roles or [])
+        person.roles.update(roles or [])
         return person
 
     def __upsert_person(self, person):
