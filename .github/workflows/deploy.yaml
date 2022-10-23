@@ -22,6 +22,8 @@ jobs:
   publish:
     name: Build and publish
     needs: tag
+    env:
+      RELEASE_VERSION: ${{ jobs.tag.outputs.tag }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
