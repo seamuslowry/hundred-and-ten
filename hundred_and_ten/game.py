@@ -47,7 +47,9 @@ class Game:
         The organizer of the game
         If no player has the role, pick a random player
         """
-        return next(iter(self.__find_people_by_role(PersonRole.ORGANIZER)), next(iter(self.people)))
+        return next(
+            iter(self.__find_people_by_role(PersonRole.ORGANIZER) or self.people),
+            Person('unknown'))
 
     @property
     def invitees(self):

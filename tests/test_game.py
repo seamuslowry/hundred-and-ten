@@ -62,3 +62,23 @@ class TestCreateGame(TestCase):
         game.join(invitee)
 
         self.assertTrue(invitee in map(lambda i: i.identifier, game.players))
+
+    def test_determines_organizer(self):
+        '''Test finding organizer'''
+        organizer = 'organizer'
+        game = Game([Person(identifier=organizer, roles={PersonRole.ORGANIZER})])
+
+        self.assertEqual(game.organizer.identifier, organizer)
+
+    def test_determines_organizer_without_one(self):
+        '''Test finding organizer when no one has the role specifically'''
+        organizer = 'organizer'
+        game = Game([Person(identifier=organizer)])
+
+        self.assertEqual(game.organizer.identifier, organizer)
+
+    def test_determines_organizer_with_no_players(self):
+        '''Test finding organizer when there are no players'''
+        game = Game()
+
+        self.assertIsNotNone(game.organizer)
