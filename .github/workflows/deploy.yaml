@@ -30,6 +30,11 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: 3.9
+      - run: echo $RELEASE_VERSION
+      - run: echo ${{ needs }}
+      - run: echo ${{ needs.tag }}
+      - run: echo ${{ needs.tag.outputs }}
+      - run: echo ${{ needs.tag.outputs.tag }}
       - run: pip install -r requirements.txt
       - run: pip install -r requirements-publish.txt
       - run: python -m build
