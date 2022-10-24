@@ -9,6 +9,11 @@ class GameStatus(Enum):
     WAITING_FOR_PLAYERS = 1
 
 
+class RoundStatus(Enum):
+    '''The statuses the round can be in'''
+    BIDDING = 1
+
+
 class PersonRole(Enum):
     '''The roles a person can have'''
     PLAYER = 1
