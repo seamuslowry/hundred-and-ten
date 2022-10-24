@@ -61,10 +61,8 @@ class Game:
             raise HundredAndTenError("You cannot play with fewer than two players.")
 
         self.rounds = [Round(
-            players=[
-                Person(identifier=self.players[0].identifier, roles={RoundRole.DEALER}),
-                map(lambda p: Person(p.identifier), self.players[1:])
-            ]
+            players=[Person(identifier=self.players[0].identifier, roles={RoundRole.DEALER})]
+            + [list(map(lambda p: Person(p.identifier), self.players[1:]))]
         )]
 
     @property
