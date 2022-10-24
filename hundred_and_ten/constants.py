@@ -25,3 +25,4 @@ class RoundRole(Enum):
     '''The roles a person can have in a round'''
     DEALER = 1
     BIDDER = 2
+    UNKNOWN = 3
