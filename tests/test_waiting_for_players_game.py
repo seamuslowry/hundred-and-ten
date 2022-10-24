@@ -67,7 +67,7 @@ class TestWaitingForPlayersGame(TestCase):
         invitee = 'invitee'
         game = Game(
             list(map(lambda i: Person(str(i),
-                                      [GameRole.PLAYER]),
+                                      {GameRole.PLAYER}),
                      range(4))) + [Person(invitee)])
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
