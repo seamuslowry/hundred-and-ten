@@ -1,4 +1,4 @@
-'''Provide a classe to represent a game of Hundred and Ten'''
+'''Represent a game of Hundred and Ten'''
 from uuid import uuid4
 
 from hundred_and_ten.constants import PUBLIC, GameStatus, PersonRole
@@ -7,16 +7,19 @@ from hundred_and_ten.person import Person
 
 
 class Game:
-    '''A Game of Hundred and Ten'''
+    '''A game of Hundred and Ten'''
 
-    def __init__(self, people=None, accessibility=PUBLIC, uuid=None):
+    def __init__(self, people=None, rounds=None, accessibility=PUBLIC, uuid=None):
         self.uuid = uuid or uuid4()
         self.accessibility = accessibility
         self.people = people or []
+        self.rounds = rounds or []
 
     def invite(self, inviter, invitee):
         '''Invite a player to the game'''
 
+        if self.status != GameStatus.WAITING_FOR_PLAYERS:
+            raise HundredAndTenError("You cannot invite a player to an in progress game.")
         if not self.__find_or_create_person(inviter) in self.players:
             raise HundredAndTenError("You cannot invite a player to a game you aren't a part of.")
 
@@ -26,24 +29,34 @@ class Game:
     def join(self, player):
         '''Add a player to the game'''
 
-        below_player_cap = len(self.players) < 4
-        waiting_for_players = self.status == GameStatus.WAITING_FOR_PLAYERS
-        public_game = self.accessibility == PUBLIC
-        invited = not self.__find_or_create_person(player).roles.isdisjoint(
-            [PersonRole.INVITEE, PersonRole.ORGANIZER])
+        if len(self.players) >= 4:
+            raise HundredAndTenError("You cannot join this game. It is at capacity.")
+        if self.status != GameStatus.WAITING_FOR_PLAYERS:
+            raise HundredAndTenError("You cannot join this game. It has already started.")
+        if self.accessibility != PUBLIC and PersonRole.INVITEE not in self.__find_or_create_person(
+                player).roles:
+            raise HundredAndTenError("You cannot join this game. You must be invited first.")
 
-        if waiting_for_players and below_player_cap and (public_game or invited):
-            self.people = self.__upsert_person(self.__find_or_create_person(
-                player, PersonRole.PLAYER))
-        else:
-            raise HundredAndTenError(
-                ("You cannot join this game."
-                 " It is either at capacity or you have not received an invitation."))
+        self.people = self.__upsert_person(self.__find_or_create_person(
+            player, PersonRole.PLAYER))
+
+    def leave(self, player):
+        '''Remove a player from the game'''
+
+        if player == self.organizer.identifier:
+            raise HundredAndTenError("The organizer cannot leave the game.")
+        if self.status != GameStatus.WAITING_FOR_PLAYERS:
+            raise HundredAndTenError("You cannot leave an in-progress game.")
+
+        self.people = map(lambda p: p if player != p.identifier else Person(
+            p.identifier, filter(lambda r: r != PersonRole.PLAYER, p.roles)), self.people)
 
     @property
     def status(self):
         """The status property."""
-        return GameStatus.WAITING_FOR_PLAYERS
+        if len(self.rounds) == 0:
+            return GameStatus.WAITING_FOR_PLAYERS
+        return self.rounds[-1].status
 
     @property
     def organizer(self):
