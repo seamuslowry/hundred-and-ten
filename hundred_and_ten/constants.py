@@ -19,3 +19,9 @@ class GameRole(Enum):
     PLAYER = 1
     ORGANIZER = 2
     INVITEE = 3
+
+
+class RoundRole(Enum):
+    '''The roles a person can have in a round'''
+    DEALER = 1
+    BIDDER = 2
