@@ -13,7 +13,7 @@ def by_identifier(people: list[Person], identifier: str) -> Optional[Person]:
     return next(iter([p for p in people if p.identifier == identifier]), None)
 
 
-def by_role(people: list[Person], role: str) -> list[Person]:
+def by_role(people: list[Person], role: AnyRole) -> list[Person]:
     '''
     Find a person with the given identifier
     '''
