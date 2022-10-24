@@ -19,6 +19,9 @@ class RoundStatus(Enum):
     BIDDING = 1
 
 
+AnyStatus = Union[GameStatus, RoundStatus]
+
+
 class GameRole(Enum):
     '''The roles a person can have in a game'''
     PLAYER = 1
