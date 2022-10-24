@@ -51,7 +51,7 @@ class Game:
             raise HundredAndTenError("You cannot leave an in-progress game.")
 
         self.people = list(map(lambda p: p if player != p.identifier else Person(
-            p.identifier, filter(lambda r: r != GameRole.PLAYER, p.roles)), self.people))
+            p.identifier, set(filter(lambda r: r != GameRole.PLAYER, p.roles))), self.people))
 
     def start_game(self):
         '''Start the game'''
