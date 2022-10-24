@@ -1,7 +1,7 @@
 '''Represent a game of Hundred and Ten'''
 from uuid import uuid4
 
-from hundred_and_ten.constants import PUBLIC, GameStatus, PersonRole
+from hundred_and_ten.constants import PUBLIC, GameStatus, GameRole
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
 from hundred_and_ten.person import Person
 
@@ -24,7 +24,7 @@ class Game:
             raise HundredAndTenError("You cannot invite a player to a game you aren't a part of.")
 
         self.people = self.__upsert_person(self.__find_or_create_person(
-            invitee, PersonRole.INVITEE))
+            invitee, GameRole.INVITEE))
 
     def join(self, player):
         '''Add a player to the game'''
@@ -33,12 +33,12 @@ class Game:
             raise HundredAndTenError("You cannot join this game. It is at capacity.")
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("You cannot join this game. It has already started.")
-        if self.accessibility != PUBLIC and PersonRole.INVITEE not in self.__find_or_create_person(
+        if self.accessibility != PUBLIC and GameRole.INVITEE not in self.__find_or_create_person(
                 player).roles:
             raise HundredAndTenError("You cannot join this game. You must be invited first.")
 
         self.people = self.__upsert_person(self.__find_or_create_person(
-            player, PersonRole.PLAYER))
+            player, GameRole.PLAYER))
 
     def leave(self, player):
         '''Remove a player from the game'''
@@ -49,7 +49,7 @@ class Game:
             raise HundredAndTenError("You cannot leave an in-progress game.")
 
         self.people = map(lambda p: p if player != p.identifier else Person(
-            p.identifier, filter(lambda r: r != PersonRole.PLAYER, p.roles)), self.people)
+            p.identifier, filter(lambda r: r != GameRole.PLAYER, p.roles)), self.people)
 
     @property
     def status(self):
@@ -65,7 +65,7 @@ class Game:
         If no player has the role, pick a random player
         """
         return next(
-            iter(self.__find_people_by_role(PersonRole.ORGANIZER) or self.people),
+            iter(self.__find_people_by_role(GameRole.ORGANIZER) or self.people),
             Person('unknown'))
 
     @property
@@ -73,14 +73,14 @@ class Game:
         """
         The invitees to the game
         """
-        return self.__find_people_by_role(PersonRole.INVITEE) or []
+        return self.__find_people_by_role(GameRole.INVITEE) or []
 
     @property
     def players(self):
         """
         The players of the game
         """
-        return self.__find_people_by_role(PersonRole.PLAYER) or []
+        return self.__find_people_by_role(GameRole.PLAYER) or []
 
     def __find_person_by_identifier(self, identifier):
         '''

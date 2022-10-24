@@ -14,8 +14,8 @@ class RoundStatus(Enum):
     BIDDING = 1
 
 
-class PersonRole(Enum):
-    '''The roles a person can have'''
+class GameRole(Enum):
+    '''The roles a person can have in a game'''
     PLAYER = 1
     ORGANIZER = 2
     INVITEE = 3

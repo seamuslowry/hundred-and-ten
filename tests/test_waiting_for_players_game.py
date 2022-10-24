@@ -1,7 +1,7 @@
 '''Test behavior of the Game while it is Waiting for Players'''
 from unittest import TestCase
 
-from hundred_and_ten.constants import GameStatus, PersonRole
+from hundred_and_ten.constants import GameStatus, GameRole
 from hundred_and_ten.game import Game
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
 from hundred_and_ten.person import Person
@@ -22,7 +22,7 @@ class TestWaitingForPlayersGame(TestCase):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
         inviter = 'inviter'
-        game = Game([Person(inviter, roles={PersonRole.PLAYER})])
+        game = Game([Person(inviter, roles={GameRole.PLAYER})])
 
         self.assertFalse(invitee in map(lambda i: i.identifier, game.invitees))
 
@@ -42,14 +42,14 @@ class TestWaitingForPlayersGame(TestCase):
         '''Test inviting a player after the game has started'''
         invitee = 'invitee'
         inviter = 'inviter'
-        game = Game([Person(inviter, roles={PersonRole.PLAYER})], rounds=[Round()])
+        game = Game([Person(inviter, roles={GameRole.PLAYER})], rounds=[Round()])
 
         self.assertRaises(HundredAndTenError, game.invite, inviter, invitee)
 
     def test_join(self):
         '''Test a player joining a game'''
         invitee = 'invitee'
-        game = Game([Person(invitee, {PersonRole.INVITEE})])
+        game = Game([Person(invitee, {GameRole.INVITEE})])
 
         game.join(invitee)
 
@@ -58,7 +58,7 @@ class TestWaitingForPlayersGame(TestCase):
     def test_join_after_start(self):
         '''Test joining a game after it has started'''
         invitee = 'invitee'
-        game = Game([Person(invitee, {PersonRole.INVITEE})], rounds=[Round()])
+        game = Game([Person(invitee, {GameRole.INVITEE})], rounds=[Round()])
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
@@ -67,7 +67,7 @@ class TestWaitingForPlayersGame(TestCase):
         invitee = 'invitee'
         game = Game(
             list(map(lambda i: Person(str(i),
-                                      [PersonRole.PLAYER]),
+                                      [GameRole.PLAYER]),
                      range(4))) + [Person(invitee)])
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
@@ -91,7 +91,7 @@ class TestWaitingForPlayersGame(TestCase):
     def test_determines_organizer(self):
         '''Test finding organizer'''
         organizer = 'organizer'
-        game = Game([Person(identifier=organizer, roles={PersonRole.ORGANIZER})])
+        game = Game([Person(identifier=organizer, roles={GameRole.ORGANIZER})])
 
         self.assertEqual(game.organizer.identifier, organizer)
 
@@ -120,8 +120,8 @@ class TestWaitingForPlayersGame(TestCase):
     def test_leave_as_invited_player(self):
         '''Test leaving a game as an invited player'''
         invited_player = 'invited'
-        game = Game([Person('organizer', {PersonRole.ORGANIZER}), Person(
-            invited_player, {PersonRole.INVITEE, PersonRole.PLAYER})])
+        game = Game([Person('organizer', {GameRole.ORGANIZER}), Person(
+            invited_player, {GameRole.INVITEE, GameRole.PLAYER})])
 
         self.assertIn(Person(invited_player), game.players)
 
@@ -132,14 +132,14 @@ class TestWaitingForPlayersGame(TestCase):
     def test_leave_as_organizer(self):
         '''Test leaving a game as an invited player'''
         organizer = 'organizer'
-        game = Game([Person(organizer, {PersonRole.ORGANIZER, PersonRole.PLAYER})])
+        game = Game([Person(organizer, {GameRole.ORGANIZER, GameRole.PLAYER})])
 
         self.assertRaises(HundredAndTenError, game.leave, organizer)
 
     def test_leave_after_start(self):
         '''Test leaving a game after it has started'''
         identifier = 'id'
-        game = Game([Person('organizer', {PersonRole.ORGANIZER}), Person(
-            identifier, {PersonRole.PLAYER})], rounds=[Round()])
+        game = Game([Person('organizer', {GameRole.ORGANIZER}), Person(
+            identifier, {GameRole.PLAYER})], rounds=[Round()])
 
         self.assertRaises(HundredAndTenError, game.leave, identifier)
