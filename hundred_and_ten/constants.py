@@ -1,5 +1,6 @@
 '''Constant values for Hundred and Ten games'''
 from enum import Enum
+from typing import Union
 
 PUBLIC = "PUBLIC"
 
@@ -26,3 +27,6 @@ class RoundRole(Enum):
     DEALER = 1
     BIDDER = 2
     UNKNOWN = 3
+
+
+AnyRole = Union[GameRole, RoundRole]
