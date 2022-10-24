@@ -2,7 +2,11 @@
 from enum import Enum
 from typing import Union
 
-PUBLIC = "PUBLIC"
+
+class Accessibility(Enum):
+    '''The accessibility options for a game'''
+    PUBLIC = 1
+    PRIVATE = 2
 
 
 class GameStatus(Enum):
