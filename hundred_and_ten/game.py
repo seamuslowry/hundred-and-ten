@@ -1,9 +1,10 @@
 '''Represent a game of Hundred and Ten'''
 from uuid import uuid4
 
-from hundred_and_ten.constants import PUBLIC, GameStatus, GameRole
+from hundred_and_ten.constants import PUBLIC, GameRole, GameStatus, RoundRole
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
 from hundred_and_ten.person import Person
+from hundred_and_ten.round import Round
 
 
 class Game:
@@ -50,6 +51,21 @@ class Game:
 
         self.people = map(lambda p: p if player != p.identifier else Person(
             p.identifier, filter(lambda r: r != GameRole.PLAYER, p.roles)), self.people)
+
+    def start_game(self):
+        '''Start the game'''
+
+        if self.status != GameStatus.WAITING_FOR_PLAYERS:
+            raise HundredAndTenError("Cannot start a game that's already started.")
+        if len(self.players) < 2:
+            raise HundredAndTenError("You cannot play with fewer than two players.")
+
+        self.rounds = [Round(
+            players=[
+                Person(identifier=self.players[0].identifier, roles={RoundRole.DEALER}),
+                map(lambda p: Person(p.identifier), self.players[1:])
+            ]
+        )]
 
     @property
     def status(self):
