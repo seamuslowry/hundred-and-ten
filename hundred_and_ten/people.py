@@ -43,4 +43,6 @@ def upsert(people: list[Person], person: Person) -> list[Person]:
     '''
     Upsert the provided person into the people array
     '''
-    return [p for p in people if p.identifier != person.identifier] + [person]
+    if person in people:
+        return list(map(lambda p: person if p == person else p, people))
+    return people + [person]
