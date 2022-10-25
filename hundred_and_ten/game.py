@@ -2,10 +2,10 @@
 from typing import Optional
 from uuid import uuid4
 
-from hundred_and_ten import people
 from hundred_and_ten.constants import (Accessibility, AnyStatus, GameRole,
                                        GameStatus, RoundRole)
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
+from hundred_and_ten.people import People
 from hundred_and_ten.person import Person
 from hundred_and_ten.round import Round
 
@@ -14,12 +14,12 @@ class Game:
     '''A game of Hundred and Ten'''
 
     def __init__(
-            self, persons: Optional[list[Person]] = None, rounds: Optional[list[Round]] = None,
+            self, persons: Optional[People] = None, rounds: Optional[list[Round]] = None,
             accessibility: Optional[Accessibility] = Accessibility.PUBLIC,
             uuid: Optional[str] = None):
         self.uuid = uuid or uuid4()
         self.accessibility = accessibility
-        self.people = persons or []
+        self.people = persons or People()
         self.rounds = rounds or []
 
     def invite(self, inviter: str, invitee: str):
@@ -27,11 +27,10 @@ class Game:
 
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("You cannot invite a player to an in progress game.")
-        if not people.find_or_create(self.people, inviter) in self.players:
+        if self.people.find_or_create(inviter) not in self.players:
             raise HundredAndTenError("You cannot invite a player to a game you aren't a part of.")
 
-        self.people = people.upsert(self.people, people.find_or_create(self.people,
-                                                                       invitee, GameRole.INVITEE))
+        self.people.upsert(self.people.find_or_create(invitee, GameRole.INVITEE))
 
     def join(self, player: str):
         '''Add a player to the game'''
@@ -41,11 +40,10 @@ class Game:
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("You cannot join this game. It has already started.")
         if (self.accessibility != Accessibility.PUBLIC
-                and GameRole.INVITEE not in people.find_or_create(self.people, player).roles):
+                and GameRole.INVITEE not in self.people.find_or_create(player).roles):
             raise HundredAndTenError("You cannot join this game. You must be invited first.")
 
-        self.people = people.upsert(self.people, people.find_or_create(self.people,
-                                                                       player, GameRole.PLAYER))
+        self.people.upsert(self.people.find_or_create(player, GameRole.PLAYER))
 
     def leave(self, player: str):
         '''Remove a player from the game'''
@@ -55,8 +53,10 @@ class Game:
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("You cannot leave an in-progress game.")
 
-        self.people = list(map(lambda p: p if player != p.identifier else Person(
-            p.identifier, set(filter(lambda r: r != GameRole.PLAYER, p.roles))), self.people))
+        person = Person(player)
+
+        if person in self.people:
+            self.people.remove(person)
 
     def start_game(self):
         '''Start the game'''
@@ -66,12 +66,11 @@ class Game:
         if len(self.players) < 2:
             raise HundredAndTenError("You cannot play with fewer than two players.")
 
-        round_players = list(map(lambda p: Person(p.identifier, {RoundRole.UNKNOWN}), self.people))
+        round_players = People(map(lambda p: Person(
+            p.identifier, {RoundRole.UNKNOWN}), self.people))
+        round_players.add_role(round_players[0].identifier, RoundRole.DEALER)
 
-        self.rounds = [
-            Round(
-                players=people.add_role(
-                    round_players, round_players[0].identifier, RoundRole.DEALER))]
+        self.rounds = [Round(players=round_players)]
 
     @ property
     def status(self) -> AnyStatus:
@@ -87,7 +86,7 @@ class Game:
         If no player has the role, pick a random player
         """
         return next(
-            iter(people.by_role(self.people, GameRole.ORGANIZER) or self.people),
+            iter(self.people.by_role(GameRole.ORGANIZER) or self.people),
             Person('unknown'))
 
     @ property
@@ -95,11 +94,11 @@ class Game:
         """
         The invitees to the game
         """
-        return people.by_role(self.people, GameRole.INVITEE) or []
+        return self.people.by_role(GameRole.INVITEE) or []
 
     @ property
     def players(self) -> list[Person]:
         """
         The players of the game
         """
-        return people.by_role(self.people, GameRole.PLAYER) or []
+        return self.people.by_role(GameRole.PLAYER) or []

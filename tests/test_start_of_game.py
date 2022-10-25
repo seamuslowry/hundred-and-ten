@@ -4,6 +4,7 @@ from unittest import TestCase
 from hundred_and_ten.constants import GameRole
 from hundred_and_ten.game import Game
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
+from hundred_and_ten.people import People
 from hundred_and_ten.person import Person
 
 
@@ -13,8 +14,8 @@ class TestStartOfGame(TestCase):
     def test_start_game(self):
         '''Adds the first round when starting a game'''
         game = Game(
-            persons=[Person('1', roles={GameRole.PLAYER}),
-                     Person('2', roles={GameRole.PLAYER})])
+            persons=People([Person('1', roles={GameRole.PLAYER}),
+                            Person('2', roles={GameRole.PLAYER})]))
 
         self.assertEqual(0, len(game.rounds))
 
@@ -29,8 +30,8 @@ class TestStartOfGame(TestCase):
     def test_start_game_when_started(self):
         '''Will not allow restarting a game'''
         game = Game(
-            persons=[Person('1', roles={GameRole.PLAYER}),
-                     Person('2', roles={GameRole.PLAYER})])
+            persons=People([Person('1', roles={GameRole.PLAYER}),
+                            Person('2', roles={GameRole.PLAYER})]))
 
         game.start_game()
         self.assertRaises(HundredAndTenError, game.start_game)
