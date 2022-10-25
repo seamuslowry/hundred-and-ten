@@ -22,10 +22,12 @@ class TestStartOfGame(TestCase):
         game.start_game()
 
         self.assertEqual(1, len(game.rounds))
-        self.assertEqual(len(game.people), len(game.rounds[0].unknowns))
-        self.assertEqual(0, len(game.rounds[0].bidders))
-        self.assertIsNotNone(game.rounds[0].dealer)
-        self.assertIsNone(game.rounds[0].active_bidder)
+        self.assertIsNotNone(game.active_round)
+        self.assertEqual(len(game.people), len(game.active_round.unknowns))
+        self.assertEqual(0, len(game.active_round.bidders))
+        self.assertIsNotNone(game.active_round.dealer)
+        self.assertIsNotNone(game.active_round.active_player)
+        self.assertIsNone(game.active_round.active_bidder)
 
     def test_start_game_when_started(self):
         '''Will not allow restarting a game'''

@@ -1,4 +1,4 @@
-'''Unit test common interactions with a list of persons'''
+'''Unit test common upserting into a list of persons'''
 from unittest import TestCase
 
 from hundred_and_ten.constants import GameRole
@@ -6,8 +6,8 @@ from hundred_and_ten.people import People
 from hundred_and_ten.person import Person
 
 
-class TestPeople(TestCase):
-    '''People unit tests'''
+class TestUpsertPeople(TestCase):
+    '''Upsert People unit tests'''
 
     def test_upsert_person_not_in_list(self):
         '''Upsert a person that is not in the list'''
