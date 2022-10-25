@@ -12,3 +12,9 @@ class Person:
     def __init__(self, identifier: str, roles: Optional[set[AnyRole]] = None):
         self.identifier = identifier
         self.roles = roles or set()
+
+    def __eq__(self, other):
+        return isinstance(other, Person) and other.identifier == self.identifier
+
+    def __hash__(self) -> int:
+        return hash(self.identifier)
