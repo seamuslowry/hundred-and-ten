@@ -10,12 +10,16 @@ class People(list[Person]):
     '''A list of persons'''
 
     def update(self, person: Person) -> None:
+        '''
+        Update the provided person within people
+        Will raise an erro if the person is not in people already
+        '''
         index = self.index(person)
         self[index] = person
 
     def upsert(self, person: Person) -> None:
         '''
-        Upsert the provided person into the people array
+        Upsert the provided person into people
         '''
         if person in self:
             self.update(person)
