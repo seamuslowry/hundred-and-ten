@@ -11,7 +11,7 @@ from hundred_and_ten.person import Person
 class Round:
     '''A round in the game of Hundred and Ten'''
 
-    def __init__(self, players: Optional[People] = None):
+    def __init__(self, players: Optional[People] = None) -> None:
         self.players = players or People()
 
     @property
@@ -20,12 +20,17 @@ class Round:
         return next(iter(self.players.by_role(RoundRole.DEALER)), None)
 
     @property
-    def bidders(self) -> list[Person]:
+    def active_player(self) -> Optional[Person]:
+        """The current active player."""
+        return next(iter(self.players.by_role(RoundRole.ACTIVE)), None)
+
+    @property
+    def bidders(self) -> People:
         """The bidders this round, anyone that has submitted a bid."""
         return self.players.by_role(RoundRole.BIDDER)
 
     @property
-    def unknowns(self) -> list[Person]:
+    def unknowns(self) -> People:
         """Unknowns in this round, anyone that hasn't had a chance to submit a bid."""
         return self.players.by_role(RoundRole.UNKNOWN)
 

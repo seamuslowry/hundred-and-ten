@@ -34,6 +34,7 @@ class RoundRole(Enum):
     DEALER = 1
     BIDDER = 2
     UNKNOWN = 3
+    ACTIVE = 4
 
 
 AnyRole = Union[GameRole, RoundRole]
