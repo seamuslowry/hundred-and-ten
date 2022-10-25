@@ -1,7 +1,7 @@
 '''Test behavior of the Game while it is Waiting for Players'''
 from unittest import TestCase
 
-from hundred_and_ten.constants import GameStatus, GameRole
+from hundred_and_ten.constants import Accessibility, GameRole, GameStatus
 from hundred_and_ten.game import Game
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
 from hundred_and_ten.person import Person
@@ -67,7 +67,7 @@ class TestWaitingForPlayersGame(TestCase):
         invitee = 'invitee'
         game = Game(
             list(map(lambda i: Person(str(i),
-                                      [GameRole.PLAYER]),
+                                      {GameRole.PLAYER}),
                      range(4))) + [Person(invitee)])
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
@@ -75,7 +75,7 @@ class TestWaitingForPlayersGame(TestCase):
     def test_join_not_invited_to_private(self):
         '''Test joining a private game without an invite'''
         invitee = 'invitee'
-        game = Game(accessibility='PRIVATE')
+        game = Game(accessibility=Accessibility.PRIVATE)
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 

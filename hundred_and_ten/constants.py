@@ -1,7 +1,12 @@
 '''Constant values for Hundred and Ten games'''
 from enum import Enum
+from typing import Union
 
-PUBLIC = "PUBLIC"
+
+class Accessibility(Enum):
+    '''The accessibility options for a game'''
+    PUBLIC = 1
+    PRIVATE = 2
 
 
 class GameStatus(Enum):
@@ -12,6 +17,9 @@ class GameStatus(Enum):
 class RoundStatus(Enum):
     '''The statuses the round can be in'''
     BIDDING = 1
+
+
+AnyStatus = Union[GameStatus, RoundStatus]
 
 
 class GameRole(Enum):
@@ -26,3 +34,6 @@ class RoundRole(Enum):
     DEALER = 1
     BIDDER = 2
     UNKNOWN = 3
+
+
+AnyRole = Union[GameRole, RoundRole]
