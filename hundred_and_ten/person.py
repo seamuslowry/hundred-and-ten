@@ -9,11 +9,11 @@ from hundred_and_ten.constants import AnyRole
 class Person:
     '''A class to keep track of person information'''
 
-    def __init__(self, identifier: str, roles: Optional[set[AnyRole]] = None):
+    def __init__(self, identifier: str, roles: Optional[set[AnyRole]] = None) -> None:
         self.identifier = identifier
         self.roles = roles or set()
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return isinstance(other, Person) and other.identifier == self.identifier
 
     def __hash__(self) -> int:

@@ -16,13 +16,13 @@ class Game:
     def __init__(
             self, persons: Optional[People] = None, rounds: Optional[list[Round]] = None,
             accessibility: Optional[Accessibility] = Accessibility.PUBLIC,
-            uuid: Optional[str] = None):
+            uuid: Optional[str] = None) -> None:
         self.uuid = uuid or uuid4()
         self.accessibility = accessibility
         self.people = persons or People()
         self.rounds = rounds or []
 
-    def invite(self, inviter: str, invitee: str):
+    def invite(self, inviter: str, invitee: str) -> None:
         '''Invite a player to the game'''
 
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
@@ -32,7 +32,7 @@ class Game:
 
         self.people.upsert(self.people.find_or_create(invitee, GameRole.INVITEE))
 
-    def join(self, player: str):
+    def join(self, player: str) -> None:
         '''Add a player to the game'''
 
         if len(self.players) >= 4:
@@ -45,7 +45,7 @@ class Game:
 
         self.people.upsert(self.people.find_or_create(player, GameRole.PLAYER))
 
-    def leave(self, player: str):
+    def leave(self, player: str) -> None:
         '''Remove a player from the game'''
 
         if player == self.organizer.identifier:
@@ -58,7 +58,7 @@ class Game:
         if person in self.people:
             self.people.remove(person)
 
-    def start_game(self):
+    def start_game(self) -> None:
         '''Start the game'''
 
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
@@ -69,17 +69,25 @@ class Game:
         round_players = People(map(lambda p: Person(
             p.identifier, {RoundRole.UNKNOWN}), self.people))
         round_players.add_role(round_players[0].identifier, RoundRole.DEALER)
+        round_players.add_role(round_players[0].identifier, RoundRole.ACTIVE)
 
         self.rounds = [Round(players=round_players)]
 
-    @ property
+    @property
     def status(self) -> AnyStatus:
         """The status property."""
-        if len(self.rounds) == 0:
+        if not self.rounds:
             return GameStatus.WAITING_FOR_PLAYERS
-        return self.rounds[-1].status
+        return self.active_round.status
 
-    @ property
+    @property
+    def active_round(self) -> Round:
+        """The active round"""
+        if self.rounds:
+            return self.rounds[-1]
+        raise HundredAndTenError("No active round found.")
+
+    @property
     def organizer(self) -> Person:
         """
         The organizer of the game
@@ -89,16 +97,16 @@ class Game:
             iter(self.people.by_role(GameRole.ORGANIZER) or self.people),
             Person('unknown'))
 
-    @ property
-    def invitees(self) -> list[Person]:
+    @property
+    def invitees(self) -> People:
         """
         The invitees to the game
         """
-        return self.people.by_role(GameRole.INVITEE) or []
+        return self.people.by_role(GameRole.INVITEE)
 
-    @ property
-    def players(self) -> list[Person]:
+    @property
+    def players(self) -> People:
         """
         The players of the game
         """
-        return self.people.by_role(GameRole.PLAYER) or []
+        return self.people.by_role(GameRole.PLAYER)

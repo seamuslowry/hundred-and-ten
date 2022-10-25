@@ -18,6 +18,7 @@ class TestWaitingForPlayersGame(TestCase):
 
         self.assertIsNotNone(game.uuid)
         self.assertEqual(game.status, GameStatus.WAITING_FOR_PLAYERS)
+        self.assertRaises(HundredAndTenError, lambda: game.active_round)
 
     def test_invite(self):
         '''Test inviting a player to a game'''
