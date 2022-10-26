@@ -45,7 +45,7 @@ class Round:
             raise HundredAndTenError(f'Player {identifier} cannot place a bid for {amount.value}')
 
     def __handle_prepass(self) -> None:
-        if RoundRole.PRE_PASSED in self.active_player.roles:
+        if self.status == RoundStatus.BIDDING and RoundRole.PRE_PASSED in self.active_player.roles:
             self.players.remove_role(self.active_player.identifier, RoundRole.PRE_PASSED)
             self.__bid(self.active_player.identifier, BidAmount.PASS)
 

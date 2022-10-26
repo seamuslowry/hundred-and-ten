@@ -231,8 +231,32 @@ class TestBidding(TestCase):
         game.bid(game.active_player.identifier, BidAmount.PASS)
 
         self.assertEqual(2, len(game.active_round.bids))
+        self.assertEqual(RoundStatus.BIDDING, game.status)
         self.assertEqual(0, len(game.active_round.players.by_role(RoundRole.PRE_PASSED)))
         # with 3 players set up as above, play will have cicled back around to the dealer
         self.assertEqual(game.active_player, game.active_round.dealer)
         self.assertEqual(1, len(game.active_round.bidders))
         self.assertIn(game.active_player, game.active_round.bidders)
+
+    def test_end_bidding_with_prepass(self):
+        '''When all players have prepassed, the round can end'''
+        people = People([
+            Person('1', roles={GameRole.PLAYER, RoundRole.DEALER, RoundRole.PRE_PASSED}),
+            Person('2', roles={GameRole.PLAYER}),
+            Person('3', roles={GameRole.PLAYER, RoundRole.PRE_PASSED}),
+            Person('4', roles={GameRole.PLAYER, RoundRole.PRE_PASSED})
+        ])
+
+        game = Game(
+            persons=people,
+            rounds=[Round(people)])
+
+        self.assertEqual(0, len(game.active_round.bids))
+
+        game.bid(game.active_player.identifier, BidAmount.PASS)
+
+        self.assertEqual(4, len(game.active_round.bids))
+        self.assertEqual(0, len(game.active_round.players.by_role(RoundRole.PRE_PASSED)))
+        self.assertEqual(0, len(game.active_round.bidders))
+        self.assertEqual(RoundStatus.COMPLETED_NO_BIDDERS, game.active_round.status)
+        self.assertRaises(HundredAndTenError, lambda: game.active_player)
