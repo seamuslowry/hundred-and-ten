@@ -80,26 +80,26 @@ class Game:
         '''Discount a pre-pass bid from the identified player'''
         self.active_round.unpass(identifier)
 
-    @ property
+    @property
     def status(self) -> AnyStatus:
         """The status property."""
         if not self.rounds:
             return GameStatus.WAITING_FOR_PLAYERS
         return self.active_round.status
 
-    @ property
+    @property
     def active_round(self) -> Round:
         """The active round"""
         if self.rounds:
             return self.rounds[-1]
         raise HundredAndTenError("No active round found.")
 
-    @ property
+    @property
     def active_player(self) -> Person:
         """The active player"""
         return self.active_round.active_player
 
-    @ property
+    @property
     def organizer(self) -> Person:
         """
         The organizer of the game
@@ -109,14 +109,14 @@ class Game:
             iter(self.people.by_role(GameRole.ORGANIZER) or self.people),
             Person('unknown'))
 
-    @ property
+    @property
     def invitees(self) -> People:
         """
         The invitees to the game
         """
         return self.people.by_role(GameRole.INVITEE)
 
-    @ property
+    @property
     def players(self) -> People:
         """
         The players of the game
