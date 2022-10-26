@@ -16,7 +16,10 @@ class GameStatus(Enum):
 
 class RoundStatus(Enum):
     '''The statuses the round can be in'''
-    BIDDING = 1
+    DEALING = 1
+    BIDDING = 2
+    TRUMP_SELECTION = 3
+    COMPLETED_NO_BIDDERS = 4
 
 
 AnyStatus = Union[GameStatus, RoundStatus]
@@ -32,10 +35,17 @@ class GameRole(Enum):
 class RoundRole(Enum):
     '''The roles a person can have in a round'''
     DEALER = 1
-    BIDDER = 2
-    UNKNOWN = 3
-    ACTIVE = 4
-    PRE_PASSED = 5
+    PRE_PASSED = 2
 
 
 AnyRole = Union[GameRole, RoundRole]
+
+
+class BidAmount(int, Enum):
+    '''The valid bid amounts'''
+    PASS = 0
+    FIFTEEN = 15
+    TWENTY = 20
+    TWENTY_FIVE = 25
+    THIRTY = 30
+    SHOOT_THE_MOON = 60
