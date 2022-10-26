@@ -2,8 +2,7 @@
 from unittest import TestCase
 
 from hundredandten.bid import Bid
-from hundredandten.constants import (BidAmount, GameRole, RoundRole,
-                                     RoundStatus)
+from hundredandten.constants import BidAmount, GameRole, RoundRole, RoundStatus
 from hundredandten.game import Game
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.people import People
@@ -214,3 +213,25 @@ class TestBidding(TestCase):
 
         self.assertEqual(game.status, RoundStatus.COMPLETED_NO_BIDDERS)
         self.assertRaises(HundredAndTenError, game.bid, people[0].identifier, BidAmount.FIFTEEN)
+
+    def test_prepass(self):
+        '''When the next player has prepassed, auto pass for them'''
+        people = People([
+            Person('1', roles={GameRole.PLAYER, RoundRole.DEALER}),
+            Person('2', roles={GameRole.PLAYER}),
+            Person('3', roles={GameRole.PLAYER, RoundRole.PRE_PASSED})
+        ])
+
+        game = Game(
+            persons=people,
+            rounds=[Round(people)])
+
+        self.assertEqual(0, len(game.active_round.bids))
+
+        game.bid(game.active_player.identifier, BidAmount.PASS)
+
+        self.assertEqual(2, len(game.active_round.bids))
+        # with 3 players set up as above, play will have cicled back around to the dealer
+        self.assertEqual(game.active_player, game.active_round.dealer)
+        self.assertEqual(1, len(game.active_round.bidders))
+        self.assertIn(game.active_player, game.active_round.bidders)
