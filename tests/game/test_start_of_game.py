@@ -23,10 +23,30 @@ class TestStartOfGame(TestCase):
 
         self.assertEqual(1, len(game.rounds))
         self.assertIsNotNone(game.active_round)
-        self.assertEqual(len(game.people), len(game.active_round.unknowns))
-        self.assertEqual(0, len(game.active_round.bidders))
+        self.assertEqual(len(game.players), len(game.active_round.bidders))
         self.assertIsNotNone(game.active_round.dealer)
         self.assertIsNotNone(game.active_round.active_player)
+        self.assertNotEqual(game.active_round.dealer, game.active_round.active_player)
+        self.assertIsNone(game.active_round.active_bidder)
+
+    def test_start_game_with_unjoined_players(self):
+        '''Adds the first round when starting a game'''
+        game = Game(
+            persons=People([Person('1', roles={GameRole.PLAYER}),
+                            Person('2', roles={GameRole.PLAYER}),
+                            Person('3', roles={GameRole.INVITEE})]))
+
+        self.assertEqual(0, len(game.rounds))
+
+        game.start_game()
+
+        self.assertEqual(1, len(game.rounds))
+        self.assertIsNotNone(game.active_round)
+        self.assertGreater(len(game.people), len(game.active_round.bidders))
+        self.assertEqual(len(game.players), len(game.active_round.bidders))
+        self.assertIsNotNone(game.active_round.dealer)
+        self.assertIsNotNone(game.active_round.active_player)
+        self.assertNotEqual(game.active_round.dealer, game.active_round.active_player)
         self.assertIsNone(game.active_round.active_bidder)
 
     def test_start_game_when_started(self):
