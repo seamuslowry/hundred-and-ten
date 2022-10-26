@@ -231,6 +231,7 @@ class TestBidding(TestCase):
         game.bid(game.active_player.identifier, BidAmount.PASS)
 
         self.assertEqual(2, len(game.active_round.bids))
+        self.assertEqual(0, len(game.active_round.players.by_role(RoundRole.PRE_PASSED)))
         # with 3 players set up as above, play will have cicled back around to the dealer
         self.assertEqual(game.active_player, game.active_round.dealer)
         self.assertEqual(1, len(game.active_round.bidders))
