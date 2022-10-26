@@ -1,12 +1,12 @@
 '''Test behavior of the Game while it is Waiting for Players'''
 from unittest import TestCase
 
-from hundred_and_ten.constants import Accessibility, GameRole, GameStatus
-from hundred_and_ten.game import Game
-from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
-from hundred_and_ten.people import People
-from hundred_and_ten.person import Person
-from hundred_and_ten.round import Round
+from hundredandten.constants import Accessibility, GameRole, GameStatus
+from hundredandten.game import Game
+from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.people import People
+from hundredandten.person import Person
+from hundredandten.round import Round
 
 
 class TestWaitingForPlayersGame(TestCase):

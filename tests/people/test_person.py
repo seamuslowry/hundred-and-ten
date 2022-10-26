@@ -1,8 +1,8 @@
 '''Person unit tests'''
 from unittest import TestCase
 
-from hundred_and_ten.constants import GameRole
-from hundred_and_ten.person import Person
+from hundredandten.constants import GameRole
+from hundredandten.person import Person
 
 
 class TestPerson(TestCase):

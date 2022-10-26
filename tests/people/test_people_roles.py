@@ -1,9 +1,9 @@
 '''Unit test role operations on a list of persons'''
 from unittest import TestCase
 
-from hundred_and_ten.constants import GameRole, RoundRole
-from hundred_and_ten.people import People
-from hundred_and_ten.person import Person
+from hundredandten.constants import GameRole, RoundRole
+from hundredandten.people import People
+from hundredandten.person import Person
 
 
 class TestPeopleRoles(TestCase):

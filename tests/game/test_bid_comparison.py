@@ -1,8 +1,8 @@
 '''Test to ensure bids are compared properly'''
 from unittest import TestCase
 
-from hundred_and_ten.bid import Bid
-from hundred_and_ten.constants import BidAmount
+from hundredandten.bid import Bid
+from hundredandten.constants import BidAmount
 
 
 class TestBidComparison(TestCase):

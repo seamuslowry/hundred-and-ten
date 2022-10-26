@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from functools import total_ordering
 
-from hundred_and_ten.constants import BidAmount
+from hundredandten.constants import BidAmount
 
 
 @dataclass

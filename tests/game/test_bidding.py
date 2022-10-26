@@ -1,14 +1,14 @@
 '''Test behavior of the Game while in a round of bidding'''
 from unittest import TestCase
 
-from hundred_and_ten.bid import Bid
-from hundred_and_ten.constants import (BidAmount, GameRole, RoundRole,
-                                       RoundStatus)
-from hundred_and_ten.game import Game
-from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
-from hundred_and_ten.people import People
-from hundred_and_ten.person import Person
-from hundred_and_ten.round import Round
+from hundredandten.bid import Bid
+from hundredandten.constants import (BidAmount, GameRole, RoundRole,
+                                     RoundStatus)
+from hundredandten.game import Game
+from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.people import People
+from hundredandten.person import Person
+from hundredandten.round import Round
 
 
 class TestBidding(TestCase):

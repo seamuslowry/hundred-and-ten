@@ -3,11 +3,11 @@
 
 from typing import Optional
 
-from hundred_and_ten.bid import Bid
-from hundred_and_ten.constants import BidAmount, RoundRole, RoundStatus
-from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
-from hundred_and_ten.people import People
-from hundred_and_ten.person import Person
+from hundredandten.bid import Bid
+from hundredandten.constants import BidAmount, RoundRole, RoundStatus
+from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.people import People
+from hundredandten.person import Person
 
 
 class Round:

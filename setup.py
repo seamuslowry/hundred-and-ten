@@ -8,7 +8,7 @@ with open("README.md", "r", encoding='utf-8') as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="hundred_and_ten",
+    name="hundredandten",
     version=os.environ['RELEASE_VERSION'] or "0.0.1",
     author="Seamus Lowry",
     description="A package to play the game Hundred and Ten",
