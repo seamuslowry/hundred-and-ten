@@ -54,7 +54,7 @@ class Round:
         player = self.players.find_or_create(identifier)
         return (
             # the identified player must be able to submit a bid
-            player in self.bidders and
+            (player in self.bidders and RoundRole.PRE_PASSED not in player.roles) and
             # pass is always available as a bid
             (amount == BidAmount.PASS or
              # no active bid means every bid is available
