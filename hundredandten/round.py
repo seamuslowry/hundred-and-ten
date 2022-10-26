@@ -40,8 +40,14 @@ class Round:
     def __bid(self, identifier: str, amount: BidAmount) -> None:
         if amount in self.available_bids(identifier):
             self.bids.append(Bid(identifier, amount))
+            self.__handle_prepass()
         else:
             raise HundredAndTenError(f'Player {identifier} cannot place a bid for {amount.value}')
+
+    def __handle_prepass(self) -> None:
+        if RoundRole.PRE_PASSED in self.active_player.roles:
+            self.players.remove_role(self.active_player.identifier, RoundRole.PRE_PASSED)
+            self.__bid(self.active_player.identifier, BidAmount.PASS)
 
     def __is_available_bid(self, identifier: str, amount: BidAmount) -> bool:
         '''Determine if the listed bid amount is available to the listed player'''
