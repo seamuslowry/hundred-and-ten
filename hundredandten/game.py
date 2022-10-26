@@ -2,12 +2,12 @@
 from typing import Optional
 from uuid import uuid4
 
-from hundred_and_ten.constants import (Accessibility, AnyStatus, BidAmount,
-                                       GameRole, GameStatus, RoundRole)
-from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
-from hundred_and_ten.people import People
-from hundred_and_ten.person import Person
-from hundred_and_ten.round import Round
+from hundredandten.constants import (Accessibility, AnyStatus, BidAmount,
+                                     GameRole, GameStatus, RoundRole)
+from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.people import People
+from hundredandten.person import Person
+from hundredandten.round import Round
 
 
 class Game:

@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from hundred_and_ten.constants import AnyRole
+from hundredandten.constants import AnyRole
 
 
 @dataclass

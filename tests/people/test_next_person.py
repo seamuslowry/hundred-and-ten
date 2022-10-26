@@ -1,8 +1,8 @@
 '''Unit test determining the next person within a list of persons'''
 from unittest import TestCase
 
-from hundred_and_ten.people import People
-from hundred_and_ten.person import Person
+from hundredandten.people import People
+from hundredandten.person import Person
 
 
 class TestNextPerson(TestCase):

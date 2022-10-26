@@ -2,8 +2,8 @@
 
 from typing import Optional
 
-from hundred_and_ten.constants import AnyRole
-from hundred_and_ten.person import Person
+from hundredandten.constants import AnyRole
+from hundredandten.person import Person
 
 
 class People(list[Person]):

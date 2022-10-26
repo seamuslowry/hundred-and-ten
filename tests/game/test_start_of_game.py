@@ -1,11 +1,11 @@
 '''Test behavior of the Game while it is starting or newly starting'''
 from unittest import TestCase
 
-from hundred_and_ten.constants import GameRole
-from hundred_and_ten.game import Game
-from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
-from hundred_and_ten.people import People
-from hundred_and_ten.person import Person
+from hundredandten.constants import GameRole
+from hundredandten.game import Game
+from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.people import People
+from hundredandten.person import Person
 
 
 class TestStartOfGame(TestCase):

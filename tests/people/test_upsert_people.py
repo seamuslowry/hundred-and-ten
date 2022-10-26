@@ -1,9 +1,9 @@
 '''Unit test common upserting into a list of persons'''
 from unittest import TestCase
 
-from hundred_and_ten.constants import GameRole
-from hundred_and_ten.people import People
-from hundred_and_ten.person import Person
+from hundredandten.constants import GameRole
+from hundredandten.people import People
+from hundredandten.person import Person
 
 
 class TestUpsertPeople(TestCase):
