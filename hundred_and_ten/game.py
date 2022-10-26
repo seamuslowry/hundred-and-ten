@@ -90,9 +90,9 @@ class Game:
     @property
     def active_round(self) -> Round:
         """The active round"""
-        if self.rounds:
-            return self.rounds[-1]
-        raise HundredAndTenError("No active round found.")
+        if not self.rounds:
+            raise HundredAndTenError("No active round found.")
+        return self.rounds[-1]
 
     @property
     def active_player(self) -> Person:

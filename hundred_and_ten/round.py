@@ -69,10 +69,10 @@ class Round:
     @property
     def dealer(self) -> Person:
         """The dealer this round."""
-        active_p = next(iter(self.players.by_role(RoundRole.DEALER)), None)
-        if active_p:
-            return active_p
-        raise HundredAndTenError("No dealer found.")
+        dlr = next(iter(self.players.by_role(RoundRole.DEALER)), None)
+        if not dlr:
+            raise HundredAndTenError("No dealer found.")
+        return dlr
 
     @property
     def active_player(self) -> Person:
@@ -91,9 +91,9 @@ class Round:
         elif self.status == RoundStatus.TRUMP_SELECTION:
             active_p = self.active_bidder
 
-        if active_p:
-            return active_p
-        raise HundredAndTenError("No active player found.")
+        if not active_p:
+            raise HundredAndTenError("No active player found.")
+        return active_p
 
     @property
     def inactive_players(self) -> People:
@@ -116,9 +116,9 @@ class Round:
     def active_bidder(self) -> Optional[Person]:
         """The active bidder this round."""
 
-        if len(self.bidders) == 1 and self.active_bid:
-            return self.bidders[0]
-        return None
+        if not self.active_bid or len(self.bidders) != 1:
+            return None
+        return self.bidders[0]
 
     @property
     def status(self) -> RoundStatus:
