@@ -62,7 +62,7 @@ class TestPeopleRoles(TestCase):
     def test_remove_role_from_player_with_existing_roles(self):
         '''Removes a role from a player with existing roles'''
 
-        initial_roles = {GameRole.PLAYER, RoundRole.UNKNOWN}
+        initial_roles = {GameRole.PLAYER, RoundRole.DEALER}
         remove_role = next(iter(initial_roles))
         person = Person('id', initial_roles)
         persons = People([person])
@@ -75,7 +75,7 @@ class TestPeopleRoles(TestCase):
     def test_swap_role(self):
         '''Swaps a role between players'''
 
-        role = RoundRole.ACTIVE
+        role = RoundRole.DEALER
         person_one = Person('one', {role})
         person_two = Person('two')
         persons = People([person_one, person_two])

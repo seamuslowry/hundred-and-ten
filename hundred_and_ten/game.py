@@ -2,8 +2,8 @@
 from typing import Optional
 from uuid import uuid4
 
-from hundred_and_ten.constants import (Accessibility, AnyStatus, GameRole,
-                                       GameStatus, RoundRole)
+from hundred_and_ten.constants import (Accessibility, AnyStatus, BidAmount,
+                                       GameRole, GameStatus, RoundRole)
 from hundred_and_ten.hundred_and_ten_error import HundredAndTenError
 from hundred_and_ten.people import People
 from hundred_and_ten.person import Person
@@ -66,12 +66,19 @@ class Game:
         if len(self.players) < 2:
             raise HundredAndTenError("You cannot play with fewer than two players.")
 
-        round_players = People(map(lambda p: Person(
-            p.identifier, {RoundRole.UNKNOWN}), self.people))
-        round_players.add_role(round_players[0].identifier, RoundRole.DEALER)
-        round_players.add_role(round_players[0].identifier, RoundRole.ACTIVE)
+        round_players = People(map(lambda p: Person(p.identifier), self.players))
+        dealer = round_players[0]
+        round_players.add_role(dealer.identifier, RoundRole.DEALER)
 
         self.rounds = [Round(players=round_players)]
+
+    def bid(self, identifier: str, amount: BidAmount) -> None:
+        '''Place a bid from the identified player'''
+        self.active_round.bid(identifier, amount)
+
+    def unpass(self, identifier: str) -> None:
+        '''Discount a pre-pass bid from the identified player'''
+        self.active_round.unpass(identifier)
 
     @property
     def status(self) -> AnyStatus:
@@ -83,9 +90,14 @@ class Game:
     @property
     def active_round(self) -> Round:
         """The active round"""
-        if self.rounds:
-            return self.rounds[-1]
-        raise HundredAndTenError("No active round found.")
+        if not self.rounds:
+            raise HundredAndTenError("No active round found.")
+        return self.rounds[-1]
+
+    @property
+    def active_player(self) -> Person:
+        """The active player"""
+        return self.active_round.active_player
 
     @property
     def organizer(self) -> Person:
