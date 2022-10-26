@@ -3,7 +3,7 @@ name: Tag and Publish
 on:
   push:
     branches:
-      - chore/change_package_name
+      - chore/*
 
 jobs:
   tag:
