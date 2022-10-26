@@ -40,7 +40,6 @@ class Round:
     def __bid(self, identifier: str, amount: BidAmount) -> None:
         if amount in self.available_bids(identifier):
             self.bids.append(Bid(identifier, amount))
-            # set the next player
         else:
             raise HundredAndTenError(f'Player {identifier} cannot place a bid for {amount.value}')
 
