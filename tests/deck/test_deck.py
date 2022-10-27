@@ -1,41 +1,59 @@
 '''Test behavior of the deck'''
-from random import Random
 from unittest import TestCase
 
-
-def deck():
-    '''return a range of ints representing a deck'''
-    return [*range(53)]
+from hundredandten.deck import Deck
+from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
 class TestDeck(TestCase):
     '''Unit tests for a deck'''
 
     def test_shuffling_without_seed(self):
-        '''Shuffling without the correct seed is always different'''
-        seed = 'test seed'
+        '''Shuffling without the same seed is always different'''
 
-        deck_1 = deck()
-        deck_2 = deck()
-        Random().shuffle(deck_1)
-        Random().shuffle(deck_2)
+        deck_1 = Deck()
+        deck_2 = Deck()
 
-        self.assertNotEqual(deck_1, deck_2)
-
-        deck_3 = deck()
-        deck_4 = deck()
-        Random(seed).shuffle(deck_3)
-        Random(seed).shuffle(deck_4)
-
-        self.assertEqual(deck_3, deck_4)
+        self.assertNotEqual(deck_1.cards, deck_2.cards)
 
     def test_shuffling_with_seed(self):
         '''Shuffling with the correct seed is always the same'''
         seed = 'test seed'
 
-        deck_1 = deck()
-        deck_2 = deck()
-        Random(seed).shuffle(deck_1)
-        Random(seed).shuffle(deck_2)
+        deck_1 = Deck(seed)
+        deck_2 = Deck(seed)
 
-        self.assertEqual(deck_1, deck_2)
+        self.assertEqual(deck_1.cards, deck_2.cards)
+
+    def test_draw(self):
+        '''Drawing returns requested cards'''
+
+        deck = Deck()
+        amt = 5
+        first_hand = deck.draw(amt)
+        second_hand = deck.draw(amt)
+
+        self.assertNotEqual(first_hand, second_hand)
+        self.assertEqual(amt*2, deck.pulled)
+
+    def test_massive_overdraw(self):
+        '''Drawing past the whole deck at once returns an error'''
+
+        deck = Deck()
+
+        self.assertRaises(HundredAndTenError, deck.draw, 54)
+
+    def test_overdraw(self):
+        '''Drawing past the whole deck returns an error'''
+
+        deck = Deck()
+
+        deck.draw(53)
+        self.assertRaises(HundredAndTenError, deck.draw, 1)
+
+    def test_underdraw(self):
+        '''Trying to draw drawn cards returns an error'''
+
+        deck = Deck()
+
+        self.assertRaises(HundredAndTenError, deck.draw, -1)
