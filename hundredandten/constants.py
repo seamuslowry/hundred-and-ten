@@ -49,3 +49,30 @@ class BidAmount(int, Enum):
     TWENTY_FIVE = 25
     THIRTY = 30
     SHOOT_THE_MOON = 60
+
+
+class CardSuit(Enum):
+    '''The valid card suits'''
+    HEARTS = 0
+    CLUBS = 1
+    SPADES = 2
+    DIAMONDS = 3
+    JOKER = 4
+
+
+class CardNumber(Enum):
+    '''The valid card values'''
+    JOKER = 1
+    TWO = 2
+    THREE = 3
+    FOUR = 4
+    FIVE = 5
+    SIX = 6
+    SEVEN = 7
+    EIGHT = 8
+    NINE = 9
+    TEN = 10
+    JACK = 11
+    QUEEN = 12
+    KING = 13
+    ACE = 14

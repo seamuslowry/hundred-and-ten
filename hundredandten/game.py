@@ -1,6 +1,5 @@
 '''Represent a game of Hundred and Ten'''
 from typing import Optional
-from uuid import uuid4
 
 from hundredandten.constants import (Accessibility, AnyStatus, BidAmount,
                                      GameRole, GameStatus, RoundRole)
@@ -15,9 +14,7 @@ class Game:
 
     def __init__(
             self, persons: Optional[People] = None, rounds: Optional[list[Round]] = None,
-            accessibility: Optional[Accessibility] = Accessibility.PUBLIC,
-            uuid: Optional[str] = None) -> None:
-        self.uuid = uuid or uuid4()
+            accessibility: Optional[Accessibility] = Accessibility.PUBLIC) -> None:
         self.accessibility = accessibility
         self.people = persons or People()
         self.rounds = rounds or []
