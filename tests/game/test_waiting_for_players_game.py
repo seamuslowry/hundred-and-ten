@@ -16,7 +16,6 @@ class TestWaitingForPlayersGame(TestCase):
         '''Game status defaults to waiting for players'''
         game = Game()
 
-        self.assertIsNotNone(game.uuid)
         self.assertEqual(game.status, GameStatus.WAITING_FOR_PLAYERS)
         self.assertRaises(HundredAndTenError, lambda: game.active_round)
 
