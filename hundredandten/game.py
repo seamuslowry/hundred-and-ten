@@ -64,14 +64,7 @@ class Game:
         if len(self.players) < 2:
             raise HundredAndTenError("You cannot play with fewer than two players.")
 
-        deck = Deck()
-
-        round_players = Players(map(lambda p: Player(
-            p.identifier, hand=deck.draw(HAND_SIZE)), self.players))
-        dealer = round_players[0]
-        round_players.add_role(dealer.identifier, RoundRole.DEALER)
-
-        self.rounds = [Round(players=round_players, deck=deck)]
+        self.__new_round(self.players[0].identifier)
 
     def bid(self, identifier: str, amount: BidAmount) -> None:
         '''Place a bid from the identified player'''
@@ -80,6 +73,15 @@ class Game:
     def unpass(self, identifier: str) -> None:
         '''Discount a pre-pass bid from the identified player'''
         self.active_round.unpass(identifier)
+
+    def __new_round(self, dealer: str) -> None:
+        deck = Deck()
+
+        round_players = Players(map(lambda p: Player(
+            p.identifier, hand=deck.draw(HAND_SIZE)), self.players))
+        round_players.add_role(dealer, RoundRole.DEALER)
+
+        self.rounds.append(Round(players=round_players, deck=deck))
 
     @property
     def status(self) -> AnyStatus:
