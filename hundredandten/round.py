@@ -6,15 +6,14 @@ from typing import Optional
 from hundredandten.bid import Bid
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.people import People
-from hundredandten.person import Person
+from hundredandten.group import Player, Players
 
 
 class Round:
     '''A round in the game of Hundred and Ten'''
 
-    def __init__(self, players: Optional[People] = None, bids: Optional[list[Bid]] = None) -> None:
-        self.players = players or People()
+    def __init__(self, players: Optional[Players] = None, bids: Optional[list[Bid]] = None) -> None:
+        self.players = players or Players()
         self.bids = bids or []
 
     def bid(self, identifier: str, amount: BidAmount) -> None:
@@ -51,7 +50,7 @@ class Round:
 
     def __is_available_bid(self, identifier: str, amount: BidAmount) -> bool:
         '''Determine if the listed bid amount is available to the listed player'''
-        player = self.players.find_or_create(identifier)
+        player = self.players.find_or_use(Player(identifier))
         return (
             # the identified player must be able to submit a bid
             (player in self.bidders and RoundRole.PRE_PASSED not in player.roles) and
@@ -73,7 +72,7 @@ class Round:
         return self.bids[loc_index] if loc_index is not None else None
 
     @property
-    def dealer(self) -> Person:
+    def dealer(self) -> Player:
         """The dealer this round."""
         dlr = next(iter(self.players.by_role(RoundRole.DEALER)), None)
         if not dlr:
@@ -81,7 +80,7 @@ class Round:
         return dlr
 
     @property
-    def active_player(self) -> Person:
+    def active_player(self) -> Player:
         """The current active player."""
         active_p = None
         # before bids, the active player is the one after the dealer
@@ -90,7 +89,7 @@ class Round:
         # while bidding, the active player is the one after the last bidder that can place a bid
         elif self.status == RoundStatus.BIDDING:
             last_bidder = self.bids[-1].identifier
-            active_and_last_bidders = People(
+            active_and_last_bidders = Players(
                 [p for p in self.players if p in self.bidders or p.identifier == last_bidder])
             active_p = active_and_last_bidders.after(last_bidder)
         # when in trump selection, the active bidder is the active player
@@ -102,9 +101,9 @@ class Round:
         return active_p
 
     @property
-    def inactive_players(self) -> People:
+    def inactive_players(self) -> Players:
         """The players that are not active."""
-        return People([p for p in self.players if p != self.active_player])
+        return Players([p for p in self.players if p != self.active_player])
 
     @property
     def active_bid(self) -> Optional[BidAmount]:
@@ -112,14 +111,14 @@ class Round:
         return max(self.bids).amount if self.bids else None
 
     @property
-    def bidders(self) -> People:
+    def bidders(self) -> Players:
         """Anyone in this round that can still submit a bid."""
-        return People(
+        return Players(
             [p for p in self.players
              if self.__current_bid(p.identifier) != Bid('', BidAmount.PASS)])
 
     @property
-    def active_bidder(self) -> Optional[Person]:
+    def active_bidder(self) -> Optional[Player]:
         """The active bidder this round."""
 
         if not self.active_bid or len(self.bidders) != 1:

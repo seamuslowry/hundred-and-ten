@@ -1,11 +1,9 @@
 '''Track a bid'''
-from dataclasses import dataclass
 from functools import total_ordering
 
 from hundredandten.constants import BidAmount
 
 
-@dataclass
 @total_ordering
 class Bid:
     '''A class to keep track of bid information'''
