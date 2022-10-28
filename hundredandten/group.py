@@ -34,7 +34,7 @@ P = TypeVar('P', bound=Person)
 
 
 class Group(list[P]):
-    '''An abstract list of persons'''
+    '''A list of persons'''
 
     def update(self, person: P) -> None:
         '''
