@@ -1,10 +1,10 @@
 '''Test behavior of the Game while it is starting or newly starting'''
 from unittest import TestCase
 
-from hundredandten.constants import GameRole
+from hundredandten.constants import HAND_SIZE, GameRole
 from hundredandten.game import Game
+from hundredandten.group import Group, Person
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.group import Person, Group
 
 
 class TestStartOfGame(TestCase):
@@ -27,6 +27,7 @@ class TestStartOfGame(TestCase):
         self.assertIsNotNone(game.active_round.active_player)
         self.assertNotEqual(game.active_round.dealer, game.active_round.active_player)
         self.assertIsNone(game.active_round.active_bidder)
+        self.assertTrue(all(len(p.hand) == HAND_SIZE for p in game.active_round.players))
 
     def test_start_game_with_unjoined_players(self):
         '''Adds the first round when starting a game'''
@@ -39,14 +40,8 @@ class TestStartOfGame(TestCase):
 
         game.start_game()
 
-        self.assertEqual(1, len(game.rounds))
-        self.assertIsNotNone(game.active_round)
         self.assertGreater(len(game.people), len(game.active_round.bidders))
         self.assertEqual(len(game.players), len(game.active_round.bidders))
-        self.assertIsNotNone(game.active_round.dealer)
-        self.assertIsNotNone(game.active_round.active_player)
-        self.assertNotEqual(game.active_round.dealer, game.active_round.active_player)
-        self.assertIsNone(game.active_round.active_bidder)
 
     def test_start_game_when_started(self):
         '''Will not allow restarting a game'''
