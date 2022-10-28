@@ -1,15 +1,42 @@
 '''Interact with a list of people'''
 
-from typing import Optional
+from typing import Optional, TypeVar
 
 from hundredandten.constants import AnyRole
-from hundredandten.person import Person
+from hundredandten.deck import Card
 
 
-class People(list[Person]):
+class Person:
+    '''A class to keep track of a person'''
+
+    def __init__(self, identifier: str, roles: Optional[set[AnyRole]] = None) -> None:
+        self.identifier = identifier
+        self.roles = roles or set()
+
+    def __eq__(self, other) -> bool:
+        return isinstance(other, Person) and other.identifier == self.identifier
+
+    def __hash__(self) -> int:
+        return hash(self.identifier)
+
+
+class Player(Person):
+    '''A class to keep track of player information'''
+
+    def __init__(
+            self, identifier: str, roles: Optional[set[AnyRole]] = None,
+            hand: Optional[list[Card]] = None) -> None:
+        super().__init__(identifier, roles)
+        self.hand = hand or []
+
+
+P = TypeVar('P', bound=Person)
+
+
+class Group(list[P]):
     '''A list of persons'''
 
-    def update(self, person: Person) -> None:
+    def update(self, person: P) -> None:
         '''
         Update the provided person within people
         Will raise an erro if the person is not in people already
@@ -17,7 +44,7 @@ class People(list[Person]):
         index = self.index(person)
         self[index] = person
 
-    def upsert(self, person: Person) -> None:
+    def upsert(self, person: P) -> None:
         '''
         Upsert the provided person into people
         '''
@@ -26,28 +53,26 @@ class People(list[Person]):
         else:
             self.append(person)
 
-    def by_identifier(self, identifier: str) -> Optional[Person]:
+    def by_identifier(self, identifier: str) -> Optional[P]:
         '''
         Find a person with the given identifier
         '''
         return next(iter([p for p in self if p.identifier == identifier]), None)
 
-    def by_role(self, role: AnyRole) -> 'People':
+    def by_role(self, role: AnyRole):
         '''
-        Find a person with the given identifier
+        Find people with the given identifier
         '''
-        return People([p for p in self if role in p.roles] or [])
+        return type(self)([p for p in self if role in p.roles] or [])
 
-    def find_or_create(
-            self,
-            identifier: str, role: Optional[AnyRole] = None) -> Person:
+    def find_or_use(self, example: P) -> P:
         '''
-        Find or create a person with the given attributes
-        Provided role will append, not overwrite
+        Find a person matching the example or return the example
+        If the example has roles, any found person will append those roles
         '''
-        person = self.by_identifier(identifier) or Person(identifier=identifier)
-        roles = person.roles.union({role}) if role else person.roles
-        return Person(person.identifier, roles)
+        person = self.by_identifier(example.identifier) or example
+        person.roles = person.roles.union(example.roles)
+        return person
 
     def add_role(self, identifier: str, role: AnyRole) -> None:
         '''
@@ -55,7 +80,7 @@ class People(list[Person]):
         '''
         person = self.by_identifier(identifier)
         if person:
-            self.update(Person(person.identifier, person.roles.union({role})))
+            person.roles.add(role)
 
     def remove_role(self, identifier: str, role: AnyRole) -> None:
         '''
@@ -63,7 +88,7 @@ class People(list[Person]):
         '''
         person = self.by_identifier(identifier)
         if person:
-            self.update(Person(person.identifier, person.roles.difference({role})))
+            person.roles.discard(role)
 
     def swap_role(self, source_identifier: str, dest_identifier: str, role: AnyRole) -> None:
         '''
@@ -72,7 +97,7 @@ class People(list[Person]):
         self.remove_role(source_identifier, role)
         self.add_role(dest_identifier, role)
 
-    def after(self, identifier: str) -> Optional[Person]:
+    def after(self, identifier: str) -> Optional[P]:
         '''
         Determine the next player after the identified one
         '''
@@ -80,3 +105,7 @@ class People(list[Person]):
         if not self or not person:
             return None
         return self[(self.index(person) + 1) % len(self)]
+
+
+class Players(Group[Player]):
+    '''A group of players'''

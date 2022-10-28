@@ -2,8 +2,7 @@
 from unittest import TestCase
 
 from hundredandten.constants import GameRole
-from hundredandten.people import People
-from hundredandten.person import Person
+from hundredandten.group import Person, Group
 
 
 class TestUpsertPeople(TestCase):
@@ -13,7 +12,7 @@ class TestUpsertPeople(TestCase):
         '''Upsert a person that is not in the list'''
 
         person = Person('1')
-        persons = People()
+        persons = Group()
 
         pre_len = len(persons)
 
@@ -26,7 +25,7 @@ class TestUpsertPeople(TestCase):
         '''Upsert a person that is in the list'''
 
         person = Person('1')
-        persons = People([person])
+        persons = Group([person])
 
         pre_len = len(persons)
 
@@ -41,7 +40,7 @@ class TestUpsertPeople(TestCase):
         identifier = '1'
         person = Person(identifier)
         person_with_roles = Person(identifier, {GameRole.ORGANIZER})
-        persons = People([person])
+        persons = Group([person])
 
         pre_len = len(persons)
 
@@ -57,7 +56,7 @@ class TestUpsertPeople(TestCase):
         identifier = '1'
         person_player = Person(identifier, {GameRole.PLAYER})
         person_invitee = Person(identifier, {GameRole.INVITEE})
-        persons = People([person_player])
+        persons = Group([person_player])
 
         pre_len = len(persons)
 
@@ -73,7 +72,7 @@ class TestUpsertPeople(TestCase):
         identifier = 'p'
         person = Person(identifier)
         new_person = Person(identifier, {GameRole.ORGANIZER})
-        persons = People([Person('1'), person, Person('2')])
+        persons = Group([Person('1'), person, Person('2')])
         pre_len = len(persons)
         pre_index = persons.index(person)
 

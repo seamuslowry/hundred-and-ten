@@ -2,7 +2,7 @@
 from unittest import TestCase
 
 from hundredandten.constants import GameRole
-from hundredandten.person import Person
+from hundredandten.group import Person
 
 
 class TestPerson(TestCase):
@@ -17,5 +17,6 @@ class TestPerson(TestCase):
     def test_persons_hash_by_identifier_only(self):
         '''When hashing a person, only the identifier matters'''
         identifier = "1"
-        self.assertEqual(hash(Person(identifier)), hash(Person(identifier, {GameRole.INVITEE})))
+        self.assertEqual(hash(Person(identifier)), hash(
+            Person(identifier, {GameRole.INVITEE})))
         self.assertNotEqual(hash(Person('one')), hash(Person('two')))

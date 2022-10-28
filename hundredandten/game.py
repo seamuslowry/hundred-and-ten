@@ -4,8 +4,7 @@ from typing import Optional
 from hundredandten.constants import (Accessibility, AnyStatus, BidAmount,
                                      GameRole, GameStatus, RoundRole)
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.people import People
-from hundredandten.person import Person
+from hundredandten.group import Person, Group, Player, Players
 from hundredandten.round import Round
 
 
@@ -13,10 +12,10 @@ class Game:
     '''A game of Hundred and Ten'''
 
     def __init__(
-            self, persons: Optional[People] = None, rounds: Optional[list[Round]] = None,
+            self, persons: Optional[Group] = None, rounds: Optional[list[Round]] = None,
             accessibility: Optional[Accessibility] = Accessibility.PUBLIC) -> None:
         self.accessibility = accessibility
-        self.people = persons or People()
+        self.people = persons or Group()
         self.rounds = rounds or []
 
     def invite(self, inviter: str, invitee: str) -> None:
@@ -24,10 +23,10 @@ class Game:
 
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("You cannot invite a player to an in progress game.")
-        if self.people.find_or_create(inviter) not in self.players:
+        if self.people.find_or_use(Person(inviter)) not in self.players:
             raise HundredAndTenError("You cannot invite a player to a game you aren't a part of.")
 
-        self.people.upsert(self.people.find_or_create(invitee, GameRole.INVITEE))
+        self.people.upsert(self.people.find_or_use(Person(invitee, {GameRole.INVITEE})))
 
     def join(self, player: str) -> None:
         '''Add a player to the game'''
@@ -37,10 +36,10 @@ class Game:
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("You cannot join this game. It has already started.")
         if (self.accessibility != Accessibility.PUBLIC
-                and GameRole.INVITEE not in self.people.find_or_create(player).roles):
+                and GameRole.INVITEE not in self.people.find_or_use(Player(player)).roles):
             raise HundredAndTenError("You cannot join this game. You must be invited first.")
 
-        self.people.upsert(self.people.find_or_create(player, GameRole.PLAYER))
+        self.people.upsert(self.people.find_or_use(Person(player, {GameRole.PLAYER})))
 
     def leave(self, player: str) -> None:
         '''Remove a player from the game'''
@@ -63,7 +62,7 @@ class Game:
         if len(self.players) < 2:
             raise HundredAndTenError("You cannot play with fewer than two players.")
 
-        round_players = People(map(lambda p: Person(p.identifier), self.players))
+        round_players = Players(map(lambda p: Player(p.identifier), self.players))
         dealer = round_players[0]
         round_players.add_role(dealer.identifier, RoundRole.DEALER)
 
@@ -107,14 +106,14 @@ class Game:
             Person('unknown'))
 
     @property
-    def invitees(self) -> People:
+    def invitees(self) -> Group:
         """
         The invitees to the game
         """
         return self.people.by_role(GameRole.INVITEE)
 
     @property
-    def players(self) -> People:
+    def players(self) -> Group:
         """
         The players of the game
         """
