@@ -1,8 +1,7 @@
 '''Unit test determining the next person within a list of persons'''
 from unittest import TestCase
 
-from hundredandten.people import People
-from hundredandten.person import Person
+from hundredandten.group import Person, Group
 
 
 class TestNextPerson(TestCase):
@@ -11,14 +10,14 @@ class TestNextPerson(TestCase):
     def test_after_with_no_players(self):
         '''Finds no player in empty list'''
 
-        persons = People([])
+        persons = Group([])
 
         self.assertIsNone(persons.after('any'))
 
     def test_after_with_unknown_player(self):
         '''Finds no player when not in list'''
 
-        persons = People([Person('1')])
+        persons = Group([Person('1')])
 
         self.assertIsNone(persons.after(persons[0].identifier + 'bad'))
 
@@ -26,7 +25,7 @@ class TestNextPerson(TestCase):
         '''Determines the next player in a list of 1'''
 
         person_one = Person('1')
-        persons = People([person_one])
+        persons = Group([person_one])
 
         self.assertEqual(person_one, persons.after(person_one.identifier))
 
@@ -35,7 +34,7 @@ class TestNextPerson(TestCase):
 
         person_one = Person('1')
         person_two = Person('2')
-        persons = People([person_one, person_two])
+        persons = Group([person_one, person_two])
 
         self.assertEqual(person_two, persons.after(person_one.identifier))
         self.assertEqual(person_one, persons.after(person_two.identifier))
@@ -47,7 +46,7 @@ class TestNextPerson(TestCase):
         person_two = Person('2')
         person_three = Person('3')
 
-        persons = People([person_one, person_two, person_three])
+        persons = Group([person_one, person_two, person_three])
 
         self.assertEqual(person_two, persons.after(person_one.identifier))
         self.assertEqual(person_three, persons.after(person_two.identifier))
@@ -61,7 +60,7 @@ class TestNextPerson(TestCase):
         person_three = Person('3')
         person_four = Person('4')
 
-        persons = People([person_one, person_two, person_three, person_four])
+        persons = Group([person_one, person_two, person_three, person_four])
 
         self.assertEqual(person_two, persons.after(person_one.identifier))
         self.assertEqual(person_three, persons.after(person_two.identifier))
