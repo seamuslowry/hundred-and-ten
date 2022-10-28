@@ -1,10 +1,12 @@
 '''Represent a game of Hundred and Ten'''
 from typing import Optional
 
-from hundredandten.constants import (Accessibility, AnyStatus, BidAmount,
-                                     GameRole, GameStatus, RoundRole)
+from hundredandten.constants import (HAND_SIZE, Accessibility, AnyStatus,
+                                     BidAmount, GameRole, GameStatus,
+                                     RoundRole)
+from hundredandten.deck import Deck
+from hundredandten.group import Group, Person, Player, Players
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.group import Person, Group, Player, Players
 from hundredandten.round import Round
 
 
@@ -62,11 +64,7 @@ class Game:
         if len(self.players) < 2:
             raise HundredAndTenError("You cannot play with fewer than two players.")
 
-        round_players = Players(map(lambda p: Player(p.identifier), self.players))
-        dealer = round_players[0]
-        round_players.add_role(dealer.identifier, RoundRole.DEALER)
-
-        self.rounds = [Round(players=round_players)]
+        self.__new_round(self.players[0].identifier)
 
     def bid(self, identifier: str, amount: BidAmount) -> None:
         '''Place a bid from the identified player'''
@@ -75,6 +73,15 @@ class Game:
     def unpass(self, identifier: str) -> None:
         '''Discount a pre-pass bid from the identified player'''
         self.active_round.unpass(identifier)
+
+    def __new_round(self, dealer: str) -> None:
+        deck = Deck()
+
+        round_players = Players(map(lambda p: Player(
+            p.identifier, hand=deck.draw(HAND_SIZE)), self.players))
+        round_players.add_role(dealer, RoundRole.DEALER)
+
+        self.rounds.append(Round(players=round_players, deck=deck))
 
     @property
     def status(self) -> AnyStatus:

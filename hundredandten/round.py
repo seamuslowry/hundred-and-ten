@@ -5,16 +5,19 @@ from typing import Optional
 
 from hundredandten.bid import Bid
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.deck import Deck
 from hundredandten.group import Player, Players
+from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
 class Round:
     '''A round in the game of Hundred and Ten'''
 
-    def __init__(self, players: Optional[Players] = None, bids: Optional[list[Bid]] = None) -> None:
+    def __init__(self, players: Optional[Players] = None, bids: Optional[list[Bid]] = None,
+                 deck: Optional[Deck] = None) -> None:
         self.players = players or Players()
         self.bids = bids or []
+        self.deck = deck or Deck()
 
     def bid(self, identifier: str, amount: BidAmount) -> None:
         "Record a bid from a player"

@@ -2,6 +2,8 @@
 from enum import Enum
 from typing import Union
 
+HAND_SIZE = 5
+
 
 class Accessibility(Enum):
     '''The accessibility options for a game'''
