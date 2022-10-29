@@ -9,6 +9,8 @@ on:
 jobs:
   tag:
     uses: seamuslowry/workflows/.github/workflows/tag.yml@chore/tag
+    secrets:
+      gh_token: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
     name: Build and publish
