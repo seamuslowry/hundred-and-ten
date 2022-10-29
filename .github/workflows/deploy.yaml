@@ -7,16 +7,16 @@ on:
       - chore/reuse_*
 
 jobs:
-  tag:
+  tag-new-version:
     uses: seamuslowry/workflows/.github/workflows/tag.yml@main
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
-    needs: tag
+    needs: tag-new-version
     uses: seamuslowry/workflows/.github/workflows/publish_python.yml@chore/publish_python_package
     with:
       repo: testpypi
-      release-version: ${{ needs.tag.outputs.tag }}
+      release-version: ${{ needs.tag-new-version.outputs.tag }}
     secrets:
       py_pi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
