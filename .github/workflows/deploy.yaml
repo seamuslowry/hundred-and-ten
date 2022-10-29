@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - chore/reuse_workflows
+      - chore/reuse_*
 
 jobs:
   tag:
