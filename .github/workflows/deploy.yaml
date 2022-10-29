@@ -13,17 +13,10 @@ jobs:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
-    name: Build and publish
     needs: tag
-    env:
-      RELEASE_VERSION: ${{ needs.tag.outputs.tag }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.9
-      - run: pip install -r requirements.txt
-      - run: pip install -r requirements-publish.txt
-      - run: python -m build
-      - run: python -m twine upload --repository testpypi --skip-existing dist/* -u "__token__" -p ${{ secrets.TEST_PYPI_API_TOKEN }}
+    uses: seamuslowry/workflows/.github/workflows/publish_python.yml@chore/publish_python_package
+    with:
+      repo: testpypi
+      release-version: ${{ needs.tag.outputs.tag }}
+    secrets:
+      py_pi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
