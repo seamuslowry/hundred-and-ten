@@ -13,7 +13,7 @@ jobs:
 
   publish:
     needs: tag-new-version
-    uses: seamuslowry/workflows/.github/workflows/publish_python.yml@chore/publish_python_package
+    uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
     with:
       repo: testpypi
       release-version: ${{ needs.tag-new-version.outputs.tag }}

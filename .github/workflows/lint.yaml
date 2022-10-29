@@ -4,4 +4,4 @@ on:
 
 jobs:
   lint:
-    uses: seamuslowry/workflows/.github/workflows/lint_python.yml@chore/lint_python
+    uses: seamuslowry/workflows/.github/workflows/lint_python.yml@main

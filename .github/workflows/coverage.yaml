@@ -4,4 +4,4 @@ on:
 
 jobs:
   test:
-    uses: seamuslowry/workflows/.github/workflows/test_python.yml@chore/python_coverage
+    uses: seamuslowry/workflows/.github/workflows/test_python.yml@main
