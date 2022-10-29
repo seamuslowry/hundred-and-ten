@@ -4,24 +4,11 @@ on:
   push:
     branches:
       - main
+      - chore/reuse_workflows
 
 jobs:
   tag:
-    name: Tag Version
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.tag-version.outputs.tag }}
-    steps:
-      - id: checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: "0"
-      - id: tag-version
-        uses: anothrNick/github-tag-action@1.52.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: false
-          DEFAULT_BUMP: patch
+    uses: seamuslowry/workflows/.github/workflows/tag.yml@chore/tag
 
   publish:
     name: Build and publish
