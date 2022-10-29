@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - chore/reuse_*
 
 jobs:
   tag-new-version:
