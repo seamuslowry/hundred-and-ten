@@ -3,5 +3,5 @@ on:
   - push
 
 jobs:
-  lint:
+  test:
     uses: seamuslowry/workflows/.github/workflows/test_python.yml@chore/python_coverage
