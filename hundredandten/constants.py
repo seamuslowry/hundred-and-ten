@@ -18,10 +18,9 @@ class GameStatus(Enum):
 
 class RoundStatus(Enum):
     '''The statuses the round can be in'''
-    DEALING = 1
-    BIDDING = 2
-    TRUMP_SELECTION = 3
-    COMPLETED_NO_BIDDERS = 4
+    BIDDING = 1
+    TRUMP_SELECTION = 2
+    COMPLETED_NO_BIDDERS = 3
 
 
 AnyStatus = Union[GameStatus, RoundStatus]

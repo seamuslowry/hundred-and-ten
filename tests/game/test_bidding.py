@@ -4,8 +4,8 @@ from unittest import TestCase
 from hundredandten.bid import Bid
 from hundredandten.constants import BidAmount, GameRole, RoundRole, RoundStatus
 from hundredandten.game import Game
+from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.group import Group, Person, Player, Players
 from hundredandten.round import Round
 
 
@@ -20,18 +20,18 @@ class TestBidding(TestCase):
 
         game = Game(
             persons=people,
-            rounds=[Round(Players([]), bids=[Bid('1', BidAmount.FIFTEEN)])])
+            rounds=[Round(Group([]), bids=[Bid('1', BidAmount.FIFTEEN)])])
 
         self.assertRaises(HundredAndTenError, lambda: game.active_player)
 
     def test_error_when_no_dealer(self):
         '''Round must always have a dealer'''
 
-        players = Players([Player('1'),
-                           Player('2')])
+        players = Group([Player('1'),
+                         Player('2')])
 
         game = Game(
-            persons=players,
+            persons=Group(),
             rounds=[Round(players)])
 
         self.assertRaises(HundredAndTenError, lambda: game.active_round.dealer)
@@ -39,12 +39,12 @@ class TestBidding(TestCase):
     def test_bid_from_active_player(self):
         '''Active player can place a bid'''
 
-        players = Players([Player('1', roles={RoundRole.DEALER}),
-                           Player('2')])
+        players = Group([Player('1', roles={RoundRole.DEALER}),
+                         Player('2')])
 
         game = Game(
-            persons=players,
-            rounds=[Round(Players(players))])
+            persons=Group(),
+            rounds=[Round(Group(players))])
 
         game.bid(game.active_player.identifier, BidAmount.FIFTEEN)
 
@@ -54,8 +54,8 @@ class TestBidding(TestCase):
     def test_low_bid_from_active_player(self):
         '''Active player cannot place a bid below the current bid'''
 
-        players = Players([Player('1', roles={RoundRole.DEALER}),
-                           Player('2')])
+        players = Group([Player('1', roles={RoundRole.DEALER}),
+                         Player('2')])
 
         game = Game(
             persons=Group(),
@@ -67,11 +67,11 @@ class TestBidding(TestCase):
     def test_equal_bid_from_active_player(self):
         '''Active player cannot place a bid equal to the current bid'''
 
-        players = Players([Player('1', roles={RoundRole.DEALER}),
-                           Player('2')])
+        players = Group([Player('1', roles={RoundRole.DEALER}),
+                         Player('2')])
 
         game = Game(
-            persons=players,
+            persons=Group(),
             rounds=[Round(players, bids=[Bid(players[0].identifier, BidAmount.FIFTEEN)])])
 
         self.assertRaises(HundredAndTenError, game.bid,
@@ -80,11 +80,11 @@ class TestBidding(TestCase):
     def test_low_bid_from_dealer(self):
         '''Dealer cannot place a bid below to the current bid'''
 
-        players = Players([Player('1'),
-                           Player('2', roles={RoundRole.DEALER})])
+        players = Group([Player('1'),
+                         Player('2', roles={RoundRole.DEALER})])
 
         game = Game(
-            persons=players,
+            persons=Group(),
             rounds=[Round(players, bids=[Bid(players[0].identifier, BidAmount.TWENTY)])])
 
         self.assertRaises(HundredAndTenError, game.bid,
@@ -93,11 +93,11 @@ class TestBidding(TestCase):
     def test_equal_bid_from_dealer(self):
         '''Dealer can place a bid equal to the current bid'''
 
-        players = Players([Player('1'),
-                           Player('2', roles={RoundRole.DEALER})])
+        players = Group([Player('1'),
+                         Player('2', roles={RoundRole.DEALER})])
 
         game = Game(
-            persons=players,
+            persons=Group(),
             rounds=[Round(players, bids=[Bid(players[0].identifier, BidAmount.FIFTEEN)])])
 
         pre_len = len(game.active_round.bids)
@@ -109,11 +109,11 @@ class TestBidding(TestCase):
     def test_bid_from_passed_player(self):
         '''Inactive player cannot place a bid'''
 
-        players = Players([Player('1', roles={RoundRole.DEALER}),
-                           Player('2')])
+        players = Group([Player('1', roles={RoundRole.DEALER}),
+                         Player('2')])
 
         game = Game(
-            persons=players,
+            persons=Group(),
             rounds=[Round(players)])
 
         once_active_player = game.active_player.identifier
@@ -124,11 +124,11 @@ class TestBidding(TestCase):
     def test_bid_from_inactive_player(self):
         '''Inactive player cannot place a bid'''
 
-        players = Players([Player('1', roles={RoundRole.DEALER}),
-                           Player('2')])
+        players = Group([Player('1', roles={RoundRole.DEALER}),
+                         Player('2')])
 
         game = Game(
-            persons=players,
+            persons=Group(),
             rounds=[Round(players)])
 
         self.assertRaises(HundredAndTenError, game.bid,
@@ -137,11 +137,11 @@ class TestBidding(TestCase):
     def test_pass_from_inactive_player(self):
         '''Inactive player can prepass'''
 
-        players = Players([Player('1', roles={RoundRole.DEALER}),
-                           Player('2')])
+        players = Group([Player('1', roles={RoundRole.DEALER}),
+                         Player('2')])
 
         game = Game(
-            persons=players,
+            persons=Group(),
             rounds=[Round(players)])
 
         game.bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS)
@@ -152,11 +152,11 @@ class TestBidding(TestCase):
     def test_unpass_from_prepassed_player(self):
         '''Prepassed player can unpass'''
 
-        players = Players([Player('1'),
-                           Player('2', roles={RoundRole.DEALER, RoundRole.PRE_PASSED})])
+        players = Group([Player('1'),
+                         Player('2', roles={RoundRole.DEALER, RoundRole.PRE_PASSED})])
 
         game = Game(
-            persons=players,
+            persons=Group(),
             rounds=[Round(players)])
 
         self.assertIn(RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles)
@@ -166,63 +166,16 @@ class TestBidding(TestCase):
         self.assertEqual(0, len(game.active_round.bids))
         self.assertNotIn(RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles)
 
-    def test_end_bidding_with_bids(self):
-        '''Bidding ends when there is only one bidder with an active bid'''
-
-        players = Players([Player('1'),
-                           Player('2', roles={RoundRole.DEALER})])
-
-        game = Game(
-            persons=players,
-            rounds=[Round(players)])
-
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.FIFTEEN)
-
-        self.assertEqual(game.status, RoundStatus.TRUMP_SELECTION)
-        self.assertEqual(game.active_player, game.active_round.active_bidder)
-
-    def test_end_bidding_with_pass(self):
-        '''Bidding ends when everyone has passed'''
-
-        players = Players([Player('1'),
-                           Player('2', roles={RoundRole.DEALER})])
-
-        game = Game(
-            persons=players,
-            rounds=[Round(players)])
-
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-
-        self.assertEqual(game.status, RoundStatus.COMPLETED_NO_BIDDERS)
-
-    def test_cannot_bid_after_bidding_stage(self):
-        '''Bidding ends when everyone has passed'''
-
-        players = Players([Player('1'),
-                           Player('2', roles={RoundRole.DEALER})])
-
-        game = Game(
-            persons=players,
-            rounds=[Round(players)])
-
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-
-        self.assertEqual(game.status, RoundStatus.COMPLETED_NO_BIDDERS)
-        self.assertRaises(HundredAndTenError, game.bid, players[0].identifier, BidAmount.FIFTEEN)
-
     def test_prepass(self):
         '''When the next player has prepassed, auto pass for them'''
-        players = Players([
+        players = Group([
             Player('1', roles={RoundRole.DEALER}),
             Player('2'),
             Player('3', roles={RoundRole.PRE_PASSED})
         ])
 
         game = Game(
-            persons=players,
+            persons=Group(),
             rounds=[Round(players)])
 
         self.assertEqual(0, len(game.active_round.bids))
@@ -236,26 +189,3 @@ class TestBidding(TestCase):
         self.assertEqual(game.active_player, game.active_round.dealer)
         self.assertEqual(1, len(game.active_round.bidders))
         self.assertIn(game.active_player, game.active_round.bidders)
-
-    def test_end_bidding_with_prepass(self):
-        '''When all players have prepassed, the round can end'''
-        players = Players([
-            Player('1', roles={RoundRole.DEALER, RoundRole.PRE_PASSED}),
-            Player('2'),
-            Player('3', roles={RoundRole.PRE_PASSED}),
-            Player('4', roles={RoundRole.PRE_PASSED})
-        ])
-
-        game = Game(
-            persons=players,
-            rounds=[Round(players)])
-
-        self.assertEqual(0, len(game.active_round.bids))
-
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-
-        self.assertEqual(4, len(game.active_round.bids))
-        self.assertEqual(0, len(game.active_round.players.by_role(RoundRole.PRE_PASSED)))
-        self.assertEqual(0, len(game.active_round.bidders))
-        self.assertEqual(RoundStatus.COMPLETED_NO_BIDDERS, game.active_round.status)
-        self.assertRaises(HundredAndTenError, lambda: game.active_player)
