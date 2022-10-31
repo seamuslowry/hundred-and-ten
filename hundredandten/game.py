@@ -69,6 +69,13 @@ class Game:
     def bid(self, identifier: str, amount: BidAmount) -> None:
         '''Place a bid from the identified player'''
         self.active_round.bid(identifier, amount)
+        self.__end_bid()
+
+    def unpass(self, identifier: str) -> None:
+        '''Discount a pre-pass bid from the identified player'''
+        self.active_round.unpass(identifier)
+
+    def __end_bid(self):
         if self.active_round.status == RoundStatus.COMPLETED_NO_BIDDERS:
             current_dealer = self.active_round.dealer.identifier
             # dealer doesn't rotate on a round with no bidders
@@ -78,10 +85,6 @@ class Game:
             next_dealer = current_dealer if keep_same_dealer else self.players.after(
                 current_dealer).identifier
             self.__new_round(next_dealer)
-
-    def unpass(self, identifier: str) -> None:
-        '''Discount a pre-pass bid from the identified player'''
-        self.active_round.unpass(identifier)
 
     def __new_round(self, dealer: str) -> None:
         deck = Deck()
