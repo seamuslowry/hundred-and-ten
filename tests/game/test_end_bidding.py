@@ -117,3 +117,9 @@ class TestEndBidding(TestCase):
         game.bid(game.active_player.identifier, BidAmount.PASS)
 
         self.assertNotEqual(game.rounds[-2].dealer, game.active_round.dealer)
+
+        # first round with new dealer won't swap
+        game.bid(game.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_player.identifier, BidAmount.PASS)
+
+        self.assertEqual(game.rounds[-2].dealer, game.active_round.dealer)
