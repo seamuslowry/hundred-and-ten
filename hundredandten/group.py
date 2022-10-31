@@ -4,6 +4,7 @@ from typing import Optional, TypeVar
 
 from hundredandten.constants import AnyRole
 from hundredandten.deck import Card
+from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
 class Person:
@@ -97,15 +98,11 @@ class Group(list[P]):
         self.remove_role(source_identifier, role)
         self.add_role(dest_identifier, role)
 
-    def after(self, identifier: str) -> Optional[P]:
+    def after(self, identifier: str) -> P:
         '''
         Determine the next player after the identified one
         '''
         person = self.by_identifier(identifier)
         if not self or not person:
-            return None
+            raise HundredAndTenError(f'Unable to find person after {identifier}.')
         return self[(self.index(person) + 1) % len(self)]
-
-
-class Players(Group[Player]):
-    '''A group of players'''

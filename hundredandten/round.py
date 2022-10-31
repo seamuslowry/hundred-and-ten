@@ -6,16 +6,16 @@ from typing import Optional
 from hundredandten.bid import Bid
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.deck import Deck
-from hundredandten.group import Player, Players
+from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
 class Round:
     '''A round in the game of Hundred and Ten'''
 
-    def __init__(self, players: Optional[Players] = None, bids: Optional[list[Bid]] = None,
+    def __init__(self, players: Optional[Group[Player]] = None, bids: Optional[list[Bid]] = None,
                  deck: Optional[Deck] = None) -> None:
-        self.players = players or Players()
+        self.players = players or Group[Player]()
         self.bids = bids or []
         self.deck = deck or Deck()
 
@@ -92,7 +92,7 @@ class Round:
         # while bidding, the active player is the one after the last bidder that can place a bid
         elif self.status == RoundStatus.BIDDING:
             last_bidder = self.bids[-1].identifier
-            active_and_last_bidders = Players(
+            active_and_last_bidders = Group[Player](
                 [p for p in self.players if p in self.bidders or p.identifier == last_bidder])
             active_p = active_and_last_bidders.after(last_bidder)
         # when in trump selection, the active bidder is the active player
@@ -104,9 +104,9 @@ class Round:
         return active_p
 
     @property
-    def inactive_players(self) -> Players:
+    def inactive_players(self) -> Group[Player]:
         """The players that are not active."""
-        return Players([p for p in self.players if p != self.active_player])
+        return Group[Player]([p for p in self.players if p != self.active_player])
 
     @property
     def active_bid(self) -> Optional[BidAmount]:
@@ -114,9 +114,9 @@ class Round:
         return max(self.bids).amount if self.bids else None
 
     @property
-    def bidders(self) -> Players:
+    def bidders(self) -> Group[Player]:
         """Anyone in this round that can still submit a bid."""
-        return Players(
+        return Group[Player](
             [p for p in self.players
              if self.__current_bid(p.identifier) != Bid('', BidAmount.PASS)])
 

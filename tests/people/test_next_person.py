@@ -1,7 +1,8 @@
 '''Unit test determining the next person within a list of persons'''
 from unittest import TestCase
 
-from hundredandten.group import Person, Group
+from hundredandten.group import Group, Person
+from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
 class TestNextPerson(TestCase):
@@ -12,14 +13,14 @@ class TestNextPerson(TestCase):
 
         persons = Group([])
 
-        self.assertIsNone(persons.after('any'))
+        self.assertRaises(HundredAndTenError, persons.after, 'any')
 
     def test_after_with_unknown_player(self):
         '''Finds no player when not in list'''
 
         persons = Group([Person('1')])
 
-        self.assertIsNone(persons.after(persons[0].identifier + 'bad'))
+        self.assertRaises(HundredAndTenError, persons.after, persons[0].identifier + 'bad')
 
     def test_after_with_one_player(self):
         '''Determines the next player in a list of 1'''

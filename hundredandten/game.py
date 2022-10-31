@@ -3,9 +3,9 @@ from typing import Optional
 
 from hundredandten.constants import (HAND_SIZE, Accessibility, AnyStatus,
                                      BidAmount, GameRole, GameStatus,
-                                     RoundRole)
+                                     RoundRole, RoundStatus)
 from hundredandten.deck import Deck
-from hundredandten.group import Group, Person, Player, Players
+from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
 
@@ -14,10 +14,10 @@ class Game:
     '''A game of Hundred and Ten'''
 
     def __init__(
-            self, persons: Optional[Group] = None, rounds: Optional[list[Round]] = None,
+            self, persons: Optional[Group[Person]] = None, rounds: Optional[list[Round]] = None,
             accessibility: Optional[Accessibility] = Accessibility.PUBLIC) -> None:
         self.accessibility = accessibility
-        self.people = persons or Group()
+        self.people = persons or Group[Person]()
         self.rounds = rounds or []
 
     def invite(self, inviter: str, invitee: str) -> None:
@@ -69,6 +69,11 @@ class Game:
     def bid(self, identifier: str, amount: BidAmount) -> None:
         '''Place a bid from the identified player'''
         self.active_round.bid(identifier, amount)
+        if self.active_round.status == RoundStatus.COMPLETED_NO_BIDDERS:
+            current_dealer = self.active_round.dealer.identifier
+            next_dealer = current_dealer if len(
+                self.rounds) < 3 else self.players.after(current_dealer).identifier
+            self.__new_round(next_dealer)
 
     def unpass(self, identifier: str) -> None:
         '''Discount a pre-pass bid from the identified player'''
@@ -77,7 +82,7 @@ class Game:
     def __new_round(self, dealer: str) -> None:
         deck = Deck()
 
-        round_players = Players(map(lambda p: Player(
+        round_players = Group[Player](map(lambda p: Player(
             p.identifier, hand=deck.draw(HAND_SIZE)), self.players))
         round_players.add_role(dealer, RoundRole.DEALER)
 
@@ -113,14 +118,14 @@ class Game:
             Person('unknown'))
 
     @property
-    def invitees(self) -> Group:
+    def invitees(self) -> Group[Person]:
         """
         The invitees to the game
         """
         return self.people.by_role(GameRole.INVITEE)
 
     @property
-    def players(self) -> Group:
+    def players(self) -> Group[Person]:
         """
         The players of the game
         """
