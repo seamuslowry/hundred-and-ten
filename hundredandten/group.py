@@ -40,7 +40,7 @@ class Group(list[P]):
     def update(self, person: P) -> None:
         '''
         Update the provided person within people
-        Will raise an erro if the person is not in people already
+        Will raise an error if the person is not in people already
         '''
         index = self.index(person)
         self[index] = person

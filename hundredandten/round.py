@@ -21,7 +21,8 @@ class Round:
 
     def bid(self, identifier: str, amount: BidAmount) -> None:
         "Record a bid from a player"
-        if self.active_player == self.players.by_identifier(identifier):
+        if self.status == RoundStatus.BIDDING and self.active_player == self.players.by_identifier(
+                identifier):
             self.__bid(identifier, amount)
         elif amount == BidAmount.PASS:
             self.players.add_role(identifier, RoundRole.PRE_PASSED)
@@ -86,13 +87,12 @@ class Round:
     def active_player(self) -> Player:
         """The current active player."""
         active_p = None
-        # before bids, the active player is the one after the dealer
-        if self.status == RoundStatus.DEALING:
-            active_p = self.players.after(self.dealer.identifier)
+
         # while bidding, the active player is the one after the last bidder that can place a bid
-        elif self.status == RoundStatus.BIDDING:
-            last_bidder = self.bids[-1].identifier
-            active_and_last_bidders = Group[Player](
+        if self.status == RoundStatus.BIDDING:
+            # before anyone has bid, treat the dealer as the last bidder
+            last_bidder = self.dealer.identifier if not self.bids else self.bids[-1].identifier
+            active_and_last_bidders = Group(
                 [p for p in self.players if p in self.bidders or p.identifier == last_bidder])
             active_p = active_and_last_bidders.after(last_bidder)
         # when in trump selection, the active bidder is the active player
@@ -106,7 +106,7 @@ class Round:
     @property
     def inactive_players(self) -> Group[Player]:
         """The players that are not active."""
-        return Group[Player]([p for p in self.players if p != self.active_player])
+        return Group([p for p in self.players if p != self.active_player])
 
     @property
     def active_bid(self) -> Optional[BidAmount]:
@@ -116,7 +116,7 @@ class Round:
     @property
     def bidders(self) -> Group[Player]:
         """Anyone in this round that can still submit a bid."""
-        return Group[Player](
+        return Group(
             [p for p in self.players
              if self.__current_bid(p.identifier) != Bid('', BidAmount.PASS)])
 
@@ -131,9 +131,6 @@ class Round:
     @property
     def status(self) -> RoundStatus:
         """The status property."""
-        bids = len(self.bids)
-        if bids == 0:
-            return RoundStatus.DEALING
         if self.active_bidder:
             return RoundStatus.TRUMP_SELECTION
         if not self.bidders:

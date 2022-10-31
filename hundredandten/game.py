@@ -71,8 +71,12 @@ class Game:
         self.active_round.bid(identifier, amount)
         if self.active_round.status == RoundStatus.COMPLETED_NO_BIDDERS:
             current_dealer = self.active_round.dealer.identifier
-            next_dealer = current_dealer if len(
-                self.rounds) < 3 else self.players.after(current_dealer).identifier
+            # dealer doesn't rotate on a round with no bidders
+            # unless the current dealer has been dealer 3x in a row
+            keep_same_dealer = len(self.rounds) < 3 or any(
+                r.dealer.identifier != current_dealer for r in self.rounds[-3:])
+            next_dealer = current_dealer if keep_same_dealer else self.players.after(
+                current_dealer).identifier
             self.__new_round(next_dealer)
 
     def unpass(self, identifier: str) -> None:
@@ -82,7 +86,7 @@ class Game:
     def __new_round(self, dealer: str) -> None:
         deck = Deck()
 
-        round_players = Group[Player](map(lambda p: Player(
+        round_players = Group(map(lambda p: Player(
             p.identifier, hand=deck.draw(HAND_SIZE)), self.players))
         round_players.add_role(dealer, RoundRole.DEALER)
 
