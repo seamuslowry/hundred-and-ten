@@ -1,5 +1,6 @@
 '''Interact with a list of people'''
 
+from dataclasses import dataclass, field
 from typing import Optional, TypeVar
 
 from hundredandten.constants import AnyRole
@@ -7,28 +8,17 @@ from hundredandten.deck import Card
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
+@dataclass
 class Person:
     '''A class to keep track of a person'''
-
-    def __init__(self, identifier: str, roles: Optional[set[AnyRole]] = None) -> None:
-        self.identifier = identifier
-        self.roles = roles or set()
-
-    def __eq__(self, other) -> bool:
-        return isinstance(other, Person) and other.identifier == self.identifier
-
-    def __hash__(self) -> int:
-        return hash(self.identifier)
+    identifier: str
+    roles: set[AnyRole] = field(default_factory=set, compare=False)
 
 
+@dataclass
 class Player(Person):
     '''A class to keep track of player information'''
-
-    def __init__(
-            self, identifier: str, roles: Optional[set[AnyRole]] = None,
-            hand: Optional[list[Card]] = None) -> None:
-        super().__init__(identifier, roles)
-        self.hand = hand or []
+    hand: list[Card] = field(default_factory=list, compare=False)
 
 
 P = TypeVar('P', bound=Person)

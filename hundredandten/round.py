@@ -1,23 +1,24 @@
 '''Represent one round of a game of Hundred and Ten'''
 
 
+from dataclasses import dataclass, field
 from typing import Optional
 
 from hundredandten.bid import Bid
-from hundredandten.constants import BidAmount, RoundRole, RoundStatus
+from hundredandten.constants import (BidAmount, RoundRole, RoundStatus,
+                                     SelectableSuit)
 from hundredandten.deck import Deck
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
+@dataclass
 class Round:
     '''A round in the game of Hundred and Ten'''
-
-    def __init__(self, players: Optional[Group[Player]] = None, bids: Optional[list[Bid]] = None,
-                 deck: Optional[Deck] = None) -> None:
-        self.players = players or Group[Player]()
-        self.bids = bids or []
-        self.deck = deck or Deck()
+    players: Group[Player] = field(default_factory=Group)
+    bids: list[Bid] = field(default_factory=list)
+    deck: Deck = field(default_factory=Deck)
+    trump: Optional[SelectableSuit] = None
 
     def bid(self, identifier: str, amount: BidAmount) -> None:
         "Record a bid from a player"
@@ -32,6 +33,15 @@ class Round:
     def unpass(self, identifier: str) -> None:
         '''Discount a prepass bid from the identified player'''
         self.players.remove_role(identifier, RoundRole.PRE_PASSED)
+
+    def select_trump(self, identifier: str, suit: SelectableSuit) -> None:
+        '''Select the passed suit as trump'''
+        if self.status != RoundStatus.TRUMP_SELECTION:
+            raise HundredAndTenError("Cannot select trump outside of the trump selection phase.")
+        if not self.active_bidder or identifier != self.active_bidder.identifier:
+            raise HundredAndTenError("Only the bidder can select trump.")
+
+        self.trump = suit
 
     def available_bids(self, identifier: str) -> list[BidAmount]:
         '''Compute the bid amounts available to the identified player'''
@@ -131,6 +141,8 @@ class Round:
     @property
     def status(self) -> RoundStatus:
         """The status property."""
+        if self.trump:
+            return RoundStatus.TRICKS
         if self.active_bidder:
             return RoundStatus.TRUMP_SELECTION
         if not self.bidders:

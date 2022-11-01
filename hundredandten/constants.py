@@ -1,5 +1,5 @@
 '''Constant values for Hundred and Ten games'''
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Union
 
 HAND_SIZE = 5
@@ -21,6 +21,7 @@ class RoundStatus(Enum):
     BIDDING = 1
     TRUMP_SELECTION = 2
     COMPLETED_NO_BIDDERS = 3
+    TRICKS = 4
 
 
 AnyStatus = Union[GameStatus, RoundStatus]
@@ -42,7 +43,7 @@ class RoundRole(Enum):
 AnyRole = Union[GameRole, RoundRole]
 
 
-class BidAmount(int, Enum):
+class BidAmount(IntEnum):
     '''The valid bid amounts'''
     PASS = 0
     FIFTEEN = 15
@@ -52,13 +53,20 @@ class BidAmount(int, Enum):
     SHOOT_THE_MOON = 60
 
 
-class CardSuit(Enum):
-    '''The valid card suits'''
+class SelectableSuit(Enum):
+    '''The card suits that can be selected as trump for a round'''
     HEARTS = 0
     CLUBS = 1
     SPADES = 2
     DIAMONDS = 3
-    JOKER = 4
+
+
+class UnselectableSuit(Enum):
+    '''The card suits that cannot be selected as trump for a round'''
+    JOKER = 1
+
+
+CardSuit = Union[SelectableSuit, UnselectableSuit]
 
 
 class CardNumber(Enum):
