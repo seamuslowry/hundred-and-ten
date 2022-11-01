@@ -13,6 +13,7 @@ class TestTrumpSelection(TestCase):
         '''Can only select trump during the trump selection phase'''
 
         game = get_bidding_game()
+
         self.assertRaises(HundredAndTenError, game.select_trump,
                           game.active_round.active_player.identifier, SelectableSuit.CLUBS)
         self.assertIsNone(game.active_round.trump)
@@ -30,6 +31,7 @@ class TestTrumpSelection(TestCase):
         '''The active bidder can select trump'''
 
         game = get_trump_selection_game()
+
         trump = SelectableSuit.DIAMONDS
 
         game.select_trump(game.active_round.active_player.identifier, trump)
