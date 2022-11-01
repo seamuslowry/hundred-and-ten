@@ -36,6 +36,18 @@ class TestDeck(TestCase):
         self.assertNotEqual(first_hand, second_hand)
         self.assertEqual(amt*2, deck.pulled)
 
+    def test_initialize_drawn(self):
+        '''Drawing returns to requested cards returns same as initializing drawn to those cards'''
+
+        amt = 5
+        deck_1 = Deck()
+        deck_2 = Deck(seed=deck_1.seed, pulled=amt)
+        deck_1.draw(amt)
+        deck_1_hand = deck_1.draw(amt)
+        deck_2_hand = deck_2.draw(amt)
+
+        self.assertEqual(deck_1_hand, deck_2_hand)
+
     def test_massive_overdraw(self):
         '''Drawing past the whole deck at once returns an error'''
 

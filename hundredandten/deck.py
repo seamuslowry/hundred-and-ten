@@ -88,20 +88,20 @@ class Deck:
     '''A seeded deck of cards'''
     seed: str = field(default_factory=lambda: str(uuid4()))
     pulled: int = 0
+    cards: list[int] = field(init=False)
+
+    def __post_init__(self):
+        self.cards = [*range(len(cards))]
+        Random(self.seed).shuffle(self.cards)
 
     def draw(self, amount: int) -> list[Card]:
         '''Draw the specified amount of cards from the deck'''
-        deck_size = len(cards)
-
         start = self.pulled
         end = self.pulled + amount
         if amount < 0:
             raise HundredAndTenError("Cannot draw previously drawn cards.")
-        if end > deck_size:
+        if end > len(self.cards):
             raise HundredAndTenError("Deck is overdrawn.")
 
-        card_arr = [*range(deck_size)]
-        Random(self.seed).shuffle(card_arr)
-
         self.pulled = end
-        return list(map(lambda num: cards[num], card_arr[start:end]))
+        return list(map(lambda num: cards[num], self.cards[start:end]))
