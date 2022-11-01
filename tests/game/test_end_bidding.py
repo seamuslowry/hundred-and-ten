@@ -5,6 +5,7 @@ from hundredandten.constants import BidAmount, GameRole, RoundRole, RoundStatus
 from hundredandten.game import Game
 from hundredandten.group import Group, Person
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+from tests.game_creation import get_trump_selection_game
 
 
 class TestEndBidding(TestCase):
@@ -13,14 +14,7 @@ class TestEndBidding(TestCase):
     def test_end_bidding_with_bids(self):
         '''Bidding ends when there is only one bidder with an active bid'''
 
-        game = Game(
-            people=Group(
-                [Person('1', roles={GameRole.PLAYER}),
-                 Person('2', roles={GameRole.PLAYER})]))
-
-        game.start_game()
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        game = get_trump_selection_game()
 
         self.assertEqual(game.status, RoundStatus.TRUMP_SELECTION)
         self.assertEqual(game.active_round.active_player, game.active_round.active_bidder)
@@ -28,14 +22,7 @@ class TestEndBidding(TestCase):
     def test_cannot_bid_after_bidding_stage(self):
         '''Bidding can only occur in the bidding stage'''
 
-        game = Game(
-            people=Group(
-                [Person('1', roles={GameRole.PLAYER}),
-                 Person('2', roles={GameRole.PLAYER})]))
-
-        game.start_game()
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        game = get_trump_selection_game()
 
         self.assertNotEqual(game.status, RoundStatus.BIDDING)
         self.assertRaises(HundredAndTenError, game.bid,
