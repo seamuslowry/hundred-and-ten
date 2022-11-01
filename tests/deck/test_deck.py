@@ -14,7 +14,7 @@ class TestDeck(TestCase):
         deck_1 = Deck()
         deck_2 = Deck()
 
-        self.assertNotEqual(deck_1.cards, deck_2.cards)
+        self.assertNotEqual(deck_1.draw(53), deck_2.draw(53))
 
     def test_shuffling_with_seed(self):
         '''Shuffling with the correct seed is always the same'''
@@ -23,7 +23,7 @@ class TestDeck(TestCase):
         deck_1 = Deck(seed)
         deck_2 = Deck(seed)
 
-        self.assertEqual(deck_1.cards, deck_2.cards)
+        self.assertEqual(deck_1.draw(53), deck_2.draw(53))
 
     def test_draw(self):
         '''Drawing returns requested cards'''
@@ -35,6 +35,18 @@ class TestDeck(TestCase):
 
         self.assertNotEqual(first_hand, second_hand)
         self.assertEqual(amt*2, deck.pulled)
+
+    def test_initialize_drawn(self):
+        '''Drawing returns to requested cards returns same as initializing drawn to those cards'''
+
+        amt = 5
+        deck_1 = Deck()
+        deck_2 = Deck(seed=deck_1.seed, pulled=amt)
+        deck_1.draw(amt)
+        deck_1_hand = deck_1.draw(amt)
+        deck_2_hand = deck_2.draw(amt)
+
+        self.assertEqual(deck_1_hand, deck_2_hand)
 
     def test_massive_overdraw(self):
         '''Drawing past the whole deck at once returns an error'''

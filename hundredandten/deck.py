@@ -1,10 +1,10 @@
 '''Handle the functions of a deck'''
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from random import Random
-from typing import Optional
 from uuid import uuid4
 
-from hundredandten.constants import CardNumber, CardSuit
+from hundredandten.constants import (CardNumber, CardSuit, SelectableSuit,
+                                     UnselectableSuit)
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
@@ -23,73 +23,75 @@ class Card:
 
 cards = [
     # Hearts
-    Card(CardNumber.TWO, CardSuit.HEARTS, 0, 0),
-    Card(CardNumber.THREE, CardSuit.HEARTS, 1, 1),
-    Card(CardNumber.FOUR, CardSuit.HEARTS, 2, 2),
-    Card(CardNumber.FIVE, CardSuit.HEARTS, 14, 3),
-    Card(CardNumber.SIX, CardSuit.HEARTS, 3, 4),
-    Card(CardNumber.SEVEN, CardSuit.HEARTS, 4, 5),
-    Card(CardNumber.EIGHT, CardSuit.HEARTS, 5, 6),
-    Card(CardNumber.NINE, CardSuit.HEARTS, 6, 7),
-    Card(CardNumber.TEN, CardSuit.HEARTS, 7, 8),
-    Card(CardNumber.JACK, CardSuit.HEARTS, 13, 9),
-    Card(CardNumber.QUEEN, CardSuit.HEARTS, 8, 10),
-    Card(CardNumber.KING, CardSuit.HEARTS, 9, 11),
-    Card(CardNumber.ACE, CardSuit.HEARTS, 11, 12, True),
+    Card(CardNumber.TWO, SelectableSuit.HEARTS, 0, 0),
+    Card(CardNumber.THREE, SelectableSuit.HEARTS, 1, 1),
+    Card(CardNumber.FOUR, SelectableSuit.HEARTS, 2, 2),
+    Card(CardNumber.FIVE, SelectableSuit.HEARTS, 14, 3),
+    Card(CardNumber.SIX, SelectableSuit.HEARTS, 3, 4),
+    Card(CardNumber.SEVEN, SelectableSuit.HEARTS, 4, 5),
+    Card(CardNumber.EIGHT, SelectableSuit.HEARTS, 5, 6),
+    Card(CardNumber.NINE, SelectableSuit.HEARTS, 6, 7),
+    Card(CardNumber.TEN, SelectableSuit.HEARTS, 7, 8),
+    Card(CardNumber.JACK, SelectableSuit.HEARTS, 13, 9),
+    Card(CardNumber.QUEEN, SelectableSuit.HEARTS, 8, 10),
+    Card(CardNumber.KING, SelectableSuit.HEARTS, 9, 11),
+    Card(CardNumber.ACE, SelectableSuit.HEARTS, 11, 12, True),
     # Diamonds
-    Card(CardNumber.TWO, CardSuit.DIAMONDS, 0, 0),
-    Card(CardNumber.THREE, CardSuit.DIAMONDS, 1, 1),
-    Card(CardNumber.FOUR, CardSuit.DIAMONDS, 2, 2),
-    Card(CardNumber.FIVE, CardSuit.DIAMONDS, 14, 3),
-    Card(CardNumber.SIX, CardSuit.DIAMONDS, 3, 4),
-    Card(CardNumber.SEVEN, CardSuit.DIAMONDS, 4, 5),
-    Card(CardNumber.EIGHT, CardSuit.DIAMONDS, 5, 6),
-    Card(CardNumber.NINE, CardSuit.DIAMONDS, 6, 7),
-    Card(CardNumber.TEN, CardSuit.DIAMONDS, 7, 8),
-    Card(CardNumber.JACK, CardSuit.DIAMONDS, 13, 9),
-    Card(CardNumber.QUEEN, CardSuit.DIAMONDS, 8, 10),
-    Card(CardNumber.KING, CardSuit.DIAMONDS, 9, 11),
-    Card(CardNumber.ACE, CardSuit.DIAMONDS, 10, 12),
+    Card(CardNumber.TWO, SelectableSuit.DIAMONDS, 0, 0),
+    Card(CardNumber.THREE, SelectableSuit.DIAMONDS, 1, 1),
+    Card(CardNumber.FOUR, SelectableSuit.DIAMONDS, 2, 2),
+    Card(CardNumber.FIVE, SelectableSuit.DIAMONDS, 14, 3),
+    Card(CardNumber.SIX, SelectableSuit.DIAMONDS, 3, 4),
+    Card(CardNumber.SEVEN, SelectableSuit.DIAMONDS, 4, 5),
+    Card(CardNumber.EIGHT, SelectableSuit.DIAMONDS, 5, 6),
+    Card(CardNumber.NINE, SelectableSuit.DIAMONDS, 6, 7),
+    Card(CardNumber.TEN, SelectableSuit.DIAMONDS, 7, 8),
+    Card(CardNumber.JACK, SelectableSuit.DIAMONDS, 13, 9),
+    Card(CardNumber.QUEEN, SelectableSuit.DIAMONDS, 8, 10),
+    Card(CardNumber.KING, SelectableSuit.DIAMONDS, 9, 11),
+    Card(CardNumber.ACE, SelectableSuit.DIAMONDS, 10, 12),
     # Spades
-    Card(CardNumber.TWO, CardSuit.SPADES, 7, 8),
-    Card(CardNumber.THREE, CardSuit.SPADES, 6, 7),
-    Card(CardNumber.FOUR, CardSuit.SPADES, 5, 6),
-    Card(CardNumber.FIVE, CardSuit.SPADES, 14, 5),
-    Card(CardNumber.SIX, CardSuit.SPADES, 4, 4),
-    Card(CardNumber.SEVEN, CardSuit.SPADES, 3, 3),
-    Card(CardNumber.EIGHT, CardSuit.SPADES, 2, 2),
-    Card(CardNumber.NINE, CardSuit.SPADES, 1, 1),
-    Card(CardNumber.TEN, CardSuit.SPADES, 0, 0),
-    Card(CardNumber.JACK, CardSuit.SPADES, 13, 9),
-    Card(CardNumber.QUEEN, CardSuit.SPADES, 8, 10),
-    Card(CardNumber.KING, CardSuit.SPADES, 9, 11),
-    Card(CardNumber.ACE, CardSuit.SPADES, 10, 12),
+    Card(CardNumber.TWO, SelectableSuit.SPADES, 7, 8),
+    Card(CardNumber.THREE, SelectableSuit.SPADES, 6, 7),
+    Card(CardNumber.FOUR, SelectableSuit.SPADES, 5, 6),
+    Card(CardNumber.FIVE, SelectableSuit.SPADES, 14, 5),
+    Card(CardNumber.SIX, SelectableSuit.SPADES, 4, 4),
+    Card(CardNumber.SEVEN, SelectableSuit.SPADES, 3, 3),
+    Card(CardNumber.EIGHT, SelectableSuit.SPADES, 2, 2),
+    Card(CardNumber.NINE, SelectableSuit.SPADES, 1, 1),
+    Card(CardNumber.TEN, SelectableSuit.SPADES, 0, 0),
+    Card(CardNumber.JACK, SelectableSuit.SPADES, 13, 9),
+    Card(CardNumber.QUEEN, SelectableSuit.SPADES, 8, 10),
+    Card(CardNumber.KING, SelectableSuit.SPADES, 9, 11),
+    Card(CardNumber.ACE, SelectableSuit.SPADES, 10, 12),
     # Clubs
-    Card(CardNumber.TWO, CardSuit.CLUBS, 7, 8),
-    Card(CardNumber.THREE, CardSuit.CLUBS, 6, 7),
-    Card(CardNumber.FOUR, CardSuit.CLUBS, 5, 6),
-    Card(CardNumber.FIVE, CardSuit.CLUBS, 14, 5),
-    Card(CardNumber.SIX, CardSuit.CLUBS, 4, 4),
-    Card(CardNumber.SEVEN, CardSuit.CLUBS, 3, 3),
-    Card(CardNumber.EIGHT, CardSuit.CLUBS, 2, 2),
-    Card(CardNumber.NINE, CardSuit.CLUBS, 1, 1),
-    Card(CardNumber.TEN, CardSuit.CLUBS, 0, 0),
-    Card(CardNumber.JACK, CardSuit.CLUBS, 13, 9),
-    Card(CardNumber.QUEEN, CardSuit.CLUBS, 8, 10),
-    Card(CardNumber.KING, CardSuit.CLUBS, 9, 11),
-    Card(CardNumber.ACE, CardSuit.CLUBS, 10, 12),
+    Card(CardNumber.TWO, SelectableSuit.CLUBS, 7, 8),
+    Card(CardNumber.THREE, SelectableSuit.CLUBS, 6, 7),
+    Card(CardNumber.FOUR, SelectableSuit.CLUBS, 5, 6),
+    Card(CardNumber.FIVE, SelectableSuit.CLUBS, 14, 5),
+    Card(CardNumber.SIX, SelectableSuit.CLUBS, 4, 4),
+    Card(CardNumber.SEVEN, SelectableSuit.CLUBS, 3, 3),
+    Card(CardNumber.EIGHT, SelectableSuit.CLUBS, 2, 2),
+    Card(CardNumber.NINE, SelectableSuit.CLUBS, 1, 1),
+    Card(CardNumber.TEN, SelectableSuit.CLUBS, 0, 0),
+    Card(CardNumber.JACK, SelectableSuit.CLUBS, 13, 9),
+    Card(CardNumber.QUEEN, SelectableSuit.CLUBS, 8, 10),
+    Card(CardNumber.KING, SelectableSuit.CLUBS, 9, 11),
+    Card(CardNumber.ACE, SelectableSuit.CLUBS, 10, 12),
     # Joker
-    Card(CardNumber.JOKER, CardSuit.JOKER, 12, 12, True)
+    Card(CardNumber.JOKER, UnselectableSuit.JOKER, 12, 12, True)
 ]
 
 
+@dataclass
 class Deck:
     '''A seeded deck of cards'''
+    seed: str = field(default_factory=lambda: str(uuid4()))
+    pulled: int = 0
+    cards: list[int] = field(init=False)
 
-    def __init__(self, seed: Optional[str] = None, pulled: int = 0):
-        self.seed = seed or str(uuid4())
-        self.pulled = pulled
-        self.cards = [*range(53)]
+    def __post_init__(self):
+        self.cards = [*range(len(cards))]
         Random(self.seed).shuffle(self.cards)
 
     def draw(self, amount: int) -> list[Card]:

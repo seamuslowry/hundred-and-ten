@@ -1,24 +1,22 @@
 '''Represent a game of Hundred and Ten'''
-from typing import Optional
+from dataclasses import dataclass, field
 
 from hundredandten.constants import (HAND_SIZE, Accessibility, AnyStatus,
                                      BidAmount, GameRole, GameStatus,
-                                     RoundRole, RoundStatus)
+                                     RoundRole, RoundStatus, SelectableSuit)
 from hundredandten.deck import Deck
 from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
 
 
+@dataclass
 class Game:
     '''A game of Hundred and Ten'''
 
-    def __init__(
-            self, persons: Optional[Group[Person]] = None, rounds: Optional[list[Round]] = None,
-            accessibility: Optional[Accessibility] = Accessibility.PUBLIC) -> None:
-        self.accessibility = accessibility
-        self.people = persons or Group[Person]()
-        self.rounds = rounds or []
+    people: Group[Person] = field(default_factory=Group)
+    rounds: list[Round] = field(default_factory=list)
+    accessibility: Accessibility = field(default=Accessibility.PUBLIC)
 
     def invite(self, inviter: str, invitee: str) -> None:
         '''Invite a player to the game'''
@@ -75,6 +73,10 @@ class Game:
         '''Discount a pre-pass bid from the identified player'''
         self.active_round.unpass(identifier)
 
+    def select_trump(self, identifier: str, trump: SelectableSuit) -> None:
+        '''Select the passed suit as trump'''
+        self.active_round.select_trump(identifier, trump)
+
     def __end_bid(self):
         if self.active_round.status == RoundStatus.COMPLETED_NO_BIDDERS:
             current_dealer = self.active_round.dealer.identifier
@@ -108,11 +110,6 @@ class Game:
         if not self.rounds:
             raise HundredAndTenError("No active round found.")
         return self.rounds[-1]
-
-    @property
-    def active_player(self) -> Person:
-        """The active player"""
-        return self.active_round.active_player
 
     @property
     def organizer(self) -> Person:

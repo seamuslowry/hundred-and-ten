@@ -1,22 +1,14 @@
 '''Track a bid'''
-from functools import total_ordering
+from dataclasses import dataclass, field
 
 from hundredandten.constants import BidAmount
 
 
-@total_ordering
+@dataclass(order=True)
 class Bid:
     '''A class to keep track of bid information'''
-
-    def __init__(self, identifier: str, amount: BidAmount) -> None:
-        self.identifier = identifier
-        self.amount = amount
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, Bid) and self.amount == other.amount
-
-    def __lt__(self, other: object) -> bool:
-        return isinstance(other, Bid) and self.amount < other.amount
+    identifier: str = field(compare=False)
+    amount: BidAmount
 
     def __bool__(self) -> bool:
         return self.amount.value > 0
