@@ -3,8 +3,8 @@ from unittest import TestCase
 
 from hundredandten.constants import Accessibility, GameRole, GameStatus
 from hundredandten.game import Game
+from hundredandten.group import Group, Person
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.group import Person, Group
 from hundredandten.round import Round
 
 

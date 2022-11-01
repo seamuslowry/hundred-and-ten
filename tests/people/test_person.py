@@ -1,8 +1,9 @@
 '''Person unit tests'''
 from unittest import TestCase
 
-from hundredandten.constants import GameRole
-from hundredandten.group import Person
+from hundredandten.constants import CardNumber, GameRole, SelectableSuit
+from hundredandten.deck import Card
+from hundredandten.group import Person, Player
 
 
 class TestPerson(TestCase):
@@ -14,9 +15,12 @@ class TestPerson(TestCase):
         self.assertEqual(Person(identifier), Person(identifier, {GameRole.INVITEE}))
         self.assertNotEqual(Person('one'), Person('two'))
 
-    def test_persons_hash_by_identifier_only(self):
-        '''When hashing a person, only the identifier matters'''
+    def test_players_equal_by_identifier_only(self):
+        '''When checking if players are equal, only the identifier matters'''
         identifier = "1"
-        self.assertEqual(hash(Person(identifier)), hash(
-            Person(identifier, {GameRole.INVITEE})))
-        self.assertNotEqual(hash(Person('one')), hash(Person('two')))
+        self.assertEqual(
+            Player(identifier),
+            Player(
+                identifier, {GameRole.INVITEE},
+                hand=[Card(CardNumber.ACE, SelectableSuit.CLUBS, 0, 0)]))
+        self.assertNotEqual(Player('one'), Player('two'))

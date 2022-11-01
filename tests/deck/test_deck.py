@@ -14,7 +14,7 @@ class TestDeck(TestCase):
         deck_1 = Deck()
         deck_2 = Deck()
 
-        self.assertNotEqual(deck_1.cards, deck_2.cards)
+        self.assertNotEqual(deck_1.draw(53), deck_2.draw(53))
 
     def test_shuffling_with_seed(self):
         '''Shuffling with the correct seed is always the same'''
@@ -23,7 +23,7 @@ class TestDeck(TestCase):
         deck_1 = Deck(seed)
         deck_2 = Deck(seed)
 
-        self.assertEqual(deck_1.cards, deck_2.cards)
+        self.assertEqual(deck_1.draw(53), deck_2.draw(53))
 
     def test_draw(self):
         '''Drawing returns requested cards'''

@@ -19,10 +19,10 @@ class TestBidding(TestCase):
                         Person('2', roles={GameRole.PLAYER})])
 
         game = Game(
-            persons=people,
+            people=people,
             rounds=[Round(Group([]), bids=[Bid('1', BidAmount.FIFTEEN)])])
 
-        self.assertRaises(HundredAndTenError, lambda: game.active_player)
+        self.assertRaises(HundredAndTenError, lambda: game.active_round.active_player)
 
     def test_error_when_no_dealer(self):
         '''Round must always have a dealer'''
@@ -31,7 +31,7 @@ class TestBidding(TestCase):
                          Player('2')])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players)])
 
         self.assertRaises(HundredAndTenError, lambda: game.active_round.dealer)
@@ -43,10 +43,10 @@ class TestBidding(TestCase):
                          Player('2')])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(Group(players))])
 
-        game.bid(game.active_player.identifier, BidAmount.FIFTEEN)
+        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
         self.assertEqual(1, len(game.active_round.bids))
         self.assertEqual(BidAmount.FIFTEEN, game.active_round.bids[0].amount)
@@ -58,11 +58,11 @@ class TestBidding(TestCase):
                          Player('2')])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players, bids=[Bid(players[0].identifier, BidAmount.TWENTY)])])
 
         self.assertRaises(HundredAndTenError, game.bid,
-                          game.active_player.identifier, BidAmount.FIFTEEN)
+                          game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
     def test_equal_bid_from_active_player(self):
         '''Active player cannot place a bid equal to the current bid'''
@@ -71,11 +71,11 @@ class TestBidding(TestCase):
                          Player('2')])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players, bids=[Bid(players[0].identifier, BidAmount.FIFTEEN)])])
 
         self.assertRaises(HundredAndTenError, game.bid,
-                          game.active_player.identifier, BidAmount.FIFTEEN)
+                          game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
     def test_low_bid_from_dealer(self):
         '''Dealer cannot place a bid below to the current bid'''
@@ -84,11 +84,11 @@ class TestBidding(TestCase):
                          Player('2', roles={RoundRole.DEALER})])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players, bids=[Bid(players[0].identifier, BidAmount.TWENTY)])])
 
         self.assertRaises(HundredAndTenError, game.bid,
-                          game.active_player.identifier, BidAmount.FIFTEEN)
+                          game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
     def test_equal_bid_from_dealer(self):
         '''Dealer can place a bid equal to the current bid'''
@@ -97,12 +97,12 @@ class TestBidding(TestCase):
                          Player('2', roles={RoundRole.DEALER})])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players, bids=[Bid(players[0].identifier, BidAmount.FIFTEEN)])])
 
         pre_len = len(game.active_round.bids)
 
-        game.bid(game.active_player.identifier, BidAmount.FIFTEEN)
+        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
         self.assertEqual(pre_len+1, len(game.active_round.bids))
 
@@ -113,10 +113,10 @@ class TestBidding(TestCase):
                          Player('2')])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players)])
 
-        once_active_player = game.active_player.identifier
+        once_active_player = game.active_round.active_player.identifier
         game.bid(once_active_player, BidAmount.PASS)
 
         self.assertRaises(HundredAndTenError, game.bid, once_active_player, BidAmount.FIFTEEN)
@@ -128,7 +128,7 @@ class TestBidding(TestCase):
                          Player('2')])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players)])
 
         self.assertRaises(HundredAndTenError, game.bid,
@@ -141,7 +141,7 @@ class TestBidding(TestCase):
                          Player('2')])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players)])
 
         game.bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS)
@@ -156,7 +156,7 @@ class TestBidding(TestCase):
                          Player('2', roles={RoundRole.DEALER, RoundRole.PRE_PASSED})])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players)])
 
         self.assertIn(RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles)
@@ -175,17 +175,17 @@ class TestBidding(TestCase):
         ])
 
         game = Game(
-            persons=Group(),
+            people=Group(),
             rounds=[Round(players)])
 
         self.assertEqual(0, len(game.active_round.bids))
 
-        game.bid(game.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
 
         self.assertEqual(2, len(game.active_round.bids))
         self.assertEqual(RoundStatus.BIDDING, game.status)
         self.assertEqual(0, len(game.active_round.players.by_role(RoundRole.PRE_PASSED)))
         # with 3 players set up as above, play will have cicled back around to the dealer
-        self.assertEqual(game.active_player, game.active_round.dealer)
+        self.assertEqual(game.active_round.active_player, game.active_round.dealer)
         self.assertEqual(1, len(game.active_round.bidders))
-        self.assertIn(game.active_player, game.active_round.bidders)
+        self.assertIn(game.active_round.active_player, game.active_round.bidders)

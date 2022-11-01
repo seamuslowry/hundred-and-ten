@@ -14,28 +14,28 @@ class TestEndBidding(TestCase):
         '''Bidding ends when there is only one bidder with an active bid'''
 
         game = Game(
-            persons=Group(
+            people=Group(
                 [Person('1', roles={GameRole.PLAYER}),
                  Person('2', roles={GameRole.PLAYER})]))
 
         game.start_game()
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.FIFTEEN)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
         self.assertEqual(game.status, RoundStatus.TRUMP_SELECTION)
-        self.assertEqual(game.active_player, game.active_round.active_bidder)
+        self.assertEqual(game.active_round.active_player, game.active_round.active_bidder)
 
     def test_cannot_bid_after_bidding_stage(self):
         '''Bidding can only occur in the bidding stage'''
 
         game = Game(
-            persons=Group(
+            people=Group(
                 [Person('1', roles={GameRole.PLAYER}),
                  Person('2', roles={GameRole.PLAYER})]))
 
         game.start_game()
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.FIFTEEN)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
         self.assertNotEqual(game.status, RoundStatus.BIDDING)
         self.assertRaises(HundredAndTenError, game.bid,
@@ -45,13 +45,13 @@ class TestEndBidding(TestCase):
         '''Bidding ends when everyone has passed'''
 
         game = Game(
-            persons=Group(
+            people=Group(
                 [Person('1', roles={GameRole.PLAYER}),
                  Person('2', roles={GameRole.PLAYER})]))
 
         game.start_game()
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
 
         # new round created because of passing
         self.assertEqual(2, len(game.rounds))
@@ -63,7 +63,7 @@ class TestEndBidding(TestCase):
     def test_end_bidding_with_prepass(self):
         '''When all players have prepassed, the round can end'''
         game = Game(
-            persons=Group([
+            people=Group([
                 Person('1', roles={GameRole.PLAYER}),
                 Person('2', roles={GameRole.PLAYER}),
                 Person('3', roles={GameRole.PLAYER}),
@@ -73,12 +73,12 @@ class TestEndBidding(TestCase):
 
         self.assertEqual(0, len(game.active_round.bids))
 
-        for player in list(filter(lambda p: p != game.active_player, game.players)):
+        for player in list(filter(lambda p: p != game.active_round.active_player, game.players)):
             game.bid(player.identifier, BidAmount.PASS)
 
         self.assertEqual(0, len(game.active_round.bids))
 
-        game.bid(game.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
 
         self.assertEqual(4, len(game.rounds[-2].bids))
         self.assertEqual(0, len(game.rounds[-2].players.by_role(RoundRole.PRE_PASSED)))
@@ -94,32 +94,32 @@ class TestEndBidding(TestCase):
         '''
 
         game = Game(
-            persons=Group(
+            people=Group(
                 [Person('1', roles={GameRole.PLAYER}),
                  Person('2', roles={GameRole.PLAYER})]))
 
         game.start_game()
 
         # first round as dealer
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
 
         self.assertEqual(game.rounds[-2].dealer, game.active_round.dealer)
 
         # second round as dealer
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
 
         self.assertEqual(game.rounds[-2].dealer, game.active_round.dealer)
 
         # third round as dealer
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
 
         self.assertNotEqual(game.rounds[-2].dealer, game.active_round.dealer)
 
         # first round with new dealer won't swap
-        game.bid(game.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
 
         self.assertEqual(game.rounds[-2].dealer, game.active_round.dealer)
