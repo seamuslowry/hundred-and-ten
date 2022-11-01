@@ -18,13 +18,6 @@ class Game:
     rounds: list[Round] = field(default_factory=list)
     accessibility: Accessibility = field(default=Accessibility.PUBLIC)
 
-    # def __init__(
-    #         self, people: Optional[Group[Person]] = None, rounds: Optional[list[Round]] = None,
-    #         accessibility: Optional[Accessibility] = Accessibility.PUBLIC) -> None:
-    #     self.accessibility = accessibility
-    #     self.people = people or Group[Person]()
-    #     self.rounds = rounds or []
-
     def invite(self, inviter: str, invitee: str) -> None:
         '''Invite a player to the game'''
 
