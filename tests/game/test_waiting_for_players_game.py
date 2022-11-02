@@ -39,8 +39,7 @@ class TestWaitingForPlayersGame(TestCase):
     def test_join(self):
         '''Test a player joining a game'''
         invitee = 'invitee'
-        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
-        arrange.make_space(game)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS, arrange.make_space)
 
         game.join(invitee)
 
@@ -56,8 +55,7 @@ class TestWaitingForPlayersGame(TestCase):
     def test_join_not_invited_to_private(self):
         '''Test joining a private game without an invite'''
         invitee = 'invitee'
-        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
-        arrange.make_space(game)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS, arrange.make_space)
         game.accessibility = Accessibility.PRIVATE
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
@@ -65,10 +63,9 @@ class TestWaitingForPlayersGame(TestCase):
     def test_join_invited_to_private(self):
         '''Test joining a public game without an invite'''
         invitee = 'invitee'
-        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS, arrange.make_space)
         game.accessibility = Accessibility.PRIVATE
         game.invite(game.organizer.identifier, invitee)
-        arrange.make_space(game)
 
         game.join(invitee)
 

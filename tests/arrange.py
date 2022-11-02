@@ -1,21 +1,26 @@
 '''Helpers to set up a game for testing'''
 
+from typing import Callable
+
 from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
                                      GameStatus, RoundStatus, SelectableSuit)
 from hundredandten.game import Game
 from hundredandten.group import Group, Person
 
 
-def game(status: AnyStatus) -> Game:
+def game(
+        status: AnyStatus, massage: Callable[[Game], None] = lambda f_game: None) -> Game:
     '''Return a game in the requested status'''
 
-    return {
+    new_game = {
         GameStatus.WAITING_FOR_PLAYERS: __get_waiting_for_players_game,
         RoundStatus.BIDDING: __get_bidding_game,
         RoundStatus.COMPLETED_NO_BIDDERS: __get_completed_no_bidders_game,
         RoundStatus.TRUMP_SELECTION: __get_trump_selection_game,
         RoundStatus.TRICKS: __get_tricks_game
     }[status]()
+    massage(new_game)
+    return new_game
 
 
 def make_space(game_to_open: Game) -> None:
