@@ -2,23 +2,12 @@
 from unittest import TestCase
 
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
-from hundredandten.group import Group
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import arrange
 
 
 class TestBidding(TestCase):
     '''Unit tests for bidding within a round of Game'''
-
-    def test_error_when_no_active_player(self):
-        '''Round must always have an active player'''
-
-        game = arrange.game(RoundStatus.BIDDING)
-
-        # clear players to put game in an invalid state to verify error
-        game.active_round.players = Group([])
-
-        self.assertRaises(HundredAndTenError, lambda: game.active_round.active_player)
 
     def test_error_when_no_dealer(self):
         '''Round must always have a dealer'''

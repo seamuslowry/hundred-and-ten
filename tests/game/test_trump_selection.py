@@ -37,4 +37,4 @@ class TestTrumpSelection(TestCase):
         game.select_trump(game.active_round.active_player.identifier, trump)
 
         self.assertEqual(trump, game.active_round.trump)
-        self.assertEqual(RoundStatus.TRICKS, game.status)
+        self.assertEqual(RoundStatus.DISCARD, game.status)

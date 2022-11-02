@@ -9,6 +9,13 @@ from tests import arrange
 class TestEndBidding(TestCase):
     '''Unit tests for ending the bidding stage'''
 
+    def test_no_active_player_when_completed_no_bidders(self):
+        '''Round will have no active player when complete'''
+
+        game = arrange.game(RoundStatus.COMPLETED_NO_BIDDERS)
+
+        self.assertRaises(HundredAndTenError, lambda: game.rounds[-2].active_player)
+
     def test_end_bidding_with_bids(self):
         '''Bidding ends when there is only one bidder with an active bid'''
 
