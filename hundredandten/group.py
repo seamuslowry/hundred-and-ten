@@ -92,7 +92,13 @@ class Group(list[P]):
         '''
         Determine the next player after the identified one
         '''
+        return self.__offset(identifier, 1)
+
+    def __offset(self, identifier: str, offset: int) -> P:
+        '''
+        Determine the player sitting the provided distance away from the identified one
+        '''
         person = self.by_identifier(identifier)
         if not self or not person:
-            raise HundredAndTenError(f'Unable to find person after {identifier}.')
-        return self[(self.index(person) + 1) % len(self)]
+            raise HundredAndTenError(f'Unable to find person {offset} away from {identifier}.')
+        return self[(self.index(person) + offset) % len(self)]

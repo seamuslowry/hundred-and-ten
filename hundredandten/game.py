@@ -8,6 +8,7 @@ from hundredandten.deck import Deck
 from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
+from hundredandten.trick import Play
 
 
 @dataclass
@@ -77,8 +78,13 @@ class Game:
         '''Select the passed suit as trump'''
         self.active_round.select_trump(identifier, trump)
 
+    def play(self, play: Play) -> None:
+        '''Play the specified card from the identified player's hand'''
+        self.active_round.play(play)
+        self.__end_play()
+
     def __end_bid(self):
-        if self.active_round.status == RoundStatus.COMPLETED_NO_BIDDERS:
+        if self.status == RoundStatus.COMPLETED_NO_BIDDERS:
             current_dealer = self.active_round.dealer.identifier
             # dealer doesn't rotate on a round with no bidders
             # unless the current dealer has been dealer 3x in a row
@@ -87,6 +93,10 @@ class Game:
             next_dealer = current_dealer if keep_same_dealer else self.players.after(
                 current_dealer).identifier
             self.__new_round(next_dealer)
+
+    def __end_play(self):
+        if self.status == RoundStatus.COMPLETED:
+            self.__new_round(self.players.after(self.active_round.dealer.identifier).identifier)
 
     def __new_round(self, dealer: str) -> None:
         deck = Deck()
