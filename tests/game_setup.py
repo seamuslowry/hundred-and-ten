@@ -13,7 +13,8 @@ def setup_game(status: AnyStatus, player_count: int = 2) -> Game:
         GameStatus.WAITING_FOR_PLAYERS: __get_waiting_for_players_game,
         RoundStatus.BIDDING: __get_bidding_game,
         RoundStatus.COMPLETED_NO_BIDDERS: __get_completed_no_bidders_game,
-        RoundStatus.TRUMP_SELECTION: __get_trump_selection_game
+        RoundStatus.TRUMP_SELECTION: __get_trump_selection_game,
+        RoundStatus.TRICKS: __get_tricks_game
     }[status](player_count)
 
 
@@ -50,7 +51,7 @@ def __get_trump_selection_game(player_count: int = 2) -> Game:
     return game
 
 
-def get_tricks_game(player_count: int = 2) -> Game:
+def __get_tricks_game(player_count: int = 2) -> Game:
     '''Return a game in the tricks status'''
     game = __get_trump_selection_game(player_count)
     game.select_trump(game.active_round.active_player.identifier, SelectableSuit.SPADES)
