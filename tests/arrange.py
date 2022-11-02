@@ -19,7 +19,7 @@ def game(status: AnyStatus) -> Game:
 
 
 def make_space(game_to_open: Game) -> None:
-    '''Have a player leave a game'''
+    '''Make space in the game, which will be full by default when arranged by this file'''
     game_to_open.leave(game_to_open.players[-1].identifier)
 
 
