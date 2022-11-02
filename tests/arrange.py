@@ -12,7 +12,7 @@ def game(
         status: AnyStatus, massage: Callable[[Game], None] = lambda f_game: None) -> Game:
     '''
     Return a game in the requested status.
-    If passed, will call the arrange function on the game before returning
+    If passed, will call the massage function on the game before returning
     '''
 
     new_game = {
