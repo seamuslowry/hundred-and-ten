@@ -5,6 +5,7 @@ from hundredandten.constants import (HAND_SIZE, Accessibility, AnyStatus,
                                      BidAmount, GameRole, GameStatus,
                                      RoundRole, RoundStatus, SelectableSuit)
 from hundredandten.deck import Deck
+from hundredandten.discard import Discard
 from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
@@ -77,6 +78,12 @@ class Game:
     def select_trump(self, identifier: str, trump: SelectableSuit) -> None:
         '''Select the passed suit as trump'''
         self.active_round.select_trump(identifier, trump)
+
+    def discard(self, discard: Discard) -> None:
+        '''
+        Discard the selected cards from the identified player's hand and replace them
+        '''
+        self.active_round.discard(discard)
 
     def play(self, play: Play) -> None:
         '''Play the specified card from the identified player's hand'''

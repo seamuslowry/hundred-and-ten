@@ -4,6 +4,7 @@ from typing import Callable
 
 from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
                                      GameStatus, RoundStatus, SelectableSuit)
+from hundredandten.discard import Discard
 from hundredandten.game import Game
 from hundredandten.group import Group, Person
 from hundredandten.trick import Play
@@ -21,6 +22,7 @@ def game(
         RoundStatus.BIDDING: __get_bidding_game,
         RoundStatus.COMPLETED_NO_BIDDERS: __get_completed_no_bidders_game,
         RoundStatus.TRUMP_SELECTION: __get_trump_selection_game,
+        RoundStatus.DISCARD: __get_discard_game,
         RoundStatus.TRICKS: __get_tricks_game
     }[status]()
     massage(new_game)
@@ -88,8 +90,17 @@ def __get_trump_selection_game() -> Game:
     return new_game
 
 
-def __get_tricks_game() -> Game:
-    '''Return a game in the tricks status'''
+def __get_discard_game() -> Game:
+    '''Return a game in the discard status'''
     new_game = __get_trump_selection_game()
     new_game.select_trump(new_game.active_round.active_player.identifier, SelectableSuit.SPADES)
+    return new_game
+
+
+def __get_tricks_game() -> Game:
+    '''Return a game in the tricks status'''
+    new_game = __get_discard_game()
+    while new_game.status == RoundStatus.DISCARD:
+        new_game.discard(Discard(new_game.active_round.active_player.identifier, []))
+
     return new_game

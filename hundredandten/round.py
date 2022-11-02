@@ -8,6 +8,7 @@ from hundredandten.bid import Bid
 from hundredandten.constants import (BidAmount, RoundRole, RoundStatus,
                                      SelectableSuit)
 from hundredandten.deck import Deck
+from hundredandten.discard import Discard
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.trick import Play, Trick
@@ -20,6 +21,7 @@ class Round:
     bids: list[Bid] = field(default_factory=list)
     deck: Deck = field(default_factory=Deck)
     trump: Optional[SelectableSuit] = None
+    discards: list[Discard] = field(default_factory=list)
     tricks: list[Trick] = field(default_factory=list)
 
     def bid(self, identifier: str, amount: BidAmount) -> None:
@@ -44,7 +46,23 @@ class Round:
             raise HundredAndTenError("Only the bidder can select trump.")
 
         self.trump = suit
-        self.__new_trick()
+
+    def discard(self, discard: Discard) -> None:
+        '''
+        Discard the selected cards from the identified player's hand and replace them
+        '''
+        if self.status != RoundStatus.DISCARD:
+            raise HundredAndTenError("Cannot discard outside of the discard phase.")
+        if discard.identifier != self.active_player.identifier:
+            raise HundredAndTenError("Only the active player can discard.")
+        if any(card not in self.active_player.hand for card in discard.cards):
+            raise HundredAndTenError("You may only discard cards that are in your hand.")
+
+        self.active_player.hand = list(
+            filter(lambda c: c not in discard.cards, self.active_player.hand))
+        self.active_player.hand.extend(self.deck.draw(len(discard.cards)))
+        self.discards.append(discard)
+        self.__end_discard()
 
     def play(self, play: Play) -> None:
         '''Play the specified card from the identified player's hand'''
@@ -99,6 +117,10 @@ class Round:
             default=None)
         return self.bids[loc_index] if loc_index is not None else None
 
+    def __end_discard(self) -> None:
+        if self.status == RoundStatus.TRICKS:
+            self.__new_trick()
+
     def __end_play(self) -> None:
         if self.status == RoundStatus.TRICKS and len(self.active_trick.plays) == len(self.players):
             self.__new_trick()
@@ -128,6 +150,11 @@ class Round:
         if self.status == RoundStatus.TRUMP_SELECTION:
             assert self.active_bidder
             return self.active_bidder
+        if self.status == RoundStatus.DISCARD:
+            assert self.active_bidder
+            last_discarder = (self.dealer.identifier
+                              if not self.discards else self.discards[-1].identifier)
+            return self.players.after(last_discarder)
         # while playing tricks, active player needs to consider
         # trick number, trick status, and winner of last trick
         if self.status == RoundStatus.TRICKS:
@@ -187,8 +214,10 @@ class Round:
         """The status property."""
         if self.tricks and all(not player.hand for player in self.players):
             return RoundStatus.COMPLETED
-        if self.trump:
+        if len(self.discards) == len(self.players):
             return RoundStatus.TRICKS
+        if self.trump:
+            return RoundStatus.DISCARD
         if self.active_bidder:
             return RoundStatus.TRUMP_SELECTION
         if not self.bidders:
