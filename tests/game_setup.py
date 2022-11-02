@@ -12,7 +12,7 @@ def setup_game(status: AnyStatus, player_count: int = 2) -> Game:
     return {
         GameStatus.WAITING_FOR_PLAYERS: __get_waiting_for_players_game,
         RoundStatus.BIDDING: __get_bidding_game,
-        RoundStatus.COMPLETED_NO_BIDDERS: get_completed_no_bidders_game,
+        RoundStatus.COMPLETED_NO_BIDDERS: __get_completed_no_bidders_game,
         RoundStatus.TRUMP_SELECTION: get_trump_selection_game
     }[status](player_count)
 
@@ -33,7 +33,7 @@ def __get_bidding_game(player_count: int = 2) -> Game:
     return game
 
 
-def get_completed_no_bidders_game(player_count: int = 2) -> Game:
+def __get_completed_no_bidders_game(player_count: int = 2) -> Game:
     '''Returns a game in the completed no bidders status'''
     game = __get_bidding_game(player_count)
     for player in game.players:

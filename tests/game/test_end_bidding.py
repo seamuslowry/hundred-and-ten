@@ -3,8 +3,7 @@ from unittest import TestCase
 
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from tests.game_setup import (get_completed_no_bidders_game,
-                              get_trump_selection_game, setup_game)
+from tests.game_setup import get_trump_selection_game, setup_game
 
 
 class TestEndBidding(TestCase):
@@ -30,7 +29,7 @@ class TestEndBidding(TestCase):
     def test_end_bidding_with_pass(self):
         '''Bidding ends when everyone has passed'''
 
-        game = get_completed_no_bidders_game()
+        game = setup_game(RoundStatus.COMPLETED_NO_BIDDERS)
 
         # old round ended as completed no bidders
         self.assertEqual(game.rounds[-2].status, RoundStatus.COMPLETED_NO_BIDDERS)
