@@ -1,11 +1,9 @@
 '''Test behavior of the Game while it is Waiting for Players'''
 from unittest import TestCase
 
-from hundredandten.constants import Accessibility, GameRole, GameStatus
-from hundredandten.game import Game
-from hundredandten.group import Group, Person
+from hundredandten.constants import Accessibility, GameStatus
+from hundredandten.group import Person
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.round import Round
 from tests import arrange
 
 
@@ -14,7 +12,7 @@ class TestWaitingForPlayersGame(TestCase):
 
     def test_default_inits_to_waiting(self):
         '''Game status defaults to waiting for players'''
-        game = Game()
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertEqual(game.status, GameStatus.WAITING_FOR_PLAYERS)
         self.assertRaises(HundredAndTenError, lambda: game.active_round)
@@ -104,11 +102,3 @@ class TestWaitingForPlayersGame(TestCase):
         game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertRaises(HundredAndTenError, game.leave, game.organizer.identifier)
-
-    def test_leave_after_start(self):
-        '''Test leaving a game after it has started'''
-        identifier = 'id'
-        game = Game(Group([Person('organizer', {GameRole.ORGANIZER}), Person(
-            identifier, {GameRole.PLAYER})]), rounds=[Round()])
-
-        self.assertRaises(HundredAndTenError, game.leave, identifier)
