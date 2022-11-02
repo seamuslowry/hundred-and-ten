@@ -6,7 +6,7 @@ from hundredandten.game import Game
 from hundredandten.group import Group, Person
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
-from tests import setup
+from tests import arrange
 
 
 class TestWaitingForPlayersGame(TestCase):
@@ -22,7 +22,7 @@ class TestWaitingForPlayersGame(TestCase):
     def test_invite(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertFalse(invitee in map(lambda i: i.identifier, game.invitees))
 
@@ -34,15 +34,15 @@ class TestWaitingForPlayersGame(TestCase):
         '''Test inviting a player without being in the game yourself'''
         invitee = 'invitee'
         inviter = 'inviter'
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertRaises(HundredAndTenError, game.invite, inviter, invitee)
 
     def test_join(self):
         '''Test a player joining a game'''
         invitee = 'invitee'
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
-        setup.make_space(game)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
+        arrange.make_space(game)
 
         game.join(invitee)
 
@@ -51,15 +51,15 @@ class TestWaitingForPlayersGame(TestCase):
     def test_join_too_many_players(self):
         '''Test joining a full game'''
         invitee = 'invitee'
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_private(self):
         '''Test joining a private game without an invite'''
         invitee = 'invitee'
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
-        setup.make_space(game)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
+        arrange.make_space(game)
         game.accessibility = Accessibility.PRIVATE
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
@@ -67,10 +67,10 @@ class TestWaitingForPlayersGame(TestCase):
     def test_join_invited_to_private(self):
         '''Test joining a public game without an invite'''
         invitee = 'invitee'
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
         game.accessibility = Accessibility.PRIVATE
         game.invite(game.organizer.identifier, invitee)
-        setup.make_space(game)
+        arrange.make_space(game)
 
         game.join(invitee)
 
@@ -79,7 +79,7 @@ class TestWaitingForPlayersGame(TestCase):
     def test_leave(self):
         '''Test leaving a game as a non player'''
         no_one = 'no one'
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         game.leave(no_one)
 
@@ -87,7 +87,7 @@ class TestWaitingForPlayersGame(TestCase):
 
     def test_leave_as_invited_player(self):
         '''Test leaving a game as an invited player'''
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         # want to ensure leaving doesn't rescind an invite so invate someone already in the game
         invited_player = game.players[-1].identifier
@@ -101,7 +101,7 @@ class TestWaitingForPlayersGame(TestCase):
 
     def test_leave_as_organizer(self):
         '''Test leaving a game as an invited player'''
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertRaises(HundredAndTenError, game.leave, game.organizer.identifier)
 

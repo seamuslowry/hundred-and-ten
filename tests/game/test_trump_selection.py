@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from hundredandten.constants import RoundStatus, SelectableSuit
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from tests import setup
+from tests import arrange
 
 
 class TestTrumpSelection(TestCase):
@@ -12,7 +12,7 @@ class TestTrumpSelection(TestCase):
     def test_selecting_trump_outside_status(self):
         '''Can only select trump during the trump selection phase'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         self.assertRaises(HundredAndTenError, game.select_trump,
                           game.active_round.active_player.identifier, SelectableSuit.CLUBS)
@@ -21,7 +21,7 @@ class TestTrumpSelection(TestCase):
     def test_selecting_trump_as_inactive_player(self):
         '''Only the active bidder can select trump'''
 
-        game = setup.game(RoundStatus.TRUMP_SELECTION)
+        game = arrange.game(RoundStatus.TRUMP_SELECTION)
 
         self.assertRaises(HundredAndTenError, game.select_trump,
                           game.active_round.inactive_players[0].identifier, SelectableSuit.CLUBS)
@@ -30,7 +30,7 @@ class TestTrumpSelection(TestCase):
     def test_selecting_trump(self):
         '''The active bidder can select trump'''
 
-        game = setup.game(RoundStatus.TRUMP_SELECTION)
+        game = arrange.game(RoundStatus.TRUMP_SELECTION)
 
         trump = SelectableSuit.DIAMONDS
 

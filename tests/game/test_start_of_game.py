@@ -4,7 +4,7 @@ from unittest import TestCase
 from hundredandten.constants import HAND_SIZE, GameStatus, RoundStatus
 from hundredandten.group import Group
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from tests import setup
+from tests import arrange
 
 
 class TestStartOfGame(TestCase):
@@ -12,7 +12,7 @@ class TestStartOfGame(TestCase):
 
     def test_start_game(self):
         '''Adds the first round when starting a game'''
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertEqual(0, len(game.rounds))
 
@@ -29,7 +29,7 @@ class TestStartOfGame(TestCase):
 
     def test_start_game_with_unjoined_players(self):
         '''Does not add unjoined invitees as players'''
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
         game.invite(game.organizer.identifier, '5th player')
 
         self.assertEqual(0, len(game.rounds))
@@ -41,14 +41,14 @@ class TestStartOfGame(TestCase):
 
     def test_start_game_when_started(self):
         '''Will not allow restarting a game'''
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         game.start_game()
         self.assertRaises(HundredAndTenError, game.start_game)
 
     def test_start_game_with_no_players(self):
         '''Will not allow starting a game with no players'''
-        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
         game.people = Group()
 
         self.assertRaises(HundredAndTenError, game.start_game)
@@ -57,19 +57,19 @@ class TestStartOfGame(TestCase):
         '''Cannot invite a player after the game has started'''
         invitee = 'invitee'
         inviter = 'inviter'
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         self.assertRaises(HundredAndTenError, game.invite, inviter, invitee)
 
     def test_join_after_start(self):
         '''Cannot join a game after it has started'''
         invitee = 'invitee'
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_leave_after_start(self):
         '''Test leaving a game after it has started'''
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         self.assertRaises(HundredAndTenError, game.leave, game.players[-1].identifier)

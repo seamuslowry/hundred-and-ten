@@ -4,7 +4,7 @@ from unittest import TestCase
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.group import Group
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from tests import setup
+from tests import arrange
 
 
 class TestBidding(TestCase):
@@ -13,7 +13,7 @@ class TestBidding(TestCase):
     def test_error_when_no_active_player(self):
         '''Round must always have an active player'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         # clear players to put game in an invalid state to verify error
         game.active_round.players = Group([])
@@ -23,7 +23,7 @@ class TestBidding(TestCase):
     def test_error_when_no_dealer(self):
         '''Round must always have a dealer'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         # remove dealer role to put game in invalid state to verify error
         game.active_round.players.remove_role(game.active_round.dealer.identifier, RoundRole.DEALER)
@@ -33,7 +33,7 @@ class TestBidding(TestCase):
     def test_bid_from_active_player(self):
         '''Active player can place a bid'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
@@ -43,7 +43,7 @@ class TestBidding(TestCase):
     def test_low_bid_from_active_player(self):
         '''Active player cannot place a bid below the current bid'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         game.bid(game.active_round.active_player.identifier, BidAmount.TWENTY)
 
@@ -53,7 +53,7 @@ class TestBidding(TestCase):
     def test_equal_bid_from_active_player(self):
         '''Active player cannot place a bid equal to the current bid'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
@@ -63,10 +63,10 @@ class TestBidding(TestCase):
     def test_low_bid_from_dealer(self):
         '''Dealer cannot place a bid below to the current bid'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         game.bid(game.active_round.active_player.identifier, BidAmount.TWENTY)
-        setup.pass_to_dealer(game)
+        arrange.pass_to_dealer(game)
 
         self.assertRaises(HundredAndTenError, game.bid,
                           game.active_round.active_player.identifier, BidAmount.FIFTEEN)
@@ -74,13 +74,13 @@ class TestBidding(TestCase):
     def test_equal_bid_from_dealer(self):
         '''Dealer can place a bid equal to the current bid'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
         self.assertNotEqual(game.active_round.active_bidder, game.active_round.dealer)
 
-        setup.pass_to_dealer(game)
+        arrange.pass_to_dealer(game)
 
         game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
 
@@ -89,7 +89,7 @@ class TestBidding(TestCase):
     def test_bid_from_passed_player(self):
         '''Inactive player cannot place a bid'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         once_active_player = game.active_round.active_player.identifier
         game.bid(once_active_player, BidAmount.PASS)
@@ -99,7 +99,7 @@ class TestBidding(TestCase):
     def test_bid_from_inactive_player(self):
         '''Inactive player cannot place a bid'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         self.assertRaises(HundredAndTenError, game.bid,
                           game.active_round.inactive_players[0].identifier, BidAmount.FIFTEEN)
@@ -107,7 +107,7 @@ class TestBidding(TestCase):
     def test_pass_from_inactive_player(self):
         '''Inactive player can prepass'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         game.bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS)
 
@@ -117,7 +117,7 @@ class TestBidding(TestCase):
     def test_unpass_from_prepassed_player(self):
         '''Prepassed player can unpass'''
 
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         game.bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS)
 
@@ -130,7 +130,7 @@ class TestBidding(TestCase):
 
     def test_prepass(self):
         '''When the next player has prepassed, auto pass for them'''
-        game = setup.game(RoundStatus.BIDDING)
+        game = arrange.game(RoundStatus.BIDDING)
 
         next_player = game.active_round.players.after(game.active_round.active_player.identifier)
 
