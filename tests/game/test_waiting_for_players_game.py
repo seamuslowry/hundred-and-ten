@@ -6,6 +6,7 @@ from hundredandten.game import Game
 from hundredandten.group import Group, Person
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
+from tests import setup
 
 
 class TestWaitingForPlayersGame(TestCase):
@@ -21,12 +22,11 @@ class TestWaitingForPlayersGame(TestCase):
     def test_invite(self):
         '''Test inviting a player to a game'''
         invitee = 'invitee'
-        inviter = 'inviter'
-        game = Game(Group([Person(inviter, roles={GameRole.PLAYER})]))
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertFalse(invitee in map(lambda i: i.identifier, game.invitees))
 
-        game.invite(inviter, invitee)
+        game.invite(game.players[0].identifier, invitee)
 
         self.assertTrue(invitee in map(lambda i: i.identifier, game.invitees))
 
@@ -34,84 +34,52 @@ class TestWaitingForPlayersGame(TestCase):
         '''Test inviting a player without being in the game yourself'''
         invitee = 'invitee'
         inviter = 'inviter'
-        game = Game()
-
-        self.assertRaises(HundredAndTenError, game.invite, inviter, invitee)
-
-    def test_invite_after_start(self):
-        '''Test inviting a player after the game has started'''
-        invitee = 'invitee'
-        inviter = 'inviter'
-        game = Game(Group([Person(inviter, roles={GameRole.PLAYER})]), rounds=[Round()])
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertRaises(HundredAndTenError, game.invite, inviter, invitee)
 
     def test_join(self):
         '''Test a player joining a game'''
         invitee = 'invitee'
-        game = Game(Group([Person(invitee, {GameRole.INVITEE})]))
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        setup.make_space(game)
 
         game.join(invitee)
 
         self.assertTrue(invitee in map(lambda i: i.identifier, game.players))
 
-    def test_join_after_start(self):
-        '''Test joining a game after it has started'''
-        invitee = 'invitee'
-        game = Game(Group([Person(invitee, {GameRole.INVITEE})]), rounds=[Round()])
-
-        self.assertRaises(HundredAndTenError, game.join, invitee)
-
     def test_join_too_many_players(self):
         '''Test joining a full game'''
         invitee = 'invitee'
-        game = Game(
-            Group(list(map(lambda i: Person(str(i),
-                                            {GameRole.PLAYER}),
-                           range(4))) + [Person(invitee)]))
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
     def test_join_not_invited_to_private(self):
         '''Test joining a private game without an invite'''
         invitee = 'invitee'
-        game = Game(accessibility=Accessibility.PRIVATE)
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        setup.make_space(game)
+        game.accessibility = Accessibility.PRIVATE
 
         self.assertRaises(HundredAndTenError, game.join, invitee)
 
-    def test_join_not_invited_to_public(self):
+    def test_join_invited_to_private(self):
         '''Test joining a public game without an invite'''
         invitee = 'invitee'
-        game = Game()
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game.accessibility = Accessibility.PRIVATE
+        game.invite(game.organizer.identifier, invitee)
+        setup.make_space(game)
 
         game.join(invitee)
 
         self.assertTrue(invitee in map(lambda i: i.identifier, game.players))
 
-    def test_determines_organizer(self):
-        '''Test finding organizer'''
-        organizer = 'organizer'
-        game = Game(Group([Person(identifier=organizer, roles={GameRole.ORGANIZER})]))
-
-        self.assertEqual(game.organizer.identifier, organizer)
-
-    def test_determines_organizer_without_one(self):
-        '''Test finding organizer when no one has the role specifically'''
-        organizer = 'organizer'
-        game = Game(Group([Person(identifier=organizer)]))
-
-        self.assertEqual(game.organizer.identifier, organizer)
-
-    def test_determines_organizer_with_no_players(self):
-        '''Test finding organizer when there are no players'''
-        game = Game()
-
-        self.assertIsNotNone(game.organizer)
-
     def test_leave(self):
         '''Test leaving a game as a non player'''
         no_one = 'no one'
-        game = Game()
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
 
         game.leave(no_one)
 
@@ -119,9 +87,11 @@ class TestWaitingForPlayersGame(TestCase):
 
     def test_leave_as_invited_player(self):
         '''Test leaving a game as an invited player'''
-        invited_player = 'invited'
-        game = Game(Group([Person('organizer', {GameRole.ORGANIZER}), Person(
-            invited_player, {GameRole.INVITEE, GameRole.PLAYER})]))
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+
+        # want to ensure leaving doesn't rescind an invite so invate someone already in the game
+        invited_player = game.players[-1].identifier
+        game.invite(game.organizer.identifier, invited_player)
 
         self.assertIn(Person(invited_player), game.players)
 
@@ -131,10 +101,9 @@ class TestWaitingForPlayersGame(TestCase):
 
     def test_leave_as_organizer(self):
         '''Test leaving a game as an invited player'''
-        organizer = 'organizer'
-        game = Game(Group([Person(organizer, {GameRole.ORGANIZER, GameRole.PLAYER})]))
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
 
-        self.assertRaises(HundredAndTenError, game.leave, organizer)
+        self.assertRaises(HundredAndTenError, game.leave, game.organizer.identifier)
 
     def test_leave_after_start(self):
         '''Test leaving a game after it has started'''

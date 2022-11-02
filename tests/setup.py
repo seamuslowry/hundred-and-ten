@@ -18,6 +18,11 @@ def game(status: AnyStatus) -> Game:
     }[status]()
 
 
+def make_space(game_to_open: Game) -> None:
+    '''Have a player leave a game'''
+    game_to_open.leave(game_to_open.players[-1].identifier)
+
+
 def pass_round(game_to_pass: Game) -> None:
     '''Pass the current round of the provided game'''
     for player in game_to_pass.active_round.bidders:
@@ -34,11 +39,13 @@ def pass_to_dealer(game_to_pass: Game) -> None:
 
 def __get_waiting_for_players_game() -> Game:
     '''Returns a game that is waiting for players'''
-    return Game(
+    new_game = Game(
         people=Group(
             list(map(
                 lambda identifier: Person(str(identifier), roles={GameRole.PLAYER}),
                 range(4)))))
+    new_game.people.add_role(new_game.people[0].identifier, GameRole.ORGANIZER)
+    return new_game
 
 
 def __get_bidding_game() -> Game:

@@ -1,7 +1,7 @@
 '''Test behavior of the Game while it is starting or newly starting'''
 from unittest import TestCase
 
-from hundredandten.constants import HAND_SIZE, GameStatus
+from hundredandten.constants import HAND_SIZE, GameStatus, RoundStatus
 from hundredandten.group import Group
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import setup
@@ -52,3 +52,24 @@ class TestStartOfGame(TestCase):
         game.people = Group()
 
         self.assertRaises(HundredAndTenError, game.start_game)
+
+    def test_invite_after_start(self):
+        '''Cannot invite a player after the game has started'''
+        invitee = 'invitee'
+        inviter = 'inviter'
+        game = setup.game(RoundStatus.BIDDING)
+
+        self.assertRaises(HundredAndTenError, game.invite, inviter, invitee)
+
+    def test_join_after_start(self):
+        '''Cannot join a game after it has started'''
+        invitee = 'invitee'
+        game = setup.game(RoundStatus.BIDDING)
+
+        self.assertRaises(HundredAndTenError, game.join, invitee)
+
+    def test_leave_after_start(self):
+        '''Test leaving a game after it has started'''
+        game = setup.game(RoundStatus.BIDDING)
+
+        self.assertRaises(HundredAndTenError, game.leave, game.players[-1].identifier)

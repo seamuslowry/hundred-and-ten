@@ -31,10 +31,10 @@ class Game:
     def join(self, player: str) -> None:
         '''Add a player to the game'''
 
-        if len(self.players) >= 4:
-            raise HundredAndTenError("You cannot join this game. It is at capacity.")
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("You cannot join this game. It has already started.")
+        if len(self.players) >= 4:
+            raise HundredAndTenError("You cannot join this game. It is at capacity.")
         if (self.accessibility != Accessibility.PUBLIC
                 and GameRole.INVITEE not in self.people.find_or_use(Player(player)).roles):
             raise HundredAndTenError("You cannot join this game. You must be invited first.")
