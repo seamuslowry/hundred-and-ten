@@ -1,8 +1,20 @@
 '''Helpers to create a game in setup for testing'''
 
-from hundredandten.constants import BidAmount, GameRole
+from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
+                                     GameStatus, RoundStatus, SelectableSuit)
 from hundredandten.game import Game
 from hundredandten.group import Group, Person
+
+
+def setup_game(status: AnyStatus, player_count: int = 2) -> Game:
+    '''Return a game in the requested status'''
+
+    return {
+        GameStatus.WAITING_FOR_PLAYERS: get_waiting_for_players_game,
+        RoundStatus.BIDDING: get_bidding_game,
+        RoundStatus.COMPLETED_NO_BIDDERS: get_completed_no_bidders_game,
+        RoundStatus.TRUMP_SELECTION: get_trump_selection_game
+    }[status](player_count)
 
 
 def get_waiting_for_players_game(player_count: int = 2) -> Game:
@@ -35,4 +47,11 @@ def get_trump_selection_game(player_count: int = 2) -> Game:
     for player in game.active_round.inactive_players:
         game.bid(player.identifier, BidAmount.PASS)
     game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+    return game
+
+
+def get_tricks_game(player_count: int = 2) -> Game:
+    '''Return a game in the trump selection status'''
+    game = get_trump_selection_game(player_count)
+    game.select_trump(game.active_round.active_player.identifier, SelectableSuit.SPADES)
     return game
