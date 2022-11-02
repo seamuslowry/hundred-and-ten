@@ -10,14 +10,14 @@ def setup_game(status: AnyStatus, player_count: int = 2) -> Game:
     '''Return a game in the requested status'''
 
     return {
-        GameStatus.WAITING_FOR_PLAYERS: get_waiting_for_players_game,
+        GameStatus.WAITING_FOR_PLAYERS: __get_waiting_for_players_game,
         RoundStatus.BIDDING: get_bidding_game,
         RoundStatus.COMPLETED_NO_BIDDERS: get_completed_no_bidders_game,
         RoundStatus.TRUMP_SELECTION: get_trump_selection_game
     }[status](player_count)
 
 
-def get_waiting_for_players_game(player_count: int = 2) -> Game:
+def __get_waiting_for_players_game(player_count: int = 2) -> Game:
     '''Returns a game that is waiting for players'''
     return Game(
         people=Group(
@@ -28,7 +28,7 @@ def get_waiting_for_players_game(player_count: int = 2) -> Game:
 
 def get_bidding_game(player_count: int = 2) -> Game:
     '''Returns a game in the bidding status'''
-    game = get_waiting_for_players_game(player_count)
+    game = __get_waiting_for_players_game(player_count)
     game.start_game()
     return game
 
