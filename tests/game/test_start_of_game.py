@@ -1,10 +1,10 @@
 '''Test behavior of the Game while it is starting or newly starting'''
 from unittest import TestCase
 
-from hundredandten.constants import HAND_SIZE, GameRole
-from hundredandten.game import Game
-from hundredandten.group import Group, Person
+from hundredandten.constants import HAND_SIZE, GameStatus
+from hundredandten.group import Group
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+from tests import setup
 
 
 class TestStartOfGame(TestCase):
@@ -12,9 +12,7 @@ class TestStartOfGame(TestCase):
 
     def test_start_game(self):
         '''Adds the first round when starting a game'''
-        game = Game(
-            people=Group([Person('1', roles={GameRole.PLAYER}),
-                          Person('2', roles={GameRole.PLAYER})]))
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertEqual(0, len(game.rounds))
 
@@ -30,11 +28,9 @@ class TestStartOfGame(TestCase):
         self.assertTrue(all(len(p.hand) == HAND_SIZE for p in game.active_round.players))
 
     def test_start_game_with_unjoined_players(self):
-        '''Adds the first round when starting a game'''
-        game = Game(
-            people=Group([Person('1', roles={GameRole.PLAYER}),
-                          Person('2', roles={GameRole.PLAYER}),
-                          Person('3', roles={GameRole.INVITEE})]))
+        '''Does not add unjoined invitees as players'''
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game.invite(game.organizer.identifier, '5th player')
 
         self.assertEqual(0, len(game.rounds))
 
@@ -45,15 +41,14 @@ class TestStartOfGame(TestCase):
 
     def test_start_game_when_started(self):
         '''Will not allow restarting a game'''
-        game = Game(
-            people=Group([Person('1', roles={GameRole.PLAYER}),
-                          Person('2', roles={GameRole.PLAYER})]))
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
 
         game.start_game()
         self.assertRaises(HundredAndTenError, game.start_game)
 
     def test_start_game_with_no_players(self):
         '''Will not allow starting a game with no players'''
-        game = Game()
+        game = setup.game(GameStatus.WAITING_FOR_PLAYERS)
+        game.people = Group()
 
         self.assertRaises(HundredAndTenError, game.start_game)
