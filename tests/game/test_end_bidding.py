@@ -3,9 +3,8 @@ from unittest import TestCase
 
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from tests.game_creation import (get_bidding_game,
-                                 get_completed_no_bidders_game,
-                                 get_trump_selection_game)
+from tests.game_setup import (get_completed_no_bidders_game,
+                              get_trump_selection_game, setup_game)
 
 
 class TestEndBidding(TestCase):
@@ -40,7 +39,7 @@ class TestEndBidding(TestCase):
 
     def test_end_bidding_with_prepass(self):
         '''When all players have prepassed, the round can end'''
-        game = get_bidding_game(4)
+        game = setup_game(RoundStatus.BIDDING, 4)
 
         self.assertEqual(0, len(game.active_round.bids))
 
@@ -64,7 +63,7 @@ class TestEndBidding(TestCase):
         otherwise, it passes to the next player
         '''
 
-        game = get_bidding_game()
+        game = setup_game(RoundStatus.BIDDING)
 
         # first round as dealer
         game.bid(game.active_round.active_player.identifier, BidAmount.PASS)

@@ -1,4 +1,4 @@
-'''Helpers to create a game in setup for testing'''
+'''Helpers to set up a game for testing'''
 
 from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
                                      GameStatus, RoundStatus, SelectableSuit)
@@ -11,7 +11,7 @@ def setup_game(status: AnyStatus, player_count: int = 2) -> Game:
 
     return {
         GameStatus.WAITING_FOR_PLAYERS: __get_waiting_for_players_game,
-        RoundStatus.BIDDING: get_bidding_game,
+        RoundStatus.BIDDING: __get_bidding_game,
         RoundStatus.COMPLETED_NO_BIDDERS: get_completed_no_bidders_game,
         RoundStatus.TRUMP_SELECTION: get_trump_selection_game
     }[status](player_count)
@@ -26,7 +26,7 @@ def __get_waiting_for_players_game(player_count: int = 2) -> Game:
                 range(player_count)))))
 
 
-def get_bidding_game(player_count: int = 2) -> Game:
+def __get_bidding_game(player_count: int = 2) -> Game:
     '''Returns a game in the bidding status'''
     game = __get_waiting_for_players_game(player_count)
     game.start_game()
@@ -35,7 +35,7 @@ def get_bidding_game(player_count: int = 2) -> Game:
 
 def get_completed_no_bidders_game(player_count: int = 2) -> Game:
     '''Returns a game in the completed no bidders status'''
-    game = get_bidding_game(player_count)
+    game = __get_bidding_game(player_count)
     for player in game.players:
         game.bid(player.identifier, BidAmount.PASS)
     return game
@@ -43,7 +43,7 @@ def get_completed_no_bidders_game(player_count: int = 2) -> Game:
 
 def get_trump_selection_game(player_count: int = 2) -> Game:
     '''Return a game in the trump selection status'''
-    game = get_bidding_game(player_count)
+    game = __get_bidding_game(player_count)
     for player in game.active_round.inactive_players:
         game.bid(player.identifier, BidAmount.PASS)
     game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
