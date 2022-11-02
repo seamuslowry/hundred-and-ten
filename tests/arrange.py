@@ -6,6 +6,7 @@ from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
                                      GameStatus, RoundStatus, SelectableSuit)
 from hundredandten.game import Game
 from hundredandten.group import Group, Person
+from hundredandten.trick import Play
 
 
 def game(
@@ -43,6 +44,14 @@ def pass_to_dealer(game_to_pass: Game) -> None:
             lambda player: player != game_to_pass.active_round.dealer,
             game_to_pass.active_round.bidders):
         game_to_pass.bid(player.identifier, BidAmount.PASS)
+
+
+def play_trick(game_to_play: Game) -> None:
+    '''Play through the current trick of the provided game'''
+    preexisting_trick_count = len(game_to_play.active_round.tricks)
+    while len(game_to_play.active_round.tricks) == preexisting_trick_count:
+        active_player = game_to_play.active_round.active_player
+        game_to_play.play(Play(active_player.identifier, active_player.hand[0]))
 
 
 def __get_waiting_for_players_game() -> Game:

@@ -22,6 +22,7 @@ class RoundStatus(Enum):
     TRUMP_SELECTION = 2
     COMPLETED_NO_BIDDERS = 3
     TRICKS = 4
+    COMPLETED = 5
 
 
 AnyStatus = Union[GameStatus, RoundStatus]
