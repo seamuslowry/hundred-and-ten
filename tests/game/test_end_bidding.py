@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from tests.game_setup import get_trump_selection_game, setup_game
+from tests.game_setup import setup_game
 
 
 class TestEndBidding(TestCase):
@@ -12,7 +12,7 @@ class TestEndBidding(TestCase):
     def test_end_bidding_with_bids(self):
         '''Bidding ends when there is only one bidder with an active bid'''
 
-        game = get_trump_selection_game()
+        game = setup_game(RoundStatus.TRUMP_SELECTION)
 
         self.assertEqual(game.status, RoundStatus.TRUMP_SELECTION)
         self.assertEqual(game.active_round.active_player, game.active_round.active_bidder)
@@ -20,7 +20,7 @@ class TestEndBidding(TestCase):
     def test_cannot_bid_after_bidding_stage(self):
         '''Bidding can only occur in the bidding stage'''
 
-        game = get_trump_selection_game()
+        game = setup_game(RoundStatus.TRUMP_SELECTION)
 
         self.assertNotEqual(game.status, RoundStatus.BIDDING)
         self.assertRaises(HundredAndTenError, game.bid,
