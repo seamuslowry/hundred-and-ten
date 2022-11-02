@@ -1,4 +1,4 @@
-'''Track a trick'''
+'''Track a discard'''
 from dataclasses import dataclass
 
 from hundredandten.deck import Card
