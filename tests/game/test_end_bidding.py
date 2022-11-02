@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from tests.game_setup import setup_game
+from tests import setup
 
 
 class TestEndBidding(TestCase):
@@ -12,7 +12,7 @@ class TestEndBidding(TestCase):
     def test_end_bidding_with_bids(self):
         '''Bidding ends when there is only one bidder with an active bid'''
 
-        game = setup_game(RoundStatus.TRUMP_SELECTION)
+        game = setup.game(RoundStatus.TRUMP_SELECTION)
 
         self.assertEqual(game.status, RoundStatus.TRUMP_SELECTION)
         self.assertEqual(game.active_round.active_player, game.active_round.active_bidder)
@@ -20,7 +20,7 @@ class TestEndBidding(TestCase):
     def test_cannot_bid_after_bidding_stage(self):
         '''Bidding can only occur in the bidding stage'''
 
-        game = setup_game(RoundStatus.TRUMP_SELECTION)
+        game = setup.game(RoundStatus.TRUMP_SELECTION)
 
         self.assertNotEqual(game.status, RoundStatus.BIDDING)
         self.assertRaises(HundredAndTenError, game.bid,
@@ -29,7 +29,7 @@ class TestEndBidding(TestCase):
     def test_end_bidding_with_pass(self):
         '''Bidding ends when everyone has passed'''
 
-        game = setup_game(RoundStatus.COMPLETED_NO_BIDDERS)
+        game = setup.game(RoundStatus.COMPLETED_NO_BIDDERS)
 
         # old round ended as completed no bidders
         self.assertEqual(game.rounds[-2].status, RoundStatus.COMPLETED_NO_BIDDERS)
@@ -38,7 +38,7 @@ class TestEndBidding(TestCase):
 
     def test_end_bidding_with_prepass(self):
         '''When all players have prepassed, the round can end'''
-        game = setup_game(RoundStatus.BIDDING, 4)
+        game = setup.game(RoundStatus.BIDDING)
 
         self.assertEqual(0, len(game.active_round.bids))
 
@@ -62,28 +62,24 @@ class TestEndBidding(TestCase):
         otherwise, it passes to the next player
         '''
 
-        game = setup_game(RoundStatus.BIDDING)
+        game = setup.game(RoundStatus.BIDDING)
 
         # first round as dealer
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        setup.pass_round(game)
 
         self.assertEqual(game.rounds[-2].dealer, game.active_round.dealer)
 
         # second round as dealer
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        setup.pass_round(game)
 
         self.assertEqual(game.rounds[-2].dealer, game.active_round.dealer)
 
         # third round as dealer
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        setup.pass_round(game)
 
         self.assertNotEqual(game.rounds[-2].dealer, game.active_round.dealer)
 
         # first round with new dealer won't swap
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        setup.pass_round(game)
 
         self.assertEqual(game.rounds[-2].dealer, game.active_round.dealer)
