@@ -72,9 +72,6 @@ class TestPlayCard(TestCase):
     def test_play_through_round(self):
         '''A new round is created after all tricks are played'''
 
-        game = arrange.game(RoundStatus.TRICKS)
-
-        while game.status != RoundStatus.BIDDING:
-            arrange.play_trick(game)
+        game = arrange.game(RoundStatus.TRICKS, arrange.play_round)
 
         self.assertEqual(2, len(game.rounds))
