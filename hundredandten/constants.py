@@ -3,6 +3,7 @@ from enum import Enum, IntEnum
 from typing import Union
 
 HAND_SIZE = 5
+TRICK_VALUE = 5
 
 
 class Accessibility(Enum):

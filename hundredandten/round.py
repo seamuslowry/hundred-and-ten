@@ -2,11 +2,12 @@
 
 
 from dataclasses import dataclass, field
+from functools import reduce
 from typing import Optional
 
 from hundredandten.bid import Bid
-from hundredandten.constants import (BidAmount, RoundRole, RoundStatus,
-                                     SelectableSuit)
+from hundredandten.constants import (TRICK_VALUE, BidAmount, RoundRole,
+                                     RoundStatus, SelectableSuit)
 from hundredandten.deck import Deck
 from hundredandten.discard import Discard
 from hundredandten.group import Group, Player
@@ -223,3 +224,56 @@ class Round:
         if not self.bidders:
             return RoundStatus.COMPLETED_NO_BIDDERS
         return RoundStatus.BIDDING
+
+    @property
+    def scores(self) -> dict[str, int]:
+        """
+        The scores each player earned for this round
+        A dictionary in the form
+        key: player identifier
+        value: player score
+        """
+        assert self.active_bidder
+        assert self.active_bid
+
+        naive_scores = self.__naive_scores
+
+        bidder_identifier = self.active_bidder.identifier
+        bidder_naive_score = naive_scores[bidder_identifier]
+
+        shot_the_moon = self.active_bid == BidAmount.SHOOT_THE_MOON and all(
+            k == bidder_identifier or v == 0 for k, v in naive_scores.items())
+        met_bid = bidder_naive_score >= self.active_bid
+
+        bidder_score = bidder_naive_score
+        if shot_the_moon:
+            bidder_score = BidAmount.SHOOT_THE_MOON
+        elif not met_bid:
+            bidder_score = self.active_bid * -1
+
+        return {
+            **naive_scores,
+            bidder_identifier: bidder_score
+        }
+
+    @property
+    def __naive_scores(self) -> dict[str, int]:
+        assert self.trump
+        none_type_winning_plays = [trick.winning_play(self.trump) for trick in self.tricks]
+        winning_plays = [play for play in none_type_winning_plays if play is not None]
+
+        trump_wins = [play for play in winning_plays
+                      if play.card.suit == self.trump or
+                      play.card.always_trump]
+        highest_play = max(
+            trump_wins, key=lambda play: play.card.trump_value, default=winning_plays[0])
+
+        scores = reduce(
+            lambda acc, curr: {**acc,
+                               curr.identifier: acc[curr.identifier] + TRICK_VALUE},
+            winning_plays, {player.identifier: 0 for player in self.players})
+
+        # the most valuable trick is counted as two tricks
+        scores[highest_play.identifier] += TRICK_VALUE
+
+        return scores
