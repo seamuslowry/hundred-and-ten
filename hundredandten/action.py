@@ -1,4 +1,4 @@
-'''Track a bid'''
+'''All the actions a player can take to interact with the game'''
 from dataclasses import dataclass, field
 
 from hundredandten.constants import BidAmount
