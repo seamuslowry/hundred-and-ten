@@ -1,7 +1,7 @@
 '''Test to ensure bids are compared properly'''
 from unittest import TestCase
 
-from hundredandten.action import Bid
+from hundredandten.actions import Bid
 from hundredandten.constants import BidAmount
 
 

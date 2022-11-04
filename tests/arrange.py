@@ -4,7 +4,7 @@ from typing import Callable, Optional
 
 from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
                                      GameStatus, RoundStatus, SelectableSuit)
-from hundredandten.action import Discard
+from hundredandten.actions import Discard
 from hundredandten.game import Game
 from hundredandten.group import Group, Person
 from hundredandten.trick import Play

@@ -1,7 +1,7 @@
 '''Test behavior of the Game when going around discarding'''
 from unittest import TestCase
 
-from hundredandten.action import Discard
+from hundredandten.actions import Discard
 from hundredandten.constants import HAND_SIZE, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import arrange

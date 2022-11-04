@@ -4,7 +4,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from hundredandten.action import Bid, Discard
+from hundredandten.actions import Bid, Discard
 from hundredandten.constants import (TRICK_VALUE, BidAmount, RoundRole,
                                      RoundStatus, SelectableSuit)
 from hundredandten.deck import Deck
