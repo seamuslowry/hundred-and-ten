@@ -1,5 +1,4 @@
 '''Interact with a list of people'''
-
 from dataclasses import dataclass, field
 from typing import Optional, TypeVar
 

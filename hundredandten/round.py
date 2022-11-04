@@ -1,6 +1,4 @@
 '''Represent one round of a game of Hundred and Ten'''
-
-
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -24,7 +22,7 @@ class Round:
     tricks: list[Trick] = field(default_factory=list)
 
     def bid(self, bid: Bid) -> None:
-        "Record a bid from a player"
+        '''Record a bid from a player'''
         identifier = bid.identifier
         amount = bid.amount
         if self.status == RoundStatus.BIDDING and self.active_player == self.players.by_identifier(
@@ -141,7 +139,7 @@ class Round:
 
     @property
     def dealer(self) -> Player:
-        """The dealer this round."""
+        '''The dealer this round.'''
         dlr = next(iter(self.players.by_role(RoundRole.DEALER)), None)
         if not dlr:
             raise HundredAndTenError("No dealer found.")
@@ -149,7 +147,7 @@ class Round:
 
     @property
     def active_player(self) -> Player:
-        """The current active player."""
+        '''The current active player.'''
         # while bidding, the active player is the one after the last bidder that can place a bid
         if self.status == RoundStatus.BIDDING:
             # before anyone has bid, treat the dealer as the last bidder
@@ -190,24 +188,24 @@ class Round:
 
     @property
     def inactive_players(self) -> Group[Player]:
-        """The players that are not active."""
+        '''The players that are not active.'''
         return Group([p for p in self.players if p != self.active_player])
 
     @property
     def active_bid(self) -> Optional[BidAmount]:
-        """The maximum bid submitted this round"""
+        '''The maximum bid submitted this round'''
         return max(self.bids).amount if self.bids else None
 
     @property
     def bidders(self) -> Group[Player]:
-        """Anyone in this round that can still submit a bid."""
+        '''Anyone in this round that can still submit a bid.'''
         return Group(
             [p for p in self.players
              if self.__current_bid(p.identifier) != Bid('', BidAmount.PASS)])
 
     @property
     def active_bidder(self) -> Optional[Player]:
-        """The active bidder this round."""
+        '''The active bidder this round.'''
 
         if not self.active_bid or len(self.bidders) != 1:
             return None
@@ -215,14 +213,14 @@ class Round:
 
     @property
     def active_trick(self) -> Trick:
-        """The current active trick"""
+        '''The current active trick'''
         if not self.tricks:
             raise HundredAndTenError("No active trick found.")
         return self.tricks[-1]
 
     @property
     def status(self) -> RoundStatus:
-        """The status property."""
+        '''The status property.'''
         if self.tricks and all(not player.hand for player in self.players):
             return RoundStatus.COMPLETED
         if len(self.discards) == len(self.players):
@@ -237,7 +235,7 @@ class Round:
 
     @property
     def scores(self) -> list[Score]:
-        """
+        '''
         The scores each player earned for this round
         A list of tuples in the form
         left: player identifier
@@ -245,7 +243,7 @@ class Round:
 
         The list will come in the order the points were earned.
         This is to determine a disputed winner
-        """
+        '''
         naive_scores = self.__ordered_naive_scores
 
         # use default values here so scores can be calculated before tricks are played
