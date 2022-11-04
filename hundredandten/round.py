@@ -24,7 +24,7 @@ class Round:
     tricks: list[Trick] = field(default_factory=list)
 
     def bid(self, bid: Bid) -> None:
-        "Record a bid from a player"
+        """Record a bid from a player"""
         identifier = bid.identifier
         amount = bid.amount
         if self.status == RoundStatus.BIDDING and self.active_player == self.players.by_identifier(
