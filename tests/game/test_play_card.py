@@ -1,11 +1,11 @@
 '''Test behavior of the Game when playing a card'''
 from unittest import TestCase
 
+from hundredandten.actions import Play
 from hundredandten.constants import (HAND_SIZE, CardNumber, RoundStatus,
                                      SelectableSuit)
 from hundredandten.deck import Card
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.trick import Play
 from tests import arrange
 
 
@@ -31,7 +31,7 @@ class TestPlayCard(TestCase):
         original_active_player = game.active_round.active_player
         play = Play(original_active_player.identifier, original_active_player.hand[0])
 
-        game.play(play)
+        game.act(play)
 
         self.assertEqual(HAND_SIZE - 1, len(original_active_player.hand))
         self.assertNotIn(play.card, original_active_player.hand)
@@ -45,15 +45,15 @@ class TestPlayCard(TestCase):
         active_player = game.active_round.active_player
         play = Play(active_player.identifier, active_player.hand[0])
 
-        game.play(play)
-        self.assertRaises(HundredAndTenError, game.play, play)
+        game.act(play)
+        self.assertRaises(HundredAndTenError, game.act, play)
 
     def test_cannot_play_other_players_card(self):
         '''A player can only play their own cards'''
 
         game = arrange.game(RoundStatus.TRICKS)
 
-        self.assertRaises(HundredAndTenError, game.play, Play(
+        self.assertRaises(HundredAndTenError, game.act, Play(
             game.active_round.active_player.identifier,
             game.active_round.inactive_players[0].hand[0]))
 
@@ -76,11 +76,11 @@ class TestPlayCard(TestCase):
 
         self.assertFalse(game.active_round.active_trick.bleeding)
 
-        game.play(Play(active_player.identifier, active_player.hand[0]))
+        game.act(Play(active_player.identifier, active_player.hand[0]))
 
         self.assertTrue(game.active_round.active_trick.bleeding)
 
-        self.assertRaises(HundredAndTenError, game.play, Play(
+        self.assertRaises(HundredAndTenError, game.act, Play(
             game.active_round.active_player.identifier,
             game.active_round.active_player.hand[0]))
 
@@ -102,12 +102,12 @@ class TestPlayCard(TestCase):
 
         self.assertFalse(game.active_round.active_trick.bleeding)
 
-        game.play(Play(active_player.identifier, active_player.hand[0]))
+        game.act(Play(active_player.identifier, active_player.hand[0]))
 
         self.assertTrue(game.active_round.active_trick.bleeding)
 
-        game.play(Play(game.active_round.active_player.identifier,
-                  game.active_round.active_player.hand[0]))
+        game.act(Play(game.active_round.active_player.identifier,
+                      game.active_round.active_player.hand[0]))
 
         self.assertTrue(game.active_round.active_trick.bleeding)
         self.assertEqual(2, len(game.active_round.active_trick.plays))

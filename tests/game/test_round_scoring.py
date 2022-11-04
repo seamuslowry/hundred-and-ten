@@ -1,7 +1,7 @@
 '''Test to ensure rounds are scored properly'''
 from unittest import TestCase
 
-from hundredandten.bid import Bid
+from hundredandten.actions import Bid
 from hundredandten.constants import BidAmount, RoundStatus
 from hundredandten.trick import Score
 from tests import arrange

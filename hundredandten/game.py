@@ -2,19 +2,18 @@
 from dataclasses import dataclass, field
 from functools import reduce
 from random import Random
-from typing import Optional
+from typing import Optional, Union
 from uuid import UUID, uuid4
 
+from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
 from hundredandten.constants import (HAND_SIZE, WINNING_SCORE, Accessibility,
-                                     AnyStatus, BidAmount, GameRole,
-                                     GameStatus, RoundRole, RoundStatus,
-                                     SelectableSuit)
+                                     AnyStatus, GameRole, GameStatus,
+                                     RoundRole, RoundStatus)
 from hundredandten.deck import Deck
-from hundredandten.discard import Discard
 from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
-from hundredandten.trick import Play, Score
+from hundredandten.trick import Score
 
 
 @dataclass
@@ -72,26 +71,39 @@ class Game:
 
         self.__new_round(self.players[0].identifier)
 
-    def bid(self, identifier: str, amount: BidAmount) -> None:
+    def act(self, action: Union[Bid, Discard, Play, SelectTrump, Unpass]) -> None:
+        '''Perform an action as a player of the game'''
+        if isinstance(action, Bid):
+            self.__bid(action)
+        if isinstance(action, Unpass):
+            self.__unpass(action)
+        if isinstance(action, SelectTrump):
+            self.__select_trump(action)
+        if isinstance(action, Discard):
+            self.__discard(action)
+        if isinstance(action, Play):
+            self.__play(action)
+
+    def __bid(self, bid: Bid) -> None:
         '''Place a bid from the identified player'''
-        self.active_round.bid(identifier, amount)
+        self.active_round.bid(bid)
         self.__end_bid()
 
-    def unpass(self, identifier: str) -> None:
+    def __unpass(self, unpass: Unpass) -> None:
         '''Discount a pre-pass bid from the identified player'''
-        self.active_round.unpass(identifier)
+        self.active_round.unpass(unpass)
 
-    def select_trump(self, identifier: str, trump: SelectableSuit) -> None:
+    def __select_trump(self, select_trump: SelectTrump) -> None:
         '''Select the passed suit as trump'''
-        self.active_round.select_trump(identifier, trump)
+        self.active_round.select_trump(select_trump)
 
-    def discard(self, discard: Discard) -> None:
+    def __discard(self, discard: Discard) -> None:
         '''
         Discard the selected cards from the identified player's hand and replace them
         '''
         self.active_round.discard(discard)
 
-    def play(self, play: Play) -> None:
+    def __play(self, play: Play) -> None:
         '''Play the specified card from the identified player's hand'''
         self.active_round.play(play)
         self.__end_play()
