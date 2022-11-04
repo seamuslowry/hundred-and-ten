@@ -2,7 +2,6 @@
 
 
 from dataclasses import dataclass, field
-from functools import reduce
 from typing import Optional
 
 from hundredandten.bid import Bid
@@ -12,7 +11,7 @@ from hundredandten.deck import Deck
 from hundredandten.discard import Discard
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.trick import Play, Trick
+from hundredandten.trick import Play, Score, Trick
 
 
 @dataclass
@@ -67,10 +66,19 @@ class Round:
 
     def play(self, play: Play) -> None:
         '''Play the specified card from the identified player's hand'''
+
+        active_player_trump_cards = [
+            card for card in self.active_player.hand
+            if card.suit == self.trump or card.always_trump]
+
         if self.active_player.identifier != play.identifier:
             raise HundredAndTenError("Cannot play a card out of turn.")
         if play.card not in self.active_player.hand:
             raise HundredAndTenError("Cannot play a card you do not have.")
+        if (self.active_trick.bleeding and
+                active_player_trump_cards and
+                not play.card in active_player_trump_cards):
+            raise HundredAndTenError("You must play a trump card when the trick is bleeding.")
 
         self.active_player.hand.remove(play.card)
         self.active_trick.plays.append(play)
@@ -127,7 +135,8 @@ class Round:
             self.__new_trick()
 
     def __new_trick(self) -> None:
-        self.tricks.append(Trick())
+        assert self.trump
+        self.tricks.append(Trick(self.trump))
 
     @property
     def dealer(self) -> Player:
@@ -167,7 +176,7 @@ class Round:
                 if len(self.tricks) == 1:
                     return self.players.after(self.active_bidder.identifier)
                 # otherwise, its the winner of the last trick
-                winning_play = self.tricks[-2].winning_play(self.trump)
+                winning_play = self.tricks[-2].winning_play
                 # when we have more than one trick, any previous trick will have a winning play
                 assert winning_play
                 winner = self.players.by_identifier(winning_play.identifier)
@@ -226,54 +235,55 @@ class Round:
         return RoundStatus.BIDDING
 
     @property
-    def scores(self) -> dict[str, int]:
+    def scores(self) -> list[Score]:
         """
         The scores each player earned for this round
-        A dictionary in the form
-        key: player identifier
-        value: player score
+        A list of tuples in the form
+        left: player identifier
+        value: score for the trick
+
+        The list will come in the order the points were earned.
+        This is to determine a disputed winner
         """
-        assert self.active_bidder
-        assert self.active_bid
+        naive_scores = self.__ordered_naive_scores
 
-        naive_scores = self.__naive_scores
+        # use default values here so scores can be calculated before tricks are played
+        # should return all zeros
+        acting_bidder = self.active_bidder or self.players[0]
+        acting_bid = self.active_bid or BidAmount.PASS
 
-        bidder_identifier = self.active_bidder.identifier
-        bidder_naive_score = naive_scores[bidder_identifier]
+        bidder_identifier = acting_bidder.identifier
+        bidder_naive_scores = list(
+            filter(
+                lambda score: score.identifier == bidder_identifier,
+                naive_scores))
+        non_bidder_naive_scores = [score for score in naive_scores
+                                   if score not in bidder_naive_scores]
+        bidder_naive_score = sum(map(lambda score: score.value, bidder_naive_scores))
 
         shot_the_moon = self.active_bid == BidAmount.SHOOT_THE_MOON and all(
-            k == bidder_identifier or v == 0 for k, v in naive_scores.items())
-        met_bid = bidder_naive_score >= self.active_bid
+            score.identifier == bidder_identifier for score in naive_scores)
+        met_bid = bidder_naive_score >= acting_bid
 
-        bidder_score = bidder_naive_score
         if shot_the_moon:
-            bidder_score = BidAmount.SHOOT_THE_MOON
-        elif not met_bid:
-            bidder_score = self.active_bid * -1
+            return [Score(bidder_identifier, BidAmount.SHOOT_THE_MOON)]
+        if not met_bid:
+            return [Score(bidder_identifier, -1 * acting_bid)] + non_bidder_naive_scores
 
-        return {
-            **naive_scores,
-            bidder_identifier: bidder_score
-        }
+        return naive_scores
 
     @property
-    def __naive_scores(self) -> dict[str, int]:
-        assert self.trump
-        none_type_winning_plays = [trick.winning_play(self.trump) for trick in self.tricks]
+    def __ordered_naive_scores(self) -> list[Score]:
+        none_type_winning_plays = [trick.winning_play for trick in self.tricks]
         winning_plays = [play for play in none_type_winning_plays if play is not None]
 
         trump_wins = [play for play in winning_plays
                       if play.card.suit == self.trump or
                       play.card.always_trump]
         highest_play = max(
-            trump_wins, key=lambda play: play.card.trump_value, default=winning_plays[0])
+            trump_wins, key=lambda play: play.card.trump_value, default=None)
 
-        scores = reduce(
-            lambda acc, curr: {**acc,
-                               curr.identifier: acc[curr.identifier] + TRICK_VALUE},
-            winning_plays, {player.identifier: 0 for player in self.players})
-
-        # the most valuable trick is counted as two tricks
-        scores[highest_play.identifier] += TRICK_VALUE
-
-        return scores
+        return list(map(lambda play: Score(play.identifier, TRICK_VALUE +
+                                           # treat the highest value play as two tricks
+                                           (TRICK_VALUE if play == highest_play else 0)),
+                        winning_plays))

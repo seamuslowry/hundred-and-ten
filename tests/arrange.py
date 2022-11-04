@@ -25,7 +25,8 @@ def game(
         RoundStatus.COMPLETED_NO_BIDDERS: __get_completed_no_bidders_game,
         RoundStatus.TRUMP_SELECTION: __get_trump_selection_game,
         RoundStatus.DISCARD: __get_discard_game,
-        RoundStatus.TRICKS: __get_tricks_game
+        RoundStatus.TRICKS: __get_tricks_game,
+        GameStatus.WON: __get_won_game
     }[status](seed)
     massage(new_game)
     return new_game
@@ -50,18 +51,38 @@ def pass_to_dealer(game_to_pass: Game) -> None:
         game_to_pass.bid(player.identifier, BidAmount.PASS)
 
 
+def bid(game_to_bid: Game) -> None:
+    '''Have the active player place a bid'''
+    for player in game_to_bid.active_round.inactive_players:
+        game_to_bid.bid(player.identifier, BidAmount.PASS)
+    game_to_bid.bid(game_to_bid.active_round.active_player.identifier, BidAmount.FIFTEEN)
+
+
+def select_trump(game_to_select: Game) -> None:
+    '''Have the active player select a trump'''
+    game_to_select.select_trump(
+        game_to_select.active_round.active_player.identifier, SelectableSuit.SPADES)
+
+
+def discard(game_to_discard: Game) -> None:
+    '''Have all players discard'''
+    while game_to_discard.status == RoundStatus.DISCARD:
+        game_to_discard.discard(Discard(game_to_discard.active_round.active_player.identifier, []))
+
+
 def play_trick(game_to_play: Game) -> None:
     '''Play through the current trick of the provided game'''
-    preexisting_trick_count = len(game_to_play.active_round.tricks)
-    while len(game_to_play.active_round.tricks) == preexisting_trick_count:
+    starting_active_trick = game_to_play.active_round.active_trick
+    while len(starting_active_trick.plays) < len(game_to_play.players):
         active_player = game_to_play.active_round.active_player
-        game_to_play.play(Play(active_player.identifier, active_player.hand[0]))
+        trumps = [card for card in active_player.hand if card.suit ==
+                  game_to_play.active_round.trump or card.always_trump]
+        game_to_play.play(Play(active_player.identifier, next(iter(trumps + active_player.hand))))
 
 
 def play_round(game_to_play: Game) -> None:
     '''Play through the current trick of the provided game'''
-    preexisting_round_count = len(game_to_play.rounds)
-    while len(game_to_play.rounds) == preexisting_round_count:
+    while game_to_play.status == RoundStatus.TRICKS:
         play_trick(game_to_play)
 
 
@@ -93,23 +114,32 @@ def __get_completed_no_bidders_game(seed: Optional[str]) -> Game:
 def __get_trump_selection_game(seed: Optional[str]) -> Game:
     '''Return a game in the trump selection status'''
     new_game = __get_bidding_game(seed)
-    for player in new_game.active_round.inactive_players:
-        new_game.bid(player.identifier, BidAmount.PASS)
-    new_game.bid(new_game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+    bid(new_game)
     return new_game
 
 
 def __get_discard_game(seed: Optional[str]) -> Game:
     '''Return a game in the discard status'''
     new_game = __get_trump_selection_game(seed)
-    new_game.select_trump(new_game.active_round.active_player.identifier, SelectableSuit.SPADES)
+    select_trump(new_game)
     return new_game
 
 
 def __get_tricks_game(seed: Optional[str]) -> Game:
     '''Return a game in the tricks status'''
     new_game = __get_discard_game(seed)
-    while new_game.status == RoundStatus.DISCARD:
-        new_game.discard(Discard(new_game.active_round.active_player.identifier, []))
+    discard(new_game)
+
+    return new_game
+
+
+def __get_won_game(seed: Optional[str]) -> Game:
+    '''Return a game in the won status'''
+    new_game = __get_bidding_game(seed)
+    while new_game.status != GameStatus.WON:
+        bid(new_game)
+        select_trump(new_game)
+        discard(new_game)
+        play_round(new_game)
 
     return new_game

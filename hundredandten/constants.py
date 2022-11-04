@@ -4,6 +4,7 @@ from typing import Union
 
 HAND_SIZE = 5
 TRICK_VALUE = 5
+WINNING_SCORE = 110
 
 
 class Accessibility(Enum):
@@ -15,6 +16,7 @@ class Accessibility(Enum):
 class GameStatus(Enum):
     '''The statuses the game can be in'''
     WAITING_FOR_PLAYERS = 1
+    WON = 2
 
 
 class RoundStatus(Enum):
