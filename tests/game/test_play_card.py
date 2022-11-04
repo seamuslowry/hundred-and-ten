@@ -1,7 +1,9 @@
 '''Test behavior of the Game when playing a card'''
 from unittest import TestCase
 
-from hundredandten.constants import HAND_SIZE, RoundStatus
+from hundredandten.constants import (HAND_SIZE, CardNumber, RoundStatus,
+                                     SelectableSuit)
+from hundredandten.deck import Card
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.trick import Play
 from tests import arrange
@@ -55,13 +57,67 @@ class TestPlayCard(TestCase):
             game.active_round.active_player.identifier,
             game.active_round.inactive_players[0].hand[0]))
 
+    def test_cannot_play_non_trump_when_bleeding(self):
+        '''A player can only play trumps while the trick is bleeding'''
+
+        game = arrange.game(RoundStatus.TRICKS)
+        assert game.active_round.trump
+
+        non_trump = next(iter(SelectableSuit))
+
+        active_player = game.active_round.active_player
+        next_player = game.active_round.players.after(active_player.identifier)
+
+        # overwrite to ensure this trick will bleed
+        active_player.hand[0] = Card(CardNumber.TEN, game.active_round.trump, 0, 0)
+        # overwrite to ensure next player breaks rules
+        next_player.hand = [Card(CardNumber.TWO, non_trump, 0, 0)
+                            ]*4 + [Card(CardNumber.NINE, game.active_round.trump, 0, 0)]
+
+        self.assertFalse(game.active_round.active_trick.bleeding)
+
+        game.play(Play(active_player.identifier, active_player.hand[0]))
+
+        self.assertTrue(game.active_round.active_trick.bleeding)
+
+        self.assertRaises(HundredAndTenError, game.play, Play(
+            game.active_round.active_player.identifier,
+            game.active_round.active_player.hand[0]))
+
+    def test_can_play_non_trump_when_bleeding(self):
+        '''A player can play non-trumps while the trick is bleeding if they have no trumps'''
+
+        game = arrange.game(RoundStatus.TRICKS)
+        assert game.active_round.trump
+
+        non_trump = next(iter(SelectableSuit))
+
+        active_player = game.active_round.active_player
+        next_player = game.active_round.players.after(active_player.identifier)
+
+        # overwrite to ensure this trick will bleed
+        active_player.hand[0] = Card(CardNumber.TEN, game.active_round.trump, 0, 0)
+        # overwrite to ensure next player breaks rules
+        next_player.hand = [Card(CardNumber.TWO, non_trump, 0, 0)]*5
+
+        self.assertFalse(game.active_round.active_trick.bleeding)
+
+        game.play(Play(active_player.identifier, active_player.hand[0]))
+
+        self.assertTrue(game.active_round.active_trick.bleeding)
+
+        game.play(Play(game.active_round.active_player.identifier,
+                  game.active_round.active_player.hand[0]))
+
+        self.assertTrue(game.active_round.active_trick.bleeding)
+        self.assertEqual(2, len(game.active_round.active_trick.plays))
+
     def test_play_through_trick(self):
         '''A new trick is created after all players have played'''
 
         game = arrange.game(RoundStatus.TRICKS, arrange.play_trick)
 
-        assert game.active_round.trump
-        winning_play = game.active_round.tricks[-2].winning_play(game.active_round.trump)
+        winning_play = game.active_round.tricks[-2].winning_play
         assert winning_play
 
         self.assertEqual(2, len(game.active_round.tricks))
