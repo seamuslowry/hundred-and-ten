@@ -4,11 +4,10 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from hundredandten.action import Bid
+from hundredandten.action import Bid, Discard
 from hundredandten.constants import (TRICK_VALUE, BidAmount, RoundRole,
                                      RoundStatus, SelectableSuit)
 from hundredandten.deck import Deck
-from hundredandten.discard import Discard
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.trick import Play, Score, Trick
