@@ -1,6 +1,4 @@
 '''Represent one round of a game of Hundred and Ten'''
-
-
 from dataclasses import dataclass, field
 from typing import Optional
 

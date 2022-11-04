@@ -1,5 +1,4 @@
 '''Helpers to set up a game for testing'''
-
 from typing import Callable, Optional
 
 from hundredandten.actions import Bid, Discard, Play, SelectTrump
