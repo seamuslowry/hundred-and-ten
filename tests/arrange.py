@@ -2,10 +2,8 @@
 
 from typing import Callable, Optional
 
-from hundredandten.constants import (AnyStatus, BidAmount, CardNumber,
-                                     CardSuit, GameRole, GameStatus,
-                                     RoundStatus, SelectableSuit)
-from hundredandten.deck import Card, cards
+from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
+                                     GameStatus, RoundStatus, SelectableSuit)
 from hundredandten.discard import Discard
 from hundredandten.game import Game
 from hundredandten.group import Group, Person
@@ -31,16 +29,6 @@ def game(
     }[status](seed)
     massage(new_game)
     return new_game
-
-
-def card(number: CardNumber, suit: CardSuit) -> Card:
-    '''Get the card with the given number and suit'''
-    return next(card for card in cards if card.suit == suit and card.number == number)
-
-
-def nothing_card(trump: CardSuit) -> Card:
-    '''Get the card that is not a trump given the trump suit'''
-    return next(card for card in cards if card.suit != trump and not card.always_trump)
 
 
 def make_space(game_to_open: Game) -> None:
