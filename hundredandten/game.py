@@ -1,17 +1,20 @@
 '''Represent a game of Hundred and Ten'''
 from dataclasses import dataclass, field
+from functools import reduce
 from random import Random
+from typing import Optional
 from uuid import UUID, uuid4
 
-from hundredandten.constants import (HAND_SIZE, Accessibility, AnyStatus,
-                                     BidAmount, GameRole, GameStatus,
-                                     RoundRole, RoundStatus, SelectableSuit)
+from hundredandten.constants import (HAND_SIZE, WINNING_SCORE, Accessibility,
+                                     AnyStatus, BidAmount, GameRole,
+                                     GameStatus, RoundRole, RoundStatus,
+                                     SelectableSuit)
 from hundredandten.deck import Deck
 from hundredandten.discard import Discard
 from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
-from hundredandten.trick import Play
+from hundredandten.trick import Play, Score
 
 
 @dataclass
@@ -119,11 +122,21 @@ class Game:
 
         self.rounds.append(Round(players=round_players, deck=deck))
 
+    def __current_score(self, identifier: str) -> int:
+        '''Return the most recent score for the provided player'''
+
+        most_recent_score = next((score for score in reversed(
+            self.score_history) if score.identifier == identifier), None)
+
+        return most_recent_score.value if most_recent_score else 0
+
     @property
     def status(self) -> AnyStatus:
         """The status property."""
         if not self.rounds:
             return GameStatus.WAITING_FOR_PLAYERS
+        if self.winner:
+            return GameStatus.WON
         return self.active_round.status
 
     @property
@@ -156,3 +169,52 @@ class Game:
         The players of the game
         """
         return self.people.by_role(GameRole.PLAYER)
+
+    @property
+    def winner(self) -> Optional[Person]:
+        """
+        The winner of the game
+        """
+        winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
+        ordered_winning_players = list(map(
+            lambda score: self.active_round.players.by_identifier(score.identifier),
+            winning_scores))
+
+        winner = (
+            self.active_round.active_bidder
+            if (self.active_round.active_bidder in ordered_winning_players) else
+            next(iter(ordered_winning_players),
+                 None))
+
+        return winner
+
+    @property
+    def score_history(self) -> list[Score]:
+        '''A list of all players' scores over time'''
+
+        scores = {}
+        score_history = []
+
+        all_final_scores = [
+            score for round in self.rounds for score in round.scores
+            if round.status == RoundStatus.COMPLETED]
+
+        for score in all_final_scores:
+            new_score = scores.get(score.identifier, 0) + score.value
+            scores[score.identifier] = new_score
+            score_history.append(Score(score.identifier, new_score))
+
+        return score_history
+
+    @property
+    def scores(self) -> dict[str, int]:
+        """
+        The scores each player earned for this game
+        A dictionary in the form
+        key: player identifier
+        value: the player's score
+        """
+
+        return reduce(lambda acc,
+                      player: {**acc, player.identifier: self.__current_score(player.identifier)},
+                      self.players, {player.identifier: 0 for player in self.players})
