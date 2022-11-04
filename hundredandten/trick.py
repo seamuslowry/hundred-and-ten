@@ -2,6 +2,7 @@
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
+from hundredandten.actions import Play
 from hundredandten.constants import CardSuit, SelectableSuit
 from hundredandten.deck import Card
 
@@ -11,13 +12,6 @@ class Score:
     '''A class to keep track of a player's score in either a trick or a game'''
     identifier: str
     value: int
-
-
-@dataclass
-class Play:
-    '''A class to keep track of one play in a trick'''
-    identifier: str
-    card: Card
 
 
 @dataclass

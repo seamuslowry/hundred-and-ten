@@ -20,3 +20,10 @@ class Discard:
     '''A class to keep track of one player's discard action'''
     identifier: str
     cards: list[Card]
+
+
+@dataclass
+class Play:
+    '''A class to keep track of one play in a trick'''
+    identifier: str
+    card: Card

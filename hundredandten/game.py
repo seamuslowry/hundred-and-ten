@@ -5,16 +5,16 @@ from random import Random
 from typing import Optional
 from uuid import UUID, uuid4
 
+from hundredandten.actions import Discard, Play
 from hundredandten.constants import (HAND_SIZE, WINNING_SCORE, Accessibility,
                                      AnyStatus, BidAmount, GameRole,
                                      GameStatus, RoundRole, RoundStatus,
                                      SelectableSuit)
 from hundredandten.deck import Deck
-from hundredandten.actions import Discard
 from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
-from hundredandten.trick import Play, Score
+from hundredandten.trick import Score
 
 
 @dataclass
