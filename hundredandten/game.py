@@ -75,13 +75,13 @@ class Game:
         '''Perform an action as a player of the game'''
         if isinstance(action, Bid):
             self.__bid(action)
-        elif isinstance(action, Unpass):
+        if isinstance(action, Unpass):
             self.__unpass(action)
-        elif isinstance(action, SelectTrump):
+        if isinstance(action, SelectTrump):
             self.__select_trump(action)
-        elif isinstance(action, Discard):
+        if isinstance(action, Discard):
             self.__discard(action)
-        else:
+        if isinstance(action, Play):
             self.__play(action)
 
     def __bid(self, bid: Bid) -> None:
