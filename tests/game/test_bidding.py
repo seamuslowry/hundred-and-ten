@@ -1,6 +1,7 @@
 '''Test behavior of the Game while in a round of bidding'''
 from unittest import TestCase
 
+from hundredandten.actions import Bid, Unpass
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import arrange
@@ -24,7 +25,7 @@ class TestBidding(TestCase):
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        game.act(Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
         self.assertEqual(1, len(game.active_round.bids))
         self.assertEqual(BidAmount.FIFTEEN, game.active_round.bids[0].amount)
@@ -34,44 +35,44 @@ class TestBidding(TestCase):
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        game.bid(game.active_round.active_player.identifier, BidAmount.TWENTY)
+        game.act(Bid(game.active_round.active_player.identifier, BidAmount.TWENTY))
 
-        self.assertRaises(HundredAndTenError, game.bid,
-                          game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        self.assertRaises(HundredAndTenError, game.act,
+                          Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
     def test_equal_bid_from_active_player(self):
         '''Active player cannot place a bid equal to the current bid'''
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        game.act(Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
-        self.assertRaises(HundredAndTenError, game.bid,
-                          game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        self.assertRaises(HundredAndTenError, game.act,
+                          Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
     def test_low_bid_from_dealer(self):
         '''Dealer cannot place a bid below to the current bid'''
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        game.bid(game.active_round.active_player.identifier, BidAmount.TWENTY)
+        game.act(Bid(game.active_round.active_player.identifier, BidAmount.TWENTY))
         arrange.pass_to_dealer(game)
 
-        self.assertRaises(HundredAndTenError, game.bid,
-                          game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        self.assertRaises(HundredAndTenError, game.act,
+                          Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
     def test_equal_bid_from_dealer(self):
         '''Dealer can place a bid equal to the current bid'''
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        game.act(Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
         self.assertNotEqual(game.active_round.active_bidder, game.active_round.dealer)
 
         arrange.pass_to_dealer(game)
 
-        game.bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        game.act(Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
         self.assertEqual(game.active_round.active_bidder, game.active_round.dealer)
 
@@ -81,24 +82,24 @@ class TestBidding(TestCase):
         game = arrange.game(RoundStatus.BIDDING)
 
         once_active_player = game.active_round.active_player.identifier
-        game.bid(once_active_player, BidAmount.PASS)
+        game.act(Bid(once_active_player, BidAmount.PASS))
 
-        self.assertRaises(HundredAndTenError, game.bid, once_active_player, BidAmount.FIFTEEN)
+        self.assertRaises(HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN))
 
     def test_bid_from_inactive_player(self):
         '''Inactive player cannot place a bid'''
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        self.assertRaises(HundredAndTenError, game.bid,
-                          game.active_round.inactive_players[0].identifier, BidAmount.FIFTEEN)
+        self.assertRaises(HundredAndTenError, game.act,
+                          Bid(game.active_round.inactive_players[0].identifier, BidAmount.FIFTEEN))
 
     def test_pass_from_inactive_player(self):
         '''Inactive player can prepass'''
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        game.bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS)
+        game.act(Bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS))
 
         self.assertEqual(0, len(game.active_round.bids))
         self.assertIn(RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles)
@@ -108,11 +109,11 @@ class TestBidding(TestCase):
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        game.bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS)
+        game.act(Bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS))
 
         self.assertIn(RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles)
 
-        game.unpass(game.active_round.inactive_players[0].identifier)
+        game.act(Unpass(game.active_round.inactive_players[0].identifier))
 
         self.assertEqual(0, len(game.active_round.bids))
         self.assertNotIn(RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles)
@@ -123,11 +124,11 @@ class TestBidding(TestCase):
 
         next_player = game.active_round.players.after(game.active_round.active_player.identifier)
 
-        game.bid(next_player.identifier, BidAmount.PASS)
+        game.act(Bid(next_player.identifier, BidAmount.PASS))
 
         self.assertEqual(0, len(game.active_round.bids))
 
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        game.act(Bid(game.active_round.active_player.identifier, BidAmount.PASS))
 
         self.assertEqual(2, len(game.active_round.bids))
         self.assertEqual(RoundStatus.BIDDING, game.status)

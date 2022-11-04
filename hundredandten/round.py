@@ -4,7 +4,7 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from hundredandten.actions import Bid, Discard, Play
+from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
 from hundredandten.constants import (TRICK_VALUE, BidAmount, RoundRole,
                                      RoundStatus, SelectableSuit)
 from hundredandten.deck import Deck
@@ -23,8 +23,10 @@ class Round:
     discards: list[Discard] = field(default_factory=list)
     tricks: list[Trick] = field(default_factory=list)
 
-    def bid(self, identifier: str, amount: BidAmount) -> None:
+    def bid(self, bid: Bid) -> None:
         "Record a bid from a player"
+        identifier = bid.identifier
+        amount = bid.amount
         if self.status == RoundStatus.BIDDING and self.active_player == self.players.by_identifier(
                 identifier):
             self.__bid(identifier, amount)
@@ -33,18 +35,18 @@ class Round:
         else:
             raise HundredAndTenError("Cannot bid out of order")
 
-    def unpass(self, identifier: str) -> None:
+    def unpass(self, unpass: Unpass) -> None:
         '''Discount a prepass bid from the identified player'''
-        self.players.remove_role(identifier, RoundRole.PRE_PASSED)
+        self.players.remove_role(unpass.identifier, RoundRole.PRE_PASSED)
 
-    def select_trump(self, identifier: str, suit: SelectableSuit) -> None:
+    def select_trump(self, select_trump: SelectTrump) -> None:
         '''Select the passed suit as trump'''
         if self.status != RoundStatus.TRUMP_SELECTION:
             raise HundredAndTenError("Cannot select trump outside of the trump selection phase.")
-        if not self.active_bidder or identifier != self.active_bidder.identifier:
+        if not self.active_bidder or select_trump.identifier != self.active_bidder.identifier:
             raise HundredAndTenError("Only the bidder can select trump.")
 
-        self.trump = suit
+        self.trump = select_trump.suit
 
     def discard(self, discard: Discard) -> None:
         '''

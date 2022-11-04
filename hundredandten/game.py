@@ -7,9 +7,8 @@ from uuid import UUID, uuid4
 
 from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
 from hundredandten.constants import (HAND_SIZE, WINNING_SCORE, Accessibility,
-                                     AnyStatus, BidAmount, GameRole,
-                                     GameStatus, RoundRole, RoundStatus,
-                                     SelectableSuit)
+                                     AnyStatus, GameRole, GameStatus,
+                                     RoundRole, RoundStatus)
 from hundredandten.deck import Deck
 from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
@@ -75,28 +74,28 @@ class Game:
     def act(self, action: Union[Bid, Discard, Play, SelectTrump, Unpass]) -> None:
         '''Perform an action as a player of the game'''
         if isinstance(action, Bid):
-            self.bid(action.identifier, action.amount)
+            self.bid(action)
         elif isinstance(action, Unpass):
-            self.unpass(action.identifier)
+            self.unpass(action)
         elif isinstance(action, SelectTrump):
-            self.select_trump(action.identifier, action.suit)
+            self.select_trump(action)
         elif isinstance(action, Discard):
             self.discard(action)
         elif isinstance(action, Play):
             self.play(action)
 
-    def bid(self, identifier: str, amount: BidAmount) -> None:
+    def bid(self, bid: Bid) -> None:
         '''Place a bid from the identified player'''
-        self.active_round.bid(identifier, amount)
+        self.active_round.bid(bid)
         self.__end_bid()
 
-    def unpass(self, identifier: str) -> None:
+    def unpass(self, unpass: Unpass) -> None:
         '''Discount a pre-pass bid from the identified player'''
-        self.active_round.unpass(identifier)
+        self.active_round.unpass(unpass)
 
-    def select_trump(self, identifier: str, trump: SelectableSuit) -> None:
+    def select_trump(self, select_trump: SelectTrump) -> None:
         '''Select the passed suit as trump'''
-        self.active_round.select_trump(identifier, trump)
+        self.active_round.select_trump(select_trump)
 
     def discard(self, discard: Discard) -> None:
         '''

@@ -2,7 +2,7 @@
 
 from typing import Callable, Optional
 
-from hundredandten.actions import Discard, Play
+from hundredandten.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
                                      GameStatus, RoundStatus, SelectableSuit)
 from hundredandten.game import Game
@@ -39,7 +39,7 @@ def make_space(game_to_open: Game) -> None:
 def pass_round(game_to_pass: Game) -> None:
     '''Pass the current round of the provided game'''
     for player in game_to_pass.active_round.bidders:
-        game_to_pass.bid(player.identifier, BidAmount.PASS)
+        game_to_pass.act(Bid(player.identifier, BidAmount.PASS))
 
 
 def pass_to_dealer(game_to_pass: Game) -> None:
@@ -47,20 +47,20 @@ def pass_to_dealer(game_to_pass: Game) -> None:
     for player in filter(
             lambda player: player != game_to_pass.active_round.dealer,
             game_to_pass.active_round.bidders):
-        game_to_pass.bid(player.identifier, BidAmount.PASS)
+        game_to_pass.act(Bid(player.identifier, BidAmount.PASS))
 
 
 def bid(game_to_bid: Game) -> None:
     '''Have the active player place a bid'''
     for player in game_to_bid.active_round.inactive_players:
-        game_to_bid.bid(player.identifier, BidAmount.PASS)
-    game_to_bid.bid(game_to_bid.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        game_to_bid.act(Bid(player.identifier, BidAmount.PASS))
+    game_to_bid.act(Bid(game_to_bid.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
 
 def select_trump(game_to_select: Game) -> None:
     '''Have the active player select a trump'''
-    game_to_select.select_trump(
-        game_to_select.active_round.active_player.identifier, SelectableSuit.SPADES)
+    game_to_select.act(SelectTrump(
+        game_to_select.active_round.active_player.identifier, SelectableSuit.SPADES))
 
 
 def discard(game_to_discard: Game) -> None:

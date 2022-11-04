@@ -1,6 +1,7 @@
 '''Test behavior of the Game when bidding ends'''
 from unittest import TestCase
 
+from hundredandten.actions import Bid
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import arrange
@@ -30,8 +31,8 @@ class TestEndBidding(TestCase):
         game = arrange.game(RoundStatus.TRUMP_SELECTION)
 
         self.assertNotEqual(game.status, RoundStatus.BIDDING)
-        self.assertRaises(HundredAndTenError, game.bid,
-                          game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+        self.assertRaises(HundredAndTenError, game.act,
+                          Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
     def test_end_bidding_with_pass(self):
         '''Bidding ends when everyone has passed'''
@@ -50,11 +51,11 @@ class TestEndBidding(TestCase):
         self.assertEqual(0, len(game.active_round.bids))
 
         for player in list(filter(lambda p: p != game.active_round.active_player, game.players)):
-            game.bid(player.identifier, BidAmount.PASS)
+            game.act(Bid(player.identifier, BidAmount.PASS))
 
         self.assertEqual(0, len(game.active_round.bids))
 
-        game.bid(game.active_round.active_player.identifier, BidAmount.PASS)
+        game.act(Bid(game.active_round.active_player.identifier, BidAmount.PASS))
 
         self.assertEqual(4, len(game.rounds[-2].bids))
         self.assertEqual(0, len(game.rounds[-2].players.by_role(RoundRole.PRE_PASSED)))
