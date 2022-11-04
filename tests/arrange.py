@@ -66,7 +66,7 @@ def select_trump(game_to_select: Game) -> None:
 def discard(game_to_discard: Game) -> None:
     '''Have all players discard'''
     while game_to_discard.status == RoundStatus.DISCARD:
-        game_to_discard.discard(Discard(game_to_discard.active_round.active_player.identifier, []))
+        game_to_discard.act(Discard(game_to_discard.active_round.active_player.identifier, []))
 
 
 def play_trick(game_to_play: Game) -> None:
@@ -76,7 +76,7 @@ def play_trick(game_to_play: Game) -> None:
         active_player = game_to_play.active_round.active_player
         trumps = [card for card in active_player.hand if card.suit ==
                   game_to_play.active_round.trump or card.always_trump]
-        game_to_play.play(Play(active_player.identifier, next(iter(trumps + active_player.hand))))
+        game_to_play.act(Play(active_player.identifier, next(iter(trumps + active_player.hand))))
 
 
 def play_round(game_to_play: Game) -> None:

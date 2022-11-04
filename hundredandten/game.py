@@ -74,36 +74,36 @@ class Game:
     def act(self, action: Union[Bid, Discard, Play, SelectTrump, Unpass]) -> None:
         '''Perform an action as a player of the game'''
         if isinstance(action, Bid):
-            self.bid(action)
+            self.__bid(action)
         elif isinstance(action, Unpass):
-            self.unpass(action)
+            self.__unpass(action)
         elif isinstance(action, SelectTrump):
-            self.select_trump(action)
+            self.__select_trump(action)
         elif isinstance(action, Discard):
-            self.discard(action)
-        elif isinstance(action, Play):
-            self.play(action)
+            self.__discard(action)
+        else:
+            self.__play(action)
 
-    def bid(self, bid: Bid) -> None:
+    def __bid(self, bid: Bid) -> None:
         '''Place a bid from the identified player'''
         self.active_round.bid(bid)
         self.__end_bid()
 
-    def unpass(self, unpass: Unpass) -> None:
+    def __unpass(self, unpass: Unpass) -> None:
         '''Discount a pre-pass bid from the identified player'''
         self.active_round.unpass(unpass)
 
-    def select_trump(self, select_trump: SelectTrump) -> None:
+    def __select_trump(self, select_trump: SelectTrump) -> None:
         '''Select the passed suit as trump'''
         self.active_round.select_trump(select_trump)
 
-    def discard(self, discard: Discard) -> None:
+    def __discard(self, discard: Discard) -> None:
         '''
         Discard the selected cards from the identified player's hand and replace them
         '''
         self.active_round.discard(discard)
 
-    def play(self, play: Play) -> None:
+    def __play(self, play: Play) -> None:
         '''Play the specified card from the identified player's hand'''
         self.active_round.play(play)
         self.__end_play()

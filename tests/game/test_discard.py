@@ -15,7 +15,7 @@ class TestDiscard(TestCase):
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        self.assertRaises(HundredAndTenError, game.discard, Discard('', []))
+        self.assertRaises(HundredAndTenError, game.act, Discard('', []))
 
     def test_cant_discard_when_not_active(self):
         '''Can't discard if not the active player'''
@@ -23,7 +23,7 @@ class TestDiscard(TestCase):
         game = arrange.game(RoundStatus.DISCARD)
         inactive_player = game.active_round.inactive_players[0]
 
-        self.assertRaises(HundredAndTenError, game.discard, Discard(
+        self.assertRaises(HundredAndTenError, game.act, Discard(
             inactive_player.identifier, inactive_player.hand))
 
     def test_cant_discard_other_players_cards(self):
@@ -31,7 +31,7 @@ class TestDiscard(TestCase):
 
         game = arrange.game(RoundStatus.DISCARD)
 
-        self.assertRaises(HundredAndTenError, game.discard, Discard(
+        self.assertRaises(HundredAndTenError, game.act, Discard(
             game.active_round.active_player.identifier, game.active_round.inactive_players[0].hand))
 
     def test_discard_whole_hand(self):
@@ -41,8 +41,8 @@ class TestDiscard(TestCase):
 
         player = game.active_round.active_player
         initial_hand = list(player.hand)
-        game.discard(Discard(player.identifier,
-                     player.hand))
+        game.act(Discard(player.identifier,
+                         player.hand))
 
         self.assertEqual(HAND_SIZE, len(player.hand))
         self.assertEqual(HAND_SIZE, len(initial_hand))
@@ -58,7 +58,7 @@ class TestDiscard(TestCase):
                           [player.hand[1], player.hand[3]])
 
         remaining_in_hand = [player.hand[0], player.hand[2], player.hand[4]]
-        game.discard(discard)
+        game.act(discard)
 
         self.assertEqual(HAND_SIZE, len(player.hand))
         self.assertTrue(all(card in player.hand for card in remaining_in_hand))
