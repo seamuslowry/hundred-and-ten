@@ -1,5 +1,7 @@
 '''Represent a game of Hundred and Ten'''
 from dataclasses import dataclass, field
+from random import Random
+from uuid import UUID, uuid4
 
 from hundredandten.constants import (HAND_SIZE, Accessibility, AnyStatus,
                                      BidAmount, GameRole, GameStatus,
@@ -19,6 +21,7 @@ class Game:
     people: Group[Person] = field(default_factory=Group)
     rounds: list[Round] = field(default_factory=list)
     accessibility: Accessibility = field(default=Accessibility.PUBLIC)
+    seed: str = field(default_factory=lambda: str(uuid4()))
 
     def invite(self, inviter: str, invitee: str) -> None:
         '''Invite a player to the game'''
@@ -106,7 +109,9 @@ class Game:
             self.__new_round(self.players.after(self.active_round.dealer.identifier).identifier)
 
     def __new_round(self, dealer: str) -> None:
-        deck = Deck()
+        r_deck_seed = self.seed if not self.rounds else self.active_round.deck.seed
+
+        deck = Deck(seed=str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4)))
 
         round_players = Group(map(lambda p: Player(
             p.identifier, hand=deck.draw(HAND_SIZE)), self.players))
