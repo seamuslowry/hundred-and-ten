@@ -144,7 +144,7 @@ class Game:
 
     @property
     def status(self) -> AnyStatus:
-        """The status property."""
+        '''The status property.'''
         if not self.rounds:
             return GameStatus.WAITING_FOR_PLAYERS
         if self.winner:
@@ -153,40 +153,40 @@ class Game:
 
     @property
     def active_round(self) -> Round:
-        """The active round"""
+        '''The active round'''
         if not self.rounds:
             raise HundredAndTenError("No active round found.")
         return self.rounds[-1]
 
     @property
     def organizer(self) -> Person:
-        """
+        '''
         The organizer of the game
         If no player has the role, pick a random player
-        """
+        '''
         return next(
             iter(self.people.by_role(GameRole.ORGANIZER) or self.people),
             Person('unknown'))
 
     @property
     def invitees(self) -> Group[Person]:
-        """
+        '''
         The invitees to the game
-        """
+        '''
         return self.people.by_role(GameRole.INVITEE)
 
     @property
     def players(self) -> Group[Person]:
-        """
+        '''
         The players of the game
-        """
+        '''
         return self.people.by_role(GameRole.PLAYER)
 
     @property
     def winner(self) -> Optional[Person]:
-        """
+        '''
         The winner of the game
-        """
+        '''
         winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
         ordered_winning_players = list(map(
             lambda score: self.active_round.players.by_identifier(score.identifier),
@@ -220,12 +220,12 @@ class Game:
 
     @property
     def scores(self) -> dict[str, int]:
-        """
+        '''
         The scores each player earned for this game
         A dictionary in the form
         key: player identifier
         value: the player's score
-        """
+        '''
 
         return reduce(lambda acc,
                       player: {**acc, player.identifier: self.__current_score(player.identifier)},
