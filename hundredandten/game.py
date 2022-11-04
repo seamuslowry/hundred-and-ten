@@ -2,10 +2,10 @@
 from dataclasses import dataclass, field
 from functools import reduce
 from random import Random
-from typing import Optional
+from typing import Optional, Union
 from uuid import UUID, uuid4
 
-from hundredandten.actions import Discard, Play
+from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
 from hundredandten.constants import (HAND_SIZE, WINNING_SCORE, Accessibility,
                                      AnyStatus, BidAmount, GameRole,
                                      GameStatus, RoundRole, RoundStatus,
@@ -71,6 +71,19 @@ class Game:
             raise HundredAndTenError("You cannot play with fewer than two players.")
 
         self.__new_round(self.players[0].identifier)
+
+    def act(self, action: Union[Bid, Discard, Play, SelectTrump, Unpass]) -> None:
+        '''Perform an action as a player of the game'''
+        if isinstance(action, Bid):
+            self.bid(action.identifier, action.amount)
+        elif isinstance(action, Unpass):
+            self.unpass(action.identifier)
+        elif isinstance(action, SelectTrump):
+            self.select_trump(action.identifier, action.suit)
+        elif isinstance(action, Discard):
+            self.discard(action)
+        elif isinstance(action, Play):
+            self.play(action)
 
     def bid(self, identifier: str, amount: BidAmount) -> None:
         '''Place a bid from the identified player'''

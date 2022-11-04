@@ -1,8 +1,14 @@
 '''All the actions a player can take to interact with the game'''
 from dataclasses import dataclass, field
 
-from hundredandten.constants import BidAmount
+from hundredandten.constants import BidAmount, SelectableSuit
 from hundredandten.deck import Card
+
+
+@dataclass
+class Unpass:
+    '''A class to represent the unpass action'''
+    identifier: str
 
 
 @dataclass(order=True)
@@ -13,6 +19,13 @@ class Bid:
 
     def __bool__(self) -> bool:
         return self.amount.value > 0
+
+
+@dataclass
+class SelectTrump:
+    '''A class to represent the select trump action'''
+    identifier: str
+    suit: SelectableSuit
 
 
 @dataclass
