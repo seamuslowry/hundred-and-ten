@@ -110,6 +110,29 @@ The status of the game can be one of the following values
 - `RoundStatus.COMPLETED`: The current round is complete with tricks won by the players. This should also be a transitionary state. Any game that reaches this state should either begin a new round and enter `RoundStatus.BIDDING` or determine a winner and enter `GameStatus.WON`
 - `GameStatus.WON`: The game is complete and a winner has been determined. No further actions are allowed.
 
+### `HundredAndTen.active_round.active_player`
+
+This field will hold the current active player.
+
+### `HundredAndTen.scores`
+
+This field will hold the current score values. In the form of a `dict[str, int]`.
+
+For example:
+
+```python
+{
+  'p1': 55,
+  'p2': 70,
+  'p3': -15,
+  'p4': 25
+}
+```
+
+### `HundredAndTen.winner`
+
+This field will hold the winner of the game, if the game is in `GameStatus.WON`. Otherwise, it will be `None`.
+
 ## Playing a Game
 
 Once a game has begun, the `HundredAndTen` instance should only be interacted with through the `act` method. In this manner, players can bid, unpass, select trump, discard cards, or play a card.
