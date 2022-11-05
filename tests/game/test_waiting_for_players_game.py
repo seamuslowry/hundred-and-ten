@@ -93,9 +93,3 @@ class TestWaitingForPlayersGame(TestCase):
         game.leave(invited_player)
 
         self.assertNotIn(Person(invited_player), game.players)
-
-    def test_leave_as_organizer(self):
-        '''Test leaving a game as an invited player'''
-        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
-
-        self.assertRaises(HundredAndTenError, game.leave, game.organizer.identifier)
