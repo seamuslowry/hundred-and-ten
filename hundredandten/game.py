@@ -147,7 +147,7 @@ class Game:
         '''The status property.'''
         if not self.rounds:
             return GameStatus.WAITING_FOR_PLAYERS
-        if self.active_round.status == RoundStatus.COMPLETED and self.winner:
+        if self.winner:
             return GameStatus.WON
         return self.active_round.status
 
@@ -187,6 +187,10 @@ class Game:
         '''
         The winner of the game
         '''
+        # if a round is in progess, don't attempt the computation
+        if self.active_round.status != RoundStatus.COMPLETED:
+            return None
+
         winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
         ordered_winning_players = list(map(
             lambda score: self.active_round.players.by_identifier(score.identifier),
