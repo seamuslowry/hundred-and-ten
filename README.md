@@ -76,3 +76,18 @@ game = HundredAndTen()
 game.join('player_identifier_1')
 game.leave('player_identifier_1')
 ```
+
+## Starting a Game
+
+Begin play by calling `start_game` on the `HundredAndTen` instance.
+
+```python
+game = HundredAndTen()
+game.join('player_1')
+game.join('player_2')
+game.join('player_3')
+game.join('player_4')
+game.start_game()
+```
+
+Once a game has begun, players can no longer join or leave the game.
