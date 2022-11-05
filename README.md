@@ -79,6 +79,8 @@ game.leave('player_identifier_1')
 
 ## Starting a Game
 
+### `HundredAndTen.start_game`
+
 Begin play by calling `start_game` on the `HundredAndTen` instance.
 
 ```python
