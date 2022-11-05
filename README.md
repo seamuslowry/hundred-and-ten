@@ -15,6 +15,8 @@ game = HundredAndTen()
 
 TODO
 
+### Bleeding
+
 ## Players
 
 All players in the game must have a unique string identifier. They may also have a list of applicable roles, but, for most use cases, the engine should manage those roles itself.
@@ -136,4 +138,50 @@ from hundredandten import HundredAndTen, Bid, BidAmount, Unpass
 # pass as the non active player
 
 game.act(Unpass('non_active_player_identifier'))
+```
+
+### `HundredAndTen.act` to `SelectTrump`
+
+Once a player has won the bid, that player must select the trump suit for that round.
+
+```python
+from hundredandten import HundredAndTen, SelectTrump, SelectableSuit
+
+# set up and start the game
+# select a bidder
+
+# any of the four SelectableSuit value can be used
+game.act(SelectTrump('bidder', SelectableSuit.CLUBS))
+```
+
+### `HundredAndTen.act` to `Discard`
+
+Once trump has been selected, each player will have the opportunity to discard a portion of their hand and refill with new cards.
+This must be done in player order.
+
+```python
+from hundredandten import HundredAndTen, Discard
+
+# set up and start the game
+# select a bidder
+# select trump
+
+game.act(Discard('active_player', game.active_round.active_player.hand[1:3]))
+```
+
+### `HundredAndTen.act` to `Play`
+
+Once bidding, trump selection, and discard have all occurred. Players will play through tricks.
+
+This action will enforce that played cards follow the rule relating to ["bleeding"](#bleeding).
+
+```python
+from hundredandten import HundredAndTen, Play
+
+# set up and start the game
+# select a bidder
+# select trump
+# discard
+
+game.act(Play('active_player', game.active_round.active_player.hand[0]))
 ```
