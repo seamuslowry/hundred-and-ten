@@ -147,7 +147,7 @@ class Game:
         '''The status property.'''
         if not self.rounds:
             return GameStatus.WAITING_FOR_PLAYERS
-        if self.winner:
+        if self.active_round.status == RoundStatus.COMPLETED and self.winner:
             return GameStatus.WON
         return self.active_round.status
 
