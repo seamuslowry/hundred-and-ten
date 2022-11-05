@@ -96,6 +96,20 @@ game.start_game()
 
 Once a game has begun, players can no longer join or leave the game.
 
+## Determining the State of a Game
+
+### `HundredAndTen.status`
+
+The status of the game can be one of the following values
+
+- `GameStatus.WAITING_FOR_PLAYERS`: The game has not yet begun. Players may still join or leave.
+- `RoundStatus.BIDDING`: Players are bidding in the current round.
+- `RoundStatus.COMPLETED_NO_BIDDERS`: The current round is complete, but no player sumbitted a bid. This should be a transitionary state. Any game that reaches this state should immediately begin a new round and enter `RoundStatus.BIDDING`.
+- `RoundStatus.TRUMP_SELECTION`: The bidder in the current round is selecting their trump value.
+- `RoundStatus.DISCARD`: Players in the current round are discarding from their hard to refill.
+- `RoundStatus.COMPLETED`: The current round is complete with tricks won by the players. This should also be a transitionary state. Any game that reaches this state should either begin a new round and enter `RoundStatus.BIDDING` or determine a winner and enter `GameStatus.WON`
+- `GameStatus.WON`: The game is complete and a winner has been determined. No further actions are allowed.
+
 ## Playing a Game
 
 Once a game has begun, the `HundredAndTen` instance should only be interacted with through the `act` method. In this manner, players can bid, unpass, select trump, discard cards, or play a card.
