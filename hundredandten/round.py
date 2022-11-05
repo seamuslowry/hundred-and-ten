@@ -128,7 +128,19 @@ class Round:
         The list will come in the order the points were earned.
         This is to determine a disputed winner
         '''
-        naive_scores = self.__ordered_naive_scores
+        winning_plays = [winning_play
+                         for winning_play in map(lambda trick: trick.winning_play, self.tricks)
+                         if winning_play is not None]
+
+        trump_wins = [play for play in winning_plays
+                      if play.card.suit == self.trump or play.card.always_trump]
+        highest_play = max(
+            trump_wins, key=lambda play: play.card.trump_value, default=None)
+
+        base_scores = list(map(lambda play: Score(play.identifier, TRICK_VALUE +
+                                                  # treat the highest value play as two tricks
+                                                  (TRICK_VALUE if play == highest_play else 0)),
+                               winning_plays))
 
         # use default values here so scores can be calculated before tricks are played
         # should return all zeros
@@ -136,40 +148,24 @@ class Round:
         acting_bid = self.active_bid or BidAmount.PASS
 
         bidder_identifier = acting_bidder.identifier
-        bidder_naive_scores = list(
+        bidder_base_scores = list(
             filter(
                 lambda score: score.identifier == bidder_identifier,
-                naive_scores))
-        non_bidder_naive_scores = [score for score in naive_scores
-                                   if score not in bidder_naive_scores]
-        bidder_naive_score = sum(map(lambda score: score.value, bidder_naive_scores))
+                base_scores))
+        non_bidder_base_scores = [score for score in base_scores
+                                  if score not in bidder_base_scores]
+        bidder_base_score = sum(map(lambda score: score.value, bidder_base_scores))
 
         shot_the_moon = self.active_bid == BidAmount.SHOOT_THE_MOON and all(
-            score.identifier == bidder_identifier for score in naive_scores)
-        met_bid = bidder_naive_score >= acting_bid
+            score.identifier == bidder_identifier for score in base_scores)
+        met_bid = bidder_base_score >= acting_bid
 
         if shot_the_moon:
             return [Score(bidder_identifier, BidAmount.SHOOT_THE_MOON)]
         if not met_bid:
-            return [Score(bidder_identifier, -1 * acting_bid)] + non_bidder_naive_scores
+            return [Score(bidder_identifier, -1 * acting_bid)] + non_bidder_base_scores
 
-        return naive_scores
-
-    @property
-    def __ordered_naive_scores(self) -> list[Score]:
-        none_type_winning_plays = [trick.winning_play for trick in self.tricks]
-        winning_plays = [play for play in none_type_winning_plays if play is not None]
-
-        trump_wins = [play for play in winning_plays
-                      if play.card.suit == self.trump or
-                      play.card.always_trump]
-        highest_play = max(
-            trump_wins, key=lambda play: play.card.trump_value, default=None)
-
-        return list(map(lambda play: Score(play.identifier, TRICK_VALUE +
-                                           # treat the highest value play as two tricks
-                                           (TRICK_VALUE if play == highest_play else 0)),
-                        winning_plays))
+        return base_scores
 
     def bid(self, bid: Bid) -> None:
         '''Record a bid from a player'''
