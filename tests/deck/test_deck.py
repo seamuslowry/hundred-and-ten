@@ -1,8 +1,11 @@
 '''Test behavior of the deck'''
 from unittest import TestCase
 
+from hundredandten import Bid, BidAmount, HundredAndTen
 from hundredandten.deck import Deck
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+
+HundredAndTen().act(Bid('', BidAmount.FIFTEEN))
 
 
 class TestDeck(TestCase):

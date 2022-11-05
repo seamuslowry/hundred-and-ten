@@ -53,7 +53,7 @@ game = HundredAndTen()
 game.join('player_identifier')
 ```
 
-Joining a private game requires an invite before you will be able to join `join`.
+Joining a private game requires an invite before the player will be able to join `join`.
 
 ```python
 # be sure to initialize private games with one player
@@ -69,7 +69,7 @@ game.join('player_identifier')
 
 ### `HundredAndTen.leave`
 
-To leave a game, you can simply call `leave`.
+To leave a game, simply call `leave`.
 
 ```python
 game = HundredAndTen()
@@ -93,3 +93,47 @@ game.start_game()
 ```
 
 Once a game has begun, players can no longer join or leave the game.
+
+## Playing a Game
+
+Once a game has begun, the `HundredAndTen` instance should only be interacted with through the `act` method. In this manner, players can bid, unpass, select trump, discard cards, or play a card.
+
+Each `act` can only be performed by the current active player. If another player attempts to act, it will result in an error.
+
+The exception to this is pre-passing. Any player may pass before their turn during the bidding stage. A bid of any other amount will still result in an error.
+
+### `HundredAndTen.act` to `Bid`
+
+To bid, call `act` with a `Bid` object.
+
+```python
+from hundredandten import HundredAndTen, Bid, BidAmount
+
+# set up and start the game
+
+game.act(Bid('active_player_identifier', BidAmount.FIFTEEN))
+```
+
+To pre-pass, a non-active player must bid a pass.
+
+```python
+from hundredandten import HundredAndTen, Bid, BidAmount
+
+# set up and start the game
+
+game.act(Bid('non_active_player_identifier', BidAmount.PASS))
+# when 'non_active_player_identifier' becomes the active player, they will pass
+```
+
+### `HundredAndTen.act` to `Unpass`
+
+If a player has prepassed, but would now like to `Bid` a non-zero amount, they should `Unpass` to avoid automatically passing on their turn.
+
+```python
+from hundredandten import HundredAndTen, Bid, BidAmount, Unpass
+
+# set up and start the game
+# pass as the non active player
+
+game.act(Unpass('non_active_player_identifier'))
+```
