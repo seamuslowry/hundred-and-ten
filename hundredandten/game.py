@@ -25,6 +25,99 @@ class Game:
     accessibility: Accessibility = field(default=Accessibility.PUBLIC)
     seed: str = field(default_factory=lambda: str(uuid4()))
 
+    @property
+    def status(self) -> AnyStatus:
+        '''The status property.'''
+        if not self.rounds:
+            return GameStatus.WAITING_FOR_PLAYERS
+        if self.winner:
+            return GameStatus.WON
+        return self.active_round.status
+
+    @property
+    def active_round(self) -> Round:
+        '''The active round'''
+        if not self.rounds:
+            raise HundredAndTenError("No active round found.")
+        return self.rounds[-1]
+
+    @property
+    def organizer(self) -> Person:
+        '''
+        The organizer of the game
+        If no player has the role, pick a random player
+        '''
+        return next(
+            iter(self.people.by_role(GameRole.ORGANIZER) or self.people),
+            Person('unknown'))
+
+    @property
+    def invitees(self) -> Group[Person]:
+        '''
+        The invitees to the game
+        '''
+        return self.people.by_role(GameRole.INVITEE)
+
+    @property
+    def players(self) -> Group[Person]:
+        '''
+        The players of the game
+        '''
+        return self.people.by_role(GameRole.PLAYER)
+
+    @property
+    def winner(self) -> Optional[Person]:
+        '''
+        The winner of the game
+        '''
+        # if a round is in progess, don't attempt the computation
+        if self.active_round.status != RoundStatus.COMPLETED:
+            return None
+
+        winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
+        ordered_winning_players = list(map(
+            lambda score: self.active_round.players.by_identifier(score.identifier),
+            winning_scores))
+
+        winner = (
+            self.active_round.active_bidder
+            if (self.active_round.active_bidder in ordered_winning_players) else
+            next(iter(ordered_winning_players),
+                 None))
+
+        return winner
+
+    @property
+    def score_history(self) -> list[Score]:
+        '''A list of all players' scores over time'''
+
+        scores = {}
+        score_history = []
+
+        all_final_scores = [
+            score for round in self.rounds for score in round.scores
+            if round.status == RoundStatus.COMPLETED]
+
+        for score in all_final_scores:
+            new_score = scores.get(score.identifier, 0) + score.value
+            scores[score.identifier] = new_score
+            score_history.append(Score(score.identifier, new_score))
+
+        return score_history
+
+    @property
+    def scores(self) -> dict[str, int]:
+        '''
+        The scores each player earned for this game
+        A dictionary in the form
+        key: player identifier
+        value: the player's score
+        '''
+
+        return reduce(lambda acc,
+                      player: {**acc, player.identifier: self.__current_score(player.identifier)},
+                      self.players, {player.identifier: 0 for player in self.players})
+
     def invite(self, inviter: str, invitee: str) -> None:
         '''Invite a player to the game'''
 
@@ -141,96 +234,3 @@ class Game:
             self.score_history) if score.identifier == identifier), None)
 
         return most_recent_score.value if most_recent_score else 0
-
-    @property
-    def status(self) -> AnyStatus:
-        '''The status property.'''
-        if not self.rounds:
-            return GameStatus.WAITING_FOR_PLAYERS
-        if self.winner:
-            return GameStatus.WON
-        return self.active_round.status
-
-    @property
-    def active_round(self) -> Round:
-        '''The active round'''
-        if not self.rounds:
-            raise HundredAndTenError("No active round found.")
-        return self.rounds[-1]
-
-    @property
-    def organizer(self) -> Person:
-        '''
-        The organizer of the game
-        If no player has the role, pick a random player
-        '''
-        return next(
-            iter(self.people.by_role(GameRole.ORGANIZER) or self.people),
-            Person('unknown'))
-
-    @property
-    def invitees(self) -> Group[Person]:
-        '''
-        The invitees to the game
-        '''
-        return self.people.by_role(GameRole.INVITEE)
-
-    @property
-    def players(self) -> Group[Person]:
-        '''
-        The players of the game
-        '''
-        return self.people.by_role(GameRole.PLAYER)
-
-    @property
-    def winner(self) -> Optional[Person]:
-        '''
-        The winner of the game
-        '''
-        # if a round is in progess, don't attempt the computation
-        if self.active_round.status != RoundStatus.COMPLETED:
-            return None
-
-        winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
-        ordered_winning_players = list(map(
-            lambda score: self.active_round.players.by_identifier(score.identifier),
-            winning_scores))
-
-        winner = (
-            self.active_round.active_bidder
-            if (self.active_round.active_bidder in ordered_winning_players) else
-            next(iter(ordered_winning_players),
-                 None))
-
-        return winner
-
-    @property
-    def score_history(self) -> list[Score]:
-        '''A list of all players' scores over time'''
-
-        scores = {}
-        score_history = []
-
-        all_final_scores = [
-            score for round in self.rounds for score in round.scores
-            if round.status == RoundStatus.COMPLETED]
-
-        for score in all_final_scores:
-            new_score = scores.get(score.identifier, 0) + score.value
-            scores[score.identifier] = new_score
-            score_history.append(Score(score.identifier, new_score))
-
-        return score_history
-
-    @property
-    def scores(self) -> dict[str, int]:
-        '''
-        The scores each player earned for this game
-        A dictionary in the form
-        key: player identifier
-        value: the player's score
-        '''
-
-        return reduce(lambda acc,
-                      player: {**acc, player.identifier: self.__current_score(player.identifier)},
-                      self.players, {player.identifier: 0 for player in self.players})
