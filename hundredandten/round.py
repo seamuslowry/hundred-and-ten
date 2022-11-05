@@ -21,6 +21,152 @@ class Round:
     discards: list[Discard] = field(default_factory=list)
     tricks: list[Trick] = field(default_factory=list)
 
+    @property
+    def dealer(self) -> Player:
+        '''The dealer this round.'''
+        dlr = next(iter(self.players.by_role(RoundRole.DEALER)), None)
+        if not dlr:
+            raise HundredAndTenError("No dealer found.")
+        return dlr
+
+    @property
+    def active_player(self) -> Player:
+        '''The current active player.'''
+        # while bidding, the active player is the one after the last bidder that can place a bid
+        if self.status == RoundStatus.BIDDING:
+            # before anyone has bid, treat the dealer as the last bidder
+            last_bidder = self.dealer.identifier if not self.bids else self.bids[-1].identifier
+            active_and_last_bidders = Group(
+                [p for p in self.players if p in self.bidders or p.identifier == last_bidder])
+            return active_and_last_bidders.after(last_bidder)
+        # when in trump selection, the active bidder is the active player
+        if self.status == RoundStatus.TRUMP_SELECTION:
+            assert self.active_bidder
+            return self.active_bidder
+        if self.status == RoundStatus.DISCARD:
+            assert self.active_bidder
+            last_discarder = (self.dealer.identifier
+                              if not self.discards else self.discards[-1].identifier)
+            return self.players.after(last_discarder)
+        # while playing tricks, active player needs to consider
+        # trick number, trick status, and winner of last trick
+        if self.status == RoundStatus.TRICKS:
+            assert self.active_bidder
+            assert self.trump
+            # when we're starting a new trick
+            if not self.active_trick.plays:
+                # the player after the bidder goes first on the first trick
+                if len(self.tricks) == 1:
+                    return self.players.after(self.active_bidder.identifier)
+                # otherwise, its the winner of the last trick
+                winning_play = self.tricks[-2].winning_play
+                # when we have more than one trick, any previous trick will have a winning play
+                assert winning_play
+                winner = self.players.by_identifier(winning_play.identifier)
+                # when the trick has a winning play, there will be a valid player associated to it
+                assert winner
+                return winner
+            # in an ongoing trick, active player is next around the table
+            return self.players.after(self.active_trick.plays[-1].identifier)
+        raise HundredAndTenError(f'Cannot determine active player in {self.status} status')
+
+    @property
+    def inactive_players(self) -> Group[Player]:
+        '''The players that are not active.'''
+        return Group([p for p in self.players if p != self.active_player])
+
+    @property
+    def active_bid(self) -> Optional[BidAmount]:
+        '''The maximum bid submitted this round'''
+        return max(self.bids).amount if self.bids else None
+
+    @property
+    def bidders(self) -> Group[Player]:
+        '''Anyone in this round that can still submit a bid.'''
+        return Group(
+            [p for p in self.players
+             if self.__current_bid(p.identifier) != Bid('', BidAmount.PASS)])
+
+    @property
+    def active_bidder(self) -> Optional[Player]:
+        '''The active bidder this round.'''
+
+        if not self.active_bid or len(self.bidders) != 1:
+            return None
+        return self.bidders[0]
+
+    @property
+    def active_trick(self) -> Trick:
+        '''The current active trick'''
+        if not self.tricks:
+            raise HundredAndTenError("No active trick found.")
+        return self.tricks[-1]
+
+    @property
+    def status(self) -> RoundStatus:
+        '''The status property.'''
+        if self.tricks and all(not player.hand for player in self.players):
+            return RoundStatus.COMPLETED
+        if len(self.discards) == len(self.players):
+            return RoundStatus.TRICKS
+        if self.trump:
+            return RoundStatus.DISCARD
+        if self.active_bidder:
+            return RoundStatus.TRUMP_SELECTION
+        if not self.bidders:
+            return RoundStatus.COMPLETED_NO_BIDDERS
+        return RoundStatus.BIDDING
+
+    @property
+    def scores(self) -> list[Score]:
+        '''
+        The scores each player earned for this round
+        A list of tuples in the form
+        left: player identifier
+        value: score for the trick
+
+        The list will come in the order the points were earned.
+        This is to determine a disputed winner
+        '''
+        winning_plays = [winning_play
+                         for winning_play in map(lambda trick: trick.winning_play, self.tricks)
+                         if winning_play is not None]
+
+        trump_wins = [play for play in winning_plays
+                      if play.card.suit == self.trump or play.card.always_trump]
+        highest_play = max(
+            trump_wins, key=lambda play: play.card.trump_value, default=None)
+
+        base_scores = list(map(lambda play: Score(play.identifier, TRICK_VALUE +
+                                                  # treat the highest value play as two tricks
+                                                  (TRICK_VALUE if play == highest_play else 0)),
+                               winning_plays))
+
+        # use default values here so scores can be calculated before tricks are played
+        # should return all zeros
+        acting_bidder = self.active_bidder or self.players[0]
+        acting_bid = self.active_bid or BidAmount.PASS
+
+        bidder_identifier = acting_bidder.identifier
+        bidder_base_scores = list(
+            filter(
+                lambda score: score.identifier == bidder_identifier,
+                base_scores))
+        non_bidder_base_scores = [score for score in base_scores
+                                  if score not in bidder_base_scores]
+        bidder_base_score = sum(map(lambda score: score.value, bidder_base_scores))
+
+        shot_the_moon = self.active_bid == BidAmount.SHOOT_THE_MOON and all(
+            score.identifier == bidder_identifier for score in base_scores)
+        met_bid = bidder_base_score >= acting_bid
+
+        if shot_the_moon:
+            return [Score(bidder_identifier, BidAmount.SHOOT_THE_MOON)]
+        if not met_bid:
+            return [Score(bidder_identifier, -1 * acting_bid)] + non_bidder_base_scores
+
+        return base_scores
+
     def bid(self, bid: Bid) -> None:
         '''Record a bid from a player'''
         identifier = bid.identifier
@@ -136,153 +282,3 @@ class Round:
     def __new_trick(self) -> None:
         assert self.trump
         self.tricks.append(Trick(self.trump))
-
-    @property
-    def dealer(self) -> Player:
-        '''The dealer this round.'''
-        dlr = next(iter(self.players.by_role(RoundRole.DEALER)), None)
-        if not dlr:
-            raise HundredAndTenError("No dealer found.")
-        return dlr
-
-    @property
-    def active_player(self) -> Player:
-        '''The current active player.'''
-        # while bidding, the active player is the one after the last bidder that can place a bid
-        if self.status == RoundStatus.BIDDING:
-            # before anyone has bid, treat the dealer as the last bidder
-            last_bidder = self.dealer.identifier if not self.bids else self.bids[-1].identifier
-            active_and_last_bidders = Group(
-                [p for p in self.players if p in self.bidders or p.identifier == last_bidder])
-            return active_and_last_bidders.after(last_bidder)
-        # when in trump selection, the active bidder is the active player
-        if self.status == RoundStatus.TRUMP_SELECTION:
-            assert self.active_bidder
-            return self.active_bidder
-        if self.status == RoundStatus.DISCARD:
-            assert self.active_bidder
-            last_discarder = (self.dealer.identifier
-                              if not self.discards else self.discards[-1].identifier)
-            return self.players.after(last_discarder)
-        # while playing tricks, active player needs to consider
-        # trick number, trick status, and winner of last trick
-        if self.status == RoundStatus.TRICKS:
-            assert self.active_bidder
-            assert self.trump
-            # when we're starting a new trick
-            if not self.active_trick.plays:
-                # the player after the bidder goes first on the first trick
-                if len(self.tricks) == 1:
-                    return self.players.after(self.active_bidder.identifier)
-                # otherwise, its the winner of the last trick
-                winning_play = self.tricks[-2].winning_play
-                # when we have more than one trick, any previous trick will have a winning play
-                assert winning_play
-                winner = self.players.by_identifier(winning_play.identifier)
-                # when the trick has a winning play, there will be a valid player associated to it
-                assert winner
-                return winner
-            # in an ongoing trick, active player is next around the table
-            return self.players.after(self.active_trick.plays[-1].identifier)
-        raise HundredAndTenError(f'Cannot determine active player in {self.status} status')
-
-    @property
-    def inactive_players(self) -> Group[Player]:
-        '''The players that are not active.'''
-        return Group([p for p in self.players if p != self.active_player])
-
-    @property
-    def active_bid(self) -> Optional[BidAmount]:
-        '''The maximum bid submitted this round'''
-        return max(self.bids).amount if self.bids else None
-
-    @property
-    def bidders(self) -> Group[Player]:
-        '''Anyone in this round that can still submit a bid.'''
-        return Group(
-            [p for p in self.players
-             if self.__current_bid(p.identifier) != Bid('', BidAmount.PASS)])
-
-    @property
-    def active_bidder(self) -> Optional[Player]:
-        '''The active bidder this round.'''
-
-        if not self.active_bid or len(self.bidders) != 1:
-            return None
-        return self.bidders[0]
-
-    @property
-    def active_trick(self) -> Trick:
-        '''The current active trick'''
-        if not self.tricks:
-            raise HundredAndTenError("No active trick found.")
-        return self.tricks[-1]
-
-    @property
-    def status(self) -> RoundStatus:
-        '''The status property.'''
-        if self.tricks and all(not player.hand for player in self.players):
-            return RoundStatus.COMPLETED
-        if len(self.discards) == len(self.players):
-            return RoundStatus.TRICKS
-        if self.trump:
-            return RoundStatus.DISCARD
-        if self.active_bidder:
-            return RoundStatus.TRUMP_SELECTION
-        if not self.bidders:
-            return RoundStatus.COMPLETED_NO_BIDDERS
-        return RoundStatus.BIDDING
-
-    @property
-    def scores(self) -> list[Score]:
-        '''
-        The scores each player earned for this round
-        A list of tuples in the form
-        left: player identifier
-        value: score for the trick
-
-        The list will come in the order the points were earned.
-        This is to determine a disputed winner
-        '''
-        naive_scores = self.__ordered_naive_scores
-
-        # use default values here so scores can be calculated before tricks are played
-        # should return all zeros
-        acting_bidder = self.active_bidder or self.players[0]
-        acting_bid = self.active_bid or BidAmount.PASS
-
-        bidder_identifier = acting_bidder.identifier
-        bidder_naive_scores = list(
-            filter(
-                lambda score: score.identifier == bidder_identifier,
-                naive_scores))
-        non_bidder_naive_scores = [score for score in naive_scores
-                                   if score not in bidder_naive_scores]
-        bidder_naive_score = sum(map(lambda score: score.value, bidder_naive_scores))
-
-        shot_the_moon = self.active_bid == BidAmount.SHOOT_THE_MOON and all(
-            score.identifier == bidder_identifier for score in naive_scores)
-        met_bid = bidder_naive_score >= acting_bid
-
-        if shot_the_moon:
-            return [Score(bidder_identifier, BidAmount.SHOOT_THE_MOON)]
-        if not met_bid:
-            return [Score(bidder_identifier, -1 * acting_bid)] + non_bidder_naive_scores
-
-        return naive_scores
-
-    @property
-    def __ordered_naive_scores(self) -> list[Score]:
-        none_type_winning_plays = [trick.winning_play for trick in self.tricks]
-        winning_plays = [play for play in none_type_winning_plays if play is not None]
-
-        trump_wins = [play for play in winning_plays
-                      if play.card.suit == self.trump or
-                      play.card.always_trump]
-        highest_play = max(
-            trump_wins, key=lambda play: play.card.trump_value, default=None)
-
-        return list(map(lambda play: Score(play.identifier, TRICK_VALUE +
-                                           # treat the highest value play as two tricks
-                                           (TRICK_VALUE if play == highest_play else 0)),
-                        winning_plays))
