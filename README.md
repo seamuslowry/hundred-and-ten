@@ -19,7 +19,7 @@ The game is played with a normal 52 card deck and includes one Joker for a total
 
 ### Dealer
 
-For each round, one player is considered the dealer. In an over-the-table game, this player would be responsible for shuffling the deck and dealing out the cards. With this package, that is all handled. However, the dealer still retains some additional privilege that goes along with the role.
+For each round, one player is considered the dealer. In an over-the-table game, this player would be responsible for shuffling the deck and dealing out the cards. With this package, that is all handled. However, the dealer still retains some additional privileges that go along with the role.
 
 Bidding begins to the left of the dealer. This means that the dealer will be the last to place a bid and can make their decision with the context of other players bids.
 
