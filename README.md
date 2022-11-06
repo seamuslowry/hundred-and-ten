@@ -39,9 +39,9 @@ If players do not believe their hand is strong enough to bid, they can pass on t
 
 The same player will remain dealer after a round when all players pass, for a maximum of three rounds. If the current dealer has been the dealer for the last three rounds, then [dealer](#dealer) will pass to the left.
 
-#### Amounts
+#### Options
 
-Players may only bid one of the following amounts:
+Players may only bid one of the following options:
 
 - 15
 - 20
@@ -357,7 +357,7 @@ Each round normally offers thirty points in total to be won by players. The tric
 
 However, if the tricks won by the bidder do not equal the amount they bid, they will instead lose the amount they bid, and the tricks they won will not offset their loss. For example, if a player began the round at zero points, bid fifteen, and won ten points, that player will end the round at negative fifteen points.
 
-Additionally, if the bidder decided to [Shoot the Moon](#amounts), they will earn sixty points iff they won every trick that round. Otherwise, they will lose sixty points.
+Additionally, if the bidder decided to [Shoot the Moon](#options), they will earn sixty points iff they won every trick that round. Otherwise, they will lose sixty points.
 
 ### Winning
 
