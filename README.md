@@ -194,6 +194,8 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
   </tr>
 </table>
 
+<center>
+
 |   Red Suit    |  Black Suit   |
 | :-----------: | :-----------: |
 |       5       |       5       |
@@ -211,6 +213,8 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
 |       4       |       8       |
 |       3       |       9       |
 |       2       |      10       |
+
+</center>
 
 If no trump card is played, the suit of the first played card is considered trump for the round. It will not follow the trump order listed above, though. Instead, it will follow a normal Ace-high card heirarchy. The only exception is that lower value black number cards still beat higher value black number cards. The table below describes the full order.
 
@@ -323,6 +327,8 @@ If no trump card is played, the suit of the first played card is considered trum
   </tr>
 </table>
 
+<center>
+
 | Red Suit | Black Suit |
 | :------: | :--------: |
 |   Ace    |    Ace     |
@@ -338,6 +344,8 @@ If no trump card is played, the suit of the first played card is considered trum
 |    4     |     8      |
 |    3     |     9      |
 |    2     |     10     |
+
+</center>
 
 #### Bleeding
 
