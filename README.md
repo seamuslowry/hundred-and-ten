@@ -19,9 +19,9 @@ The game is played with a normal 52 card deck and includes one Joker for a total
 
 ### Dealer
 
-For each round, one player is considered the dealer. In an over-the-table game, this player would be responsible for shuffling the deck and dealing out the cards. With this package, that is all handled. However, the dealer still retains some additional privileges that go along with the role.
+For each round, one player is considered the dealer. In an over-the-table game, this player would be responsible for shuffling the deck and dealing out the cards. With this package, that is all handled. However, the dealer still retains some additional privileges that go along with the role:
 
-1. Bidding begins to the left of the dealer. This means that the dealer will be the last to place a bid and can make their decision with the context of other players' bids.
+1. Bidding begins to the left of the dealer. This means that the dealer is always the last to place a bid and can make their decision with the context of other players' bids.
 
 2. Normally, to steal a bid, players must bid _above_ the current amount. The dealer, however, can steal a bid for the current amount.
 
@@ -29,19 +29,19 @@ The position of dealer moves to the current dealer's left on conditions describe
 
 ### Bidding
 
-Before tricks are played, the round will go through a stage of bidding. Each player is dealt a hand of five cards and will use this to determine if they wish to "bid" any points. The player who has bid the most is considered the bidder and will decide which suit is trumps for the round. However, if the bidder fails to earn at least the amount of points they bid, they will instead lose that amount.
+Before tricks are played, the round will go through a stage of bidding. Each player is dealt a hand of five cards and will use this to determine if they wish to "bid" any points. The highest bidder will decide which suit is trumps for the round. However, if the highest bidder fails to earn at least the amount of points they bid, they instead lose that amount.
 
-Bidding begins to the left of the [dealer](#dealer) and continues clockwise around the table until either all players have passed or a single bidder is decided.
+Bidding begins to the left of the [dealer](#dealer) and continues clockwise around the table until either all players have passed or a single bidder remains.
 
 #### Passing
 
-If players do not believe their hand is strong enough to bid, the can pass on their turn. If all players pass, the round ends and cards are re-dealt.
+If players do not believe their hand is strong enough to bid, they can pass on their turn. If all players pass, the round ends.
 
-If the current dealer has been the dealer for the last three rounds, then [dealer](#dealer) will pass to the left. Otherwise, the same player will remain dealer after a round when all players pass.
+The same player will remain dealer after a round when all players pass, for a maximum of three rounds. If the current dealer has been the dealer for the last three rounds, then [dealer](#dealer) will pass to the left.
 
 #### Amounts
 
-Players may only bid one of the following amounts.
+Players may only bid one of the following amounts:
 
 - 15
 - 20
@@ -51,19 +51,21 @@ Players may only bid one of the following amounts.
 
 #### Stealing a Bid
 
-When a player has already bid, but another player that has not yet passed would still like to be the bidder, they may attempt to steal the bid. To do so, they must bid an amount over the current bid. Play will continue around the table and the original bidder will be given the opportunity to steal the bid back or pass and cede the bid. Recall that the [dealer](#dealer) has special privileges when stealing the bid. Bidding will continue until all but one player has passed.
+When a player places a bid, other players in the round must bid above this amount (unless they are the [dealer](#dealer)) or pass. Bidding above (or at, see: [dealer](#dealer)) the current highest bid is called Stealing the Bid and bidding continues around the table until all but one player has passed.
 
 #### Selecting Trump
 
-Once a player has bid, they will select the trump suit for the round. Once trump is selected, all players at the table may discard any or all of their current hand and have their hand refilled from the deck. The dealer is the first player to discard. From there, the turn passes around the table clockwise until all players have had the opportunity.
+The highest bidder selects the trump suit for the round. Once the trump is selected, all players at the table may choose to discard any or all of their current hand and have their hand refilled from the deck. This begins with the dealer, and continues clockwise until all players have had the opportunity to discard.
 
 ### Tricks
 
-Once trump is selected and all players have discarded and been redealt, the first trick begins. The player to the left of the bidder plays the first card. From there, play continues clockwise until all players have played one card. Subsequent tricks will start with the winner of the previous trick and continue clockwise in the same manner.
+Each round consists of five tricks. Each player contributes one card to a trick. When all players have played a card, the trick ends and a winner is determined.
+
+The first trick begins with the player to the left of the highest bidder; play continues clockwise until the trick is complete. Subsequent tricks will begin with the winner of the previous trick.
 
 #### Trump Cards
 
-A card is a trump card if it is the suit selected by the bidder.
+A card is a trump card if it is the suit selected by the highest bidder.
 
 Additionally, the Ace of Hearts and the Joker are both considered trump cards regardless of the suit chosen by the bidder. This is important to remember for [winning a trick](#winning-a-trick) and [bleeding](#bleeding).
 
@@ -71,7 +73,7 @@ Additionally, the Ace of Hearts and the Joker are both considered trump cards re
 
 A trick is won by the highest value card in the trick. Trump cards will always beat non-trump cards.
 
-When a suit is trump, the card heirarchy is changed. Additionally, recall the additonal [trump cards](#trump-cards) that will not necessarily be of the selected suit. The trump card heirarchy is below. Note that red suits and black suits follow the same trump heirarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
+When a suit is trump, the card heirarchy is changed. Recall the additional [trump cards](#trump-cards) that will not necessarily be of the selected suit. The trump card heirarchy is below. Note that red suits and black suits follow the same trump heirarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
 
 |   Red Suit    |  Black Suit   |
 | :-----------: | :-----------: |
