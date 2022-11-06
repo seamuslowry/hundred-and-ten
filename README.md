@@ -323,6 +323,8 @@ If no trump card is played, the suit of the first played card is considered trum
   </tr>
 </table>
 
+<div align="center">
+
 | Red Suit | Black Suit |
 | :------: | :--------: |
 |   Ace    |    Ace     |
@@ -338,6 +340,8 @@ If no trump card is played, the suit of the first played card is considered trum
 |    4     |     8      |
 |    3     |     9      |
 |    2     |     10     |
+
+</div>
 
 #### Bleeding
 
