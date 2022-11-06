@@ -78,7 +78,7 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
 <table align="center">
   <tr>
     <th>
-      Rank
+      Beats
     </th>
     <th>
       Hearts
@@ -94,7 +94,7 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </th>
   </tr>
   <tr>
-    <td rowspan=15 align="center">
+    <td rowspan=15 align="center" style="transform: scale(8, 40)">
       ↓
     </td>
     <td colspan=4 align="center">
