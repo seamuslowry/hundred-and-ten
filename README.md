@@ -29,7 +29,7 @@ The position of dealer moves to the current dealer's left on conditions describe
 
 ### Bidding
 
-Before tricks are played, the round will go through a stage of bidding. Each player will be dealt a hand of five cards and will use this to determine if they wish to "bid" any points. The player who has bid the most is considered the bidder and they decide which suit is trumps for the round. However, if the bidder fails to earn at least the amount of points they bid, they will instead lose that amount.
+Before tricks are played, the round will go through a stage of bidding. Each player is dealt a hand of five cards and will use this to determine if they wish to "bid" any points. The player who has bid the most is considered the bidder and they decide which suit is trumps for the round. However, if the bidder fails to earn at least the amount of points they bid, they will instead lose that amount.
 
 Bidding begins to the left of the [dealer](#dealer) and continues clockwise around the table until either all players have passed or a single bidder is decided.
 
