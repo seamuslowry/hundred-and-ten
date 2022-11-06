@@ -75,6 +75,125 @@ A trick is won by the highest value card in the trick. Trump cards will always b
 
 When a suit is trump, the card heirarchy is changed. Recall the additional [trump cards](#trump-cards) that will not necessarily be of the selected suit. The trump card heirarchy is below. Note that red suits and black suits follow the same trump heirarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
 
+<table>
+  <tr>
+    <th>
+      Hearts
+    </th>
+    <th>
+      Diamonds
+    </th>
+    <th>
+      Spades
+    </th>
+    <th>
+      Clubs
+    </th>
+  </tr>
+  <tr>
+    <td colspan=4  style="text-align:center">
+      5
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4  style="text-align:center">
+      Jack
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4  style="text-align:center">
+      Joker
+    </td>
+  </tr>
+  <tr>
+    <td colspan=1 rowspan=2  style="text-align:center">
+      Ace
+    </td>
+    <td colspan=3  style="text-align:center">
+      Ace of Hearts
+    </td>
+  </tr>
+  <tr>
+    <td colspan=3  style="text-align:center">
+      Ace
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4  style="text-align:center">
+      King
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4  style="text-align:center">
+      Queen
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      10
+    </td>
+    <td colspan=2  style="text-align:center">
+      2
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      9
+    </td>
+    <td colspan=2  style="text-align:center">
+      3
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      8
+    </td>
+    <td colspan=2  style="text-align:center">
+      4
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      7
+    </td>
+    <td colspan=2  style="text-align:center">
+      6
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      6
+    </td>
+    <td colspan=2  style="text-align:center">
+      7
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      4
+    </td>
+    <td colspan=2  style="text-align:center">
+      8
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      3
+    </td>
+    <td colspan=2  style="text-align:center">
+      9
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      2
+    </td>
+    <td colspan=2  style="text-align:center">
+      10
+    </td>
+  </tr>
+</table>
+
 |   Red Suit    |  Black Suit   |
 | :-----------: | :-----------: |
 |       5       |       5       |
@@ -94,6 +213,115 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
 |       2       |      10       |
 
 If no trump card is played, the suit of the first played card is considered trump for the round. It will not follow the trump order listed above, though. Instead, it will follow a normal Ace-high card heirarchy. The only exception is that lower value black number cards still beat higher value black number cards. The table below describes the full order.
+
+<table>
+  <tr>
+    <th>
+      Hearts
+    </th>
+    <th>
+      Diamonds
+    </th>
+    <th>
+      Spades
+    </th>
+    <th>
+      Clubs
+    </th>
+  </tr>
+  <tr>
+    <td colspan=4  style="text-align:center">
+      Ace
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4  style="text-align:center">
+      King
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4  style="text-align:center">
+      Queen
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4  style="text-align:center">
+      Jack
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      10
+    </td>
+    <td colspan=2  style="text-align:center">
+      2
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      9
+    </td>
+    <td colspan=2  style="text-align:center">
+      3
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      8
+    </td>
+    <td colspan=2  style="text-align:center">
+      4
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      7
+    </td>
+    <td colspan=2  style="text-align:center">
+      5
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      5
+    </td>
+    <td colspan=2  style="text-align:center">
+      6
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      6
+    </td>
+    <td colspan=2  style="text-align:center">
+      7
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      4
+    </td>
+    <td colspan=2  style="text-align:center">
+      8
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      3
+    </td>
+    <td colspan=2  style="text-align:center">
+      9
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2  style="text-align:center">
+      2
+    </td>
+    <td colspan=2  style="text-align:center">
+      10
+    </td>
+  </tr>
+</table>
 
 | Red Suit | Black Suit |
 | :------: | :--------: |
