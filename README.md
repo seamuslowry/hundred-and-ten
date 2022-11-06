@@ -51,7 +51,7 @@ Players may only bid one of the following amounts.
 
 #### Stealing a Bid
 
-Any player that has not passed may steal the bid. To do so, they must bid an amount over the current bid. If two players in a round both want to bid, bidding will continue between the two until one has passed.
+When a player has already bid, but another player that has not yet passed would still like to be the bidder, they may attempt to steal the bid. To do so, they must bid an amount over the current bid. Play will continue around the table and the original bidder will be given the opportunity to steal the bid back or pass and cede the bid. Recall that the [dealer](#dealer) has special privileges when stealing the bid. Bidding will continue until all but one player has passed.
 
 #### Selecting Trump
 
