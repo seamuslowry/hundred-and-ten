@@ -233,6 +233,9 @@ If no trump card is played, the suit of the first played card is considered trum
 <table align="center">
   <tr>
     <th>
+      Rank
+    </th>
+    <th>
       Hearts
     </th>
     <th>
@@ -246,11 +249,17 @@ If no trump card is played, the suit of the first played card is considered trum
     </th>
   </tr>
   <tr>
+    <td align="center">
+      Highest
+    </td>
     <td colspan=4 align="center">
       Ace
     </td>
   </tr>
   <tr>
+    <td rowspan=11>
+      &nbsp
+    </td>
     <td colspan=4 align="center">
       King
     </td>
@@ -330,6 +339,9 @@ If no trump card is played, the suit of the first played card is considered trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      Lowest
+    </td>
     <td colspan=2 align="center">
       2
     </td>
