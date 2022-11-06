@@ -75,7 +75,7 @@ A trick is won by the highest value card in the trick. Trump cards will always b
 
 When a suit is trump, the card heirarchy is changed. Recall the additional [trump cards](#trump-cards) that will not necessarily be of the selected suit. The trump card heirarchy is below. Note that red suits and black suits follow the same trump heirarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
 
-<table>
+<table align="center">
   <tr>
     <th>
       Hearts
@@ -214,7 +214,7 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
 
 If no trump card is played, the suit of the first played card is considered trump for the round. It will not follow the trump order listed above, though. Instead, it will follow a normal Ace-high card heirarchy. The only exception is that lower value black number cards still beat higher value black number cards. The table below describes the full order.
 
-<table>
+<table align="center">
   <tr>
     <th>
       Hearts
