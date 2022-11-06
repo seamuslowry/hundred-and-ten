@@ -94,7 +94,7 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </th>
   </tr>
   <tr>
-    <td rowspan=15>
+    <td rowspan=15 align="center">
       ↓
     </td>
     <td colspan=4 align="center">
