@@ -47,7 +47,7 @@ Players may only bid one of the following amounts.
 - 20
 - 25
 - 30
-- Shoot the Moon (see: [Scoring](#scoring)
+- Shoot the Moon (see: [Scoring](#scoring))
 
 #### Stealing a Bid
 
