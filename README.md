@@ -13,9 +13,122 @@ game = HundredAndTen()
 
 ## How To Play
 
-TODO
+Hundred and Ten is a trick-taking game structured into rounds of five tricks each that continue until one player has reached a score of 110 or above.
 
-### Bleeding
+The game is played with a normal 52 card deck and includes one Joker for a total deck of 53 cards.
+
+### Dealer
+
+For each round, one player is considered the dealer. In an over-the-table game, this player would be responsible for shuffling the deck and dealing out the cards. With this package, that is all handled. However, the dealer still retains some additional privilege that goes along with the role.
+
+Bidding begins to the left of the dealer. This means that the dealer will be the last to place a bid and can make their decision with the context of other players bids.
+
+Normally, to steal a bid, players must bid _above_ the current amount. The dealer, however, can steal a bid for the current amount.
+
+The position of dealer moves to the current dealer's left on conditions described in [passing](#passing) and [scoring](#scoring).
+
+### Bidding
+
+Before tricks are played, the round will go through a stage of bidding. Each player will be dealt a hand of five cards and will use this to determine if they wish to "bid" any points. The player who has bid the most is considered the bidder and they decide which suit is trumps for the round. However, if the bidder fails to earn at least the amount of points they bid, they will instead lose that amount.
+
+Bidding begins to the left of the [dealer](#dealer) and continues clockwise around the table until either all players have passed or a single bidder is decided.
+
+#### Passing
+
+If players do not believe their hand is strong enough to bid, the can pass on their turn in the bidding stage. If all players pass, the round ends and cards are re-dealt.
+
+If the current dealer has been the dealer for the last three rounds, then [dealer](#dealer) will pass to the left. Otherwise, they will remain dealer after a round when all players pass.
+
+#### Amounts
+
+Players may only bid one of the following amounts.
+
+- 15
+- 20
+- 25
+- 30
+- Shoot the Moon (see: [Scoring](#scoring)
+
+#### Stealing a Bid
+
+Any player that has not passed may steal the bid. To do so, they must bid an amount over the current bid. If two players in a round both want to bid, bidding will continue between the two until one has passed.
+
+#### Selecting Trump
+
+Once a player has bid, they may select the trump suit for the round. Once trump is selected, all players at the table may discard any or all of their current hand and have it refilled from the deck.
+
+### Tricks
+
+Once trump is selected and all players have discarded and been redealt, the first trick begins. The player to the left of the bidder players the first card. From there, play continues clockwise until all players have played one card. Subsequent tricks will start with the winner of the previous trick and continue clockwise in the same manner.
+
+#### Trump Cards
+
+A card is a trump card if it is the suit selected by the bidder.
+
+Additionally, the Ace of Hearts and the Joker are both considered trump cards regardless of the suit chosen by the bidder. This is important to remember for [winning a trick](#winning-a-trick) and [bleeding](#bleeding).
+
+#### Winning a Trick
+
+A trick is won by the highest value card in the trick. Trump cards will always beat non-trump cards.
+
+When a suit is trump, the card heirarchy is changed. Additionally, recall the additonal [trump cards](#trump-cards) that will not necessarily be of the selected suit. The trump card heirarchy is below. Note that red suits and black suits follow the same trump heirarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
+
+|   Red Suit    |  Black Suit   |
+| :-----------: | :-----------: |
+|       5       |       5       |
+|     Jack      |     Jack      |
+|     Joker     |     Joker     |
+| Ace of Hearts | Ace of Hearts |
+| Ace of Trump  | Ace of Trump  |
+|     King      |     King      |
+|     Queen     |     Queen     |
+|      10       |       2       |
+|       9       |       3       |
+|       8       |       4       |
+|       7       |       6       |
+|       6       |       7       |
+|       4       |       8       |
+|       3       |       9       |
+|       2       |      10       |
+
+If no trump card is played, the suit of the first played card is considered trump for the round. It will not follow the trump order listed above, though. Instead, it will follow a normal Ace-high card heirarchy. The only exception is that lower value black number cards still beat higher value black number cards. The table below describes the full order.
+
+| Red Suit | Black Suit |
+| :------: | :--------: |
+|   Ace    |    Ace     |
+|   King   |    King    |
+|  Queen   |   Queen    |
+|   Jack   |    Jack    |
+|    10    |     2      |
+|    9     |     3      |
+|    8     |     4      |
+|    7     |     5      |
+|    6     |     6      |
+|    5     |     7      |
+|    4     |     8      |
+|    3     |     9      |
+|    2     |     10     |
+
+#### Bleeding
+
+If the first card in a trick is a trump card, the trick is "bleeding." This means that all players _must_ play a trump card if they have one in their hand. If they do not have one in their hand, they may play whatever card they wish.
+
+#### Scoring
+
+Each round normally offers thirty points in total to be won by players. The trick that was won with the highest value card is worth ten points. The remaining four tricks are worth five points each.
+
+However, if the tricks won by the bidder do not equal the amount they bid, they will instead lose the amount they bid, and the tricks they won will not offset their loss. For example, if a player began the round at zero points, bid fifteen, and won ten points, that player will end the round at negative fifteen points.
+
+Additionally, if the bidder decided to [Shoot the Moon](#amounts), they will earn sixty points iff they won every trick that round. Otherwise, they will lose sixty points.
+
+### Winning
+
+The game ends if, after a round is scored, one or more players has a total score greater than or equal to 110.
+
+If multiple players are above 110, the winner is determined as follows:
+
+- If the bidder is among the players above 110, the bidder wins.
+- Otherwise, the player who would have reached 110 first had scoring occurred within the round wins.
 
 ## Players
 
