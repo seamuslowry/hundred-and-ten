@@ -78,6 +78,9 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
 <table align="center">
   <tr>
     <th>
+      Rank
+    </th>
+    <th>
       Hearts
     </th>
     <th>
@@ -91,21 +94,33 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </th>
   </tr>
   <tr>
+    <td align="center">
+      1
+    </td>
     <td colspan=4 align="center">
       5
     </td>
   </tr>
   <tr>
+    <td align="center">
+      2
+    </td>
     <td colspan=4 align="center">
       Jack
     </td>
   </tr>
   <tr>
+    <td align="center">
+      3
+    </td>
     <td colspan=4 align="center">
       Joker
     </td>
   </tr>
   <tr>
+    <td align="center">
+      4
+    </td>
     <td colspan=1 rowspan=2 align="center">
       Ace
     </td>
@@ -114,21 +129,33 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      5
+    </td>
     <td colspan=3 align="center">
       Ace
     </td>
   </tr>
   <tr>
+    <td align="center">
+      6
+    </td>
     <td colspan=4 align="center">
       King
     </td>
   </tr>
   <tr>
+    <td align="center">
+      7
+    </td>
     <td colspan=4 align="center">
       Queen
     </td>
   </tr>
   <tr>
+    <td align="center">
+      8
+    </td>
     <td colspan=2 align="center">
       10
     </td>
@@ -137,6 +164,9 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      8
+    </td>
     <td colspan=2 align="center">
       9
     </td>
@@ -145,6 +175,9 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      9
+    </td>
     <td colspan=2 align="center">
       8
     </td>
@@ -153,6 +186,9 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      10
+    </td>
     <td colspan=2 align="center">
       7
     </td>
@@ -161,6 +197,9 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      11
+    </td>
     <td colspan=2 align="center">
       6
     </td>
@@ -169,6 +208,9 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      12
+    </td>
     <td colspan=2 align="center">
       4
     </td>
@@ -177,6 +219,9 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      13
+    </td>
     <td colspan=2 align="center">
       3
     </td>
@@ -185,6 +230,9 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      14
+    </td>
     <td colspan=2 align="center">
       2
     </td>
