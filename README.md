@@ -91,104 +91,104 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </th>
   </tr>
   <tr>
-    <td colspan=4  style="text-align:center">
+    <td colspan=4 align="center">
       5
     </td>
   </tr>
   <tr>
-    <td colspan=4  style="text-align:center">
+    <td colspan=4 align="center">
       Jack
     </td>
   </tr>
   <tr>
-    <td colspan=4  style="text-align:center">
+    <td colspan=4 align="center">
       Joker
     </td>
   </tr>
   <tr>
-    <td colspan=1 rowspan=2  style="text-align:center">
+    <td colspan=1 rowspan=2 align="center">
       Ace
     </td>
-    <td colspan=3  style="text-align:center">
+    <td colspan=3 align="center">
       Ace of Hearts
     </td>
   </tr>
   <tr>
-    <td colspan=3  style="text-align:center">
+    <td colspan=3 align="center">
       Ace
     </td>
   </tr>
   <tr>
-    <td colspan=4  style="text-align:center">
+    <td colspan=4 align="center">
       King
     </td>
   </tr>
   <tr>
-    <td colspan=4  style="text-align:center">
+    <td colspan=4 align="center">
       Queen
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       10
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       2
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       9
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       3
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       8
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       4
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       7
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       6
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       6
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       7
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       4
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       8
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       3
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       9
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       2
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       10
     </td>
   </tr>
@@ -230,94 +230,94 @@ If no trump card is played, the suit of the first played card is considered trum
     </th>
   </tr>
   <tr>
-    <td colspan=4  style="text-align:center">
+    <td colspan=4 align="center">
       Ace
     </td>
   </tr>
   <tr>
-    <td colspan=4  style="text-align:center">
+    <td colspan=4 align="center">
       King
     </td>
   </tr>
   <tr>
-    <td colspan=4  style="text-align:center">
+    <td colspan=4 align="center">
       Queen
     </td>
   </tr>
   <tr>
-    <td colspan=4  style="text-align:center">
+    <td colspan=4 align="center">
       Jack
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       10
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       2
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       9
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       3
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       8
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       4
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       7
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       5
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       5
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       6
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       6
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       7
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       4
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       8
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       3
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       9
     </td>
   </tr>
   <tr>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       2
     </td>
-    <td colspan=2  style="text-align:center">
+    <td colspan=2 align="center">
       10
     </td>
   </tr>
