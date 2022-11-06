@@ -59,7 +59,7 @@ Once a player has bid, they will select the trump suit for the round. Once trump
 
 ### Tricks
 
-Once trump is selected and all players have discarded and been redealt, the first trick begins. The player to the left of the bidder players the first card. From there, play continues clockwise until all players have played one card. Subsequent tricks will start with the winner of the previous trick and continue clockwise in the same manner.
+Once trump is selected and all players have discarded and been redealt, the first trick begins. The player to the left of the bidder plays the first card. From there, play continues clockwise until all players have played one card. Subsequent tricks will start with the winner of the previous trick and continue clockwise in the same manner.
 
 #### Trump Cards
 
