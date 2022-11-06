@@ -78,7 +78,7 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
 <table align="center">
   <tr>
     <th>
-      Beats
+      Rank
     </th>
     <th>
       Hearts
@@ -94,22 +94,17 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </th>
   </tr>
   <tr>
-    <td rowspan=15 align="center">
-      |<br>
-      |<br>
-      |<br>
-      |<br>
-      |<br>
-      |<br>
-      |<br>
-      |<br>
-      ⌄
+    <td align="center">
+      Highest
     </td>
     <td colspan=4 align="center">
       5
     </td>
   </tr>
   <tr>
+    <td  rowspan=13 align="center">
+      &nbsp
+    </td>
     <td colspan=4 align="center">
       Jack
     </td>
@@ -199,6 +194,9 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
     </td>
   </tr>
   <tr>
+    <td align="center">
+      Lowest
+    </td>
     <td colspan=2 align="center">
       2
     </td>
