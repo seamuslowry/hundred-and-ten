@@ -55,7 +55,7 @@ When a player has already bid, but another player that has not yet passed would 
 
 #### Selecting Trump
 
-Once a player has bid, they may select the trump suit for the round. Once trump is selected, all players at the table may discard any or all of their current hand and have it refilled from the deck.
+Once a player has bid, they will select the trump suit for the round. Once trump is selected, all players at the table may discard any or all of their current hand and have their hand refilled from the deck. The dealer is the first player to discard. From there, the turn passes around the table clockwise until all players have had the opportunity.
 
 ### Tricks
 
