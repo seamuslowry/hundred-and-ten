@@ -35,7 +35,7 @@ Bidding begins to the left of the [dealer](#dealer) and continues clockwise arou
 
 #### Passing
 
-If players do not believe their hand is strong enough to bid, the can pass on their turn in the bidding stage. If all players pass, the round ends and cards are re-dealt.
+If players do not believe their hand is strong enough to bid, the can pass on their turn. If all players pass, the round ends and cards are re-dealt.
 
 If the current dealer has been the dealer for the last three rounds, then [dealer](#dealer) will pass to the left. Otherwise, they will remain dealer after a round when all players pass.
 
