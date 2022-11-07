@@ -6,11 +6,18 @@ on:
       - main
 
 jobs:
+  get-tag:
+    outputs:
+      tag: ${{ steps.retrieve-tag.outputs.latest_tag }}
+    steps:
+      - id: retrieve-tag
+        run: echo "latest_tag=$(git describe --always --tags)" >> $GITHUB_OUTPUT
+
   publish:
-    # - run: echo "latest_tag=$(git describe --always --tags)" >> $GITHUB_ENV
+    needs: get-tag
     uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
     with:
       repo: testpypi
-      release-version: "${{ git describe --always --tags }}-${{ github.run_attempt }}"
+      release-version: "${{ needs.get-tag.outputs.tag }}-${{ github.run_attempt }}"
     secrets:
       py_pi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
