@@ -8,10 +8,10 @@ on:
 jobs:
   publish:
     steps:
-      - run: echo "latest_tag=$(git describe --always --tags)" >> $GITHUB_ENV
-      - uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
-        with:
-          repo: testpypi
-          release-version: "${{ env.latest_tag }}-${{ github.run_attempt }}"
-        secrets:
-          py_pi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
+      # - run: echo "latest_tag=$(git describe --always --tags)" >> $GITHUB_ENV
+      uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
+      with:
+        repo: testpypi
+        release-version: "${{ git describe --always --tags }}-${{ github.run_attempt }}"
+      secrets:
+        py_pi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
