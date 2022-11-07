@@ -12,7 +12,7 @@ jobs:
       tag: ${{ steps.retrieve-tag.outputs.latest_tag }}
     steps:
       - id: retrieve-tag
-        run: echo "latest_tag=$(git describe --always --tags)" >> $GITHUB_OUTPUT
+        run: echo "latest_tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
   publish:
     needs: get-tag
