@@ -15,7 +15,6 @@ jobs:
     needs: tag-new-version
     uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
     with:
-      repo: testpypi
       release-version: ${{ needs.tag-new-version.outputs.tag }}
     secrets:
-      py_pi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
+      py_pi_token: ${{ secrets.PYPI_API_TOKEN }}

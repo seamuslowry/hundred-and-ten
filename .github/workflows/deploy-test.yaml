@@ -2,8 +2,8 @@ name: Publish (Test)
 
 on:
   push:
-    branches-ignore:
-      - main
+    branches:
+      - candidate/*
 
   publish:
     steps:
