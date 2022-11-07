@@ -11,6 +11,8 @@ jobs:
     outputs:
       tag: ${{ steps.retrieve-tag.outputs.latest_tag }}
     steps:
+      - id: checkout
+        uses: actions/checkout@v3
       - id: retrieve-tag
         run: echo "latest_tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
