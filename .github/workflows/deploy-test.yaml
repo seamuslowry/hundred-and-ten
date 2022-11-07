@@ -7,6 +7,7 @@ on:
 
 jobs:
   get-tag:
+    runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.retrieve-tag.outputs.latest_tag }}
     steps:
