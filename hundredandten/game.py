@@ -144,8 +144,6 @@ class Game:
     def leave(self, player: str) -> None:
         '''Remove a player from the game'''
 
-        if player == self.organizer.identifier:
-            raise HundredAndTenError("The organizer cannot leave the game.")
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("You cannot leave an in-progress game.")
 
