@@ -439,7 +439,7 @@ The status of the game can be one of the following values
 
 - `GameStatus.WAITING_FOR_PLAYERS`: The game has not yet begun. Players may still join or leave.
 - `RoundStatus.BIDDING`: Players are bidding in the current round.
-- `RoundStatus.COMPLETED_NO_BIDDERS`: The current round is complete, but no player sumbitted a bid. This should be a transitionary state. Any game that reaches this state should immediately begin a new round and enter `RoundStatus.BIDDING`.
+- `RoundStatus.COMPLETED_NO_BIDDERS`: The current round is complete, but no player submitted a bid. This should be a transitionary state. Any game that reaches this state should immediately begin a new round and enter `RoundStatus.BIDDING`.
 - `RoundStatus.TRUMP_SELECTION`: The bidder in the current round is selecting their trump value.
 - `RoundStatus.DISCARD`: Players in the current round are discarding from their hard to refill.
 - `RoundStatus.COMPLETED`: The current round is complete with tricks won by the players. This should also be a transitionary state. Any game that reaches this state should either begin a new round and enter `RoundStatus.BIDDING` or determine a winner and enter `GameStatus.WON`
