@@ -25,11 +25,11 @@ For each round, one player is considered the dealer. In an over-the-table game, 
 
 2. Normally, to steal a bid, players must bid _above_ the current amount. The dealer, however, can steal a bid for the current amount.
 
-The position of dealer moves to the current dealer's left on conditions described in [passing](#passing) and [scoring](#scoring).
+The position of dealer moves to the current dealer's left at the end of the round, except with conditions described in [passing](#passing).
 
 ### Bidding
 
-Before tricks are played, the round will go through a stage of bidding. Each player is dealt a hand of five cards and will use this to determine if they wish to "bid" any points. The highest bidder will decide which suit is trumps for the round. However, if the highest bidder fails to earn at least the amount of points they bid, they instead lose that amount.
+Before the round begins, players are dealt a hand of five cards, which they will use to determine if they wish to "bid" any points. The highest bidder will decide which suit is trumps for the round. However, if the highest bidder fails to earn at least the amount of points they bid, they instead lose that amount (see [scoring](#scoring)).
 
 Bidding begins to the left of the [dealer](#dealer) and continues clockwise around the table until either all players have passed or a single bidder remains.
 
@@ -59,7 +59,7 @@ The highest bidder selects the trump suit for the round. Once the trump is selec
 
 ### Tricks
 
-Each round consists of five tricks. Each player contributes one card to a trick. When all players have played a card, the trick ends and a winner is determined.
+Each round consists of five tricks. Each player contributes one card to a trick. When all players have played a card, the trick ends and a winner is determined (see [Winning a Trick](#winning-a-trick)).
 
 The first trick begins with the player to the left of the highest bidder; play continues clockwise until the trick is complete. Subsequent tricks will begin with the winner of the previous trick.
 
@@ -349,8 +349,8 @@ The game ends if, after a round is scored, one or more players has a total score
 
 If multiple players are above 110, the winner is determined as follows:
 
-- If the current highest bidder is among the players above 110, the highest bidder wins.
-- Otherwise, the player who would have reached 110 first within the round wins.
+1. If the current highest bidder is among the players above 110, the highest bidder wins.
+2. Otherwise, the player who would have reached 110 first within the round wins.
 
 ## Players
 
