@@ -2,9 +2,10 @@ name: Publish (Test)
 
 on:
   push:
-    branches:
-      - candidate/*
+    branches-ignore:
+      - main
 
+jobs:
   publish:
     steps:
       - run: echo "latest_tag=$(git describe --always --tags)" >> $GITHUB_ENV
