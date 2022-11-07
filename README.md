@@ -73,7 +73,7 @@ Additionally, the Ace of Hearts and the Joker are both considered trump cards re
 
 A trick is won by the highest value card in the trick. Trump cards will always beat non-trump cards.
 
-When a suit is trump, the card heirarchy is changed. Recall the additional [trump cards](#trump-cards) that will not necessarily be of the selected suit. The trump card heirarchy is below. Note that red suits and black suits follow the same trump heirarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
+See below for the card heirarchy for each suit, when it is trump. Recall the additional [trump cards](#trump-cards) that will not necessarily be of the selected suit. Note that red suits and black suits follow the same trump heirarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
 
 <table align="center">
   <tr>
@@ -206,7 +206,7 @@ When a suit is trump, the card heirarchy is changed. Recall the additional [trum
   </tr>
 </table>
 
-If no trump card is played, the suit of the first played card is considered trump for the round. It will not follow the trump order listed above, though. Instead, it will follow a normal Ace-high card heirarchy. The only exception is that lower value black number cards still beat higher value black number cards. The table below describes the full order.
+If no trump card is played, the suit of the first played card is considered trump for the trick. It will not follow the trump order listed above, though. Instead, it will follow a normal Ace-high card heirarchy. The only exception is that lower value black number cards still beat higher value black number cards. The table below describes the full order.
 
 <table align="center">
   <tr>
@@ -331,15 +331,17 @@ If no trump card is played, the suit of the first played card is considered trum
 
 #### Bleeding
 
-If the first card in a trick is a trump card, the trick is "bleeding." This means that all players _must_ play a trump card if they have one in their hand. If they do not have one in their hand, they may play whatever card they wish.
+If the first card in a trick is a trump card, the trick is "bleeding". This means that all players _must_ play a trump card if they have one in their hand. If they do not have one in their hand, they may play whatever card they wish.
 
 #### Scoring
 
-Each round normally offers thirty points in total to be won by players. The trick that was won with the highest value card is worth ten points. The remaining four tricks are worth five points each.
+Each round (which consists of five tricks) normally offers thirty points in total to be won by players. The trick that was won with the highest value card is worth ten points. The remaining four tricks are worth five points each.
 
-However, if the tricks won by the bidder do not equal the amount they bid, they will instead lose the amount they bid, and the tricks they won will not offset their loss. For example, if a player began the round at zero points, bid fifteen, and won ten points, that player will end the round at negative fifteen points.
+If the tricks won by the highest bidder do not equal or exceed the amount they bid, they will instead lose the amount of their bid. The tricks they won will not offset their loss. For example, if a player began the round at zero points, bid fifteen, and won ten points, that player will end the round at negative fifteen points.
 
-Additionally, if the bidder decided to [Shoot the Moon](#options), they will earn sixty points iff they won every trick that round. Otherwise, they will lose sixty points.
+Additionally, if the highest bidder decided to [Shoot the Moon](#options), they will earn sixty points if they won every trick that round. Otherwise, they will lose sixty points.
+
+Only the highest bidder can lose points.
 
 ### Winning
 
@@ -347,8 +349,8 @@ The game ends if, after a round is scored, one or more players has a total score
 
 If multiple players are above 110, the winner is determined as follows:
 
-- If the bidder is among the players above 110, the bidder wins.
-- Otherwise, the player who would have reached 110 first had scoring occurred within the round wins.
+- If the current highest bidder is among the players above 110, the highest bidder wins.
+- Otherwise, the player who would have reached 110 first within the round wins.
 
 ## Players
 
