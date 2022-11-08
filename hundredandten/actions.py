@@ -1,5 +1,6 @@
 '''All the actions a player can take to interact with the game'''
 from dataclasses import dataclass, field
+from typing import List
 
 from hundredandten.constants import BidAmount, SelectableSuit
 from hundredandten.deck import Card
@@ -32,7 +33,7 @@ class SelectTrump:
 class Discard:
     '''A class to keep track of one player's discard action'''
     identifier: str
-    cards: list[Card]
+    cards: List[Card]
 
 
 @dataclass

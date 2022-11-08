@@ -1,6 +1,6 @@
 '''Represent one round of a game of Hundred and Ten'''
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List, Optional
 
 from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
 from hundredandten.constants import (TRICK_VALUE, BidAmount, RoundRole,
@@ -15,11 +15,11 @@ from hundredandten.trick import Score, Trick
 class Round:
     '''A round in the game of Hundred and Ten'''
     players: Group[Player] = field(default_factory=Group)
-    bids: list[Bid] = field(default_factory=list)
+    bids: List[Bid] = field(default_factory=list)
     deck: Deck = field(default_factory=Deck)
     trump: Optional[SelectableSuit] = None
-    discards: list[Discard] = field(default_factory=list)
-    tricks: list[Trick] = field(default_factory=list)
+    discards: List[Discard] = field(default_factory=list)
+    tricks: List[Trick] = field(default_factory=list)
 
     @property
     def dealer(self) -> Player:
@@ -118,7 +118,7 @@ class Round:
         return RoundStatus.BIDDING
 
     @property
-    def scores(self) -> list[Score]:
+    def scores(self) -> List[Score]:
         '''
         The scores each player earned for this round
         A list of tuples in the form
@@ -229,7 +229,7 @@ class Round:
         self.active_trick.plays.append(play)
         self.__end_play()
 
-    def available_bids(self, identifier: str) -> list[BidAmount]:
+    def available_bids(self, identifier: str) -> List[BidAmount]:
         '''Compute the bid amounts available to the identified player'''
         return [
             bid_amount for bid_amount in BidAmount

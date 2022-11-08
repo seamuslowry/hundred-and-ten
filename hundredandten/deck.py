@@ -1,6 +1,7 @@
 '''Handle the functions of a deck'''
 from dataclasses import dataclass, field
 from random import Random
+from typing import List
 from uuid import uuid4
 
 from hundredandten.constants import (CardNumber, CardSuit, SelectableSuit,
@@ -88,13 +89,13 @@ class Deck:
     '''A seeded deck of cards'''
     seed: str = field(default_factory=lambda: str(uuid4()))
     pulled: int = 0
-    cards: list[int] = field(init=False)
+    cards: List[int] = field(init=False)
 
     def __post_init__(self):
         self.cards = [*range(len(cards))]
         Random(self.seed).shuffle(self.cards)
 
-    def draw(self, amount: int) -> list[Card]:
+    def draw(self, amount: int) -> List[Card]:
         '''Draw the specified amount of cards from the deck'''
         start = self.pulled
         end = self.pulled + amount

@@ -1,6 +1,6 @@
 '''Interact with a list of people'''
 from dataclasses import dataclass, field
-from typing import Optional, TypeVar
+from typing import List, Optional, Set, TypeVar
 
 from hundredandten.constants import AnyRole
 from hundredandten.deck import Card
@@ -11,19 +11,19 @@ from hundredandten.hundred_and_ten_error import HundredAndTenError
 class Person:
     '''A class to keep track of a person'''
     identifier: str
-    roles: set[AnyRole] = field(default_factory=set, compare=False)
+    roles: Set[AnyRole] = field(default_factory=set, compare=False)
 
 
 @dataclass
 class Player(Person):
     '''A class to keep track of player information'''
-    hand: list[Card] = field(default_factory=list, compare=False)
+    hand: List[Card] = field(default_factory=list, compare=False)
 
 
 P = TypeVar('P', bound=Person)
 
 
-class Group(list[P]):
+class Group(List[P]):
     '''A list of persons'''
 
     def update(self, person: P) -> None:

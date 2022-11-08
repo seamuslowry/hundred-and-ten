@@ -2,7 +2,7 @@
 from dataclasses import dataclass, field
 from functools import reduce
 from random import Random
-from typing import Optional, Union
+from typing import Dict, List, Optional, Union
 from uuid import UUID, uuid4
 
 from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
@@ -21,7 +21,7 @@ class Game:
     '''A game of Hundred and Ten'''
 
     people: Group[Person] = field(default_factory=Group)
-    rounds: list[Round] = field(default_factory=list)
+    rounds: List[Round] = field(default_factory=list)
     accessibility: Accessibility = field(default=Accessibility.PUBLIC)
     seed: str = field(default_factory=lambda: str(uuid4()))
 
@@ -88,7 +88,7 @@ class Game:
         return winner
 
     @property
-    def score_history(self) -> list[Score]:
+    def score_history(self) -> List[Score]:
         '''A list of all players' scores over time'''
 
         scores = {}
@@ -106,7 +106,7 @@ class Game:
         return score_history
 
     @property
-    def scores(self) -> dict[str, int]:
+    def scores(self) -> Dict[str, int]:
         '''
         The scores each player earned for this game
         A dictionary in the form

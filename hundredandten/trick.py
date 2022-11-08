@@ -1,6 +1,6 @@
 '''Track a trick'''
 from dataclasses import dataclass, field
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 from hundredandten.actions import Play
 from hundredandten.constants import CardSuit, SelectableSuit
@@ -18,7 +18,7 @@ class Score:
 class Trick:
     '''A class to keep track of one trick'''
     round_trump: SelectableSuit
-    plays: list[Play] = field(default_factory=list)
+    plays: List[Play] = field(default_factory=list)
 
     @property
     def winning_play(self) -> Optional[Play]:
