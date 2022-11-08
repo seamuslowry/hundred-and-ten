@@ -24,6 +24,6 @@ jobs:
     with:
       python-version: 3.6
       repo: testpypi
-      release-version: "${{ needs.get-tag.outputs.tag }}-36-${{ github.run_number }}"
+      release-version: "${{ needs.get-tag.outputs.tag }}.36-${{ github.run_number }}"
     secrets:
       py_pi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
