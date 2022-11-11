@@ -20,6 +20,9 @@ class Card:
     # true if the card is _always_ trumps
     always_trump: bool = False
 
+    def __repr__(self):
+        return f'{self.number.name} of {self.suit.name}'
+
 
 cards = [
     # Hearts
