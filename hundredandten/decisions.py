@@ -4,7 +4,7 @@ from hundredandten.deck import Card
 
 
 def max_bid(cards: list[Card]) -> BidAmount:
-    '''Return the maximum amount the player will bid'''
+    '''Return the maximum amount to bid with the given hand'''
 
     best_value = __most_valuable_suit(cards)[1]
 
@@ -22,8 +22,16 @@ def max_bid(cards: list[Card]) -> BidAmount:
     return BidAmount.PASS
 
 
+def desired_trump(cards: list[Card]) -> SelectableSuit:
+    '''Return the desired trump for the given hand'''
+
+    return __most_valuable_suit(cards)[0]
+
+
 def __bid_value(cards: list[Card]) -> int:
     '''Returns the bid value for a list of cards, assuming they are all trump'''
+    # add some logic to discourage bidding without the five
+
     return sum(map(lambda card: card.trump_value, cards))
 
 
