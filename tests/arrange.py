@@ -4,6 +4,7 @@ from typing import Callable, Optional
 from hundredandten.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
                                      GameStatus, RoundStatus, SelectableSuit)
+from hundredandten.decisions import trumps
 from hundredandten.game import Game
 from hundredandten.group import Group, Person
 
@@ -73,8 +74,11 @@ def play_trick(game_to_play: Game) -> None:
     starting_active_trick = game_to_play.active_round.active_trick
     while len(starting_active_trick.plays) < len(game_to_play.players):
         active_player = game_to_play.active_round.active_player
-        trumps = active_player.trumps(game_to_play.active_round.trump)
-        game_to_play.act(Play(active_player.identifier, next(iter(trumps + active_player.hand))))
+        trump_cards = trumps(active_player.hand, game_to_play.active_round.trump)
+        game_to_play.act(
+            Play(
+                active_player.identifier, next(
+                    iter(trump_cards + active_player.hand))))
 
 
 def play_round(game_to_play: Game) -> None:
