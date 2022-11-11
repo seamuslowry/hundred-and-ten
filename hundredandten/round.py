@@ -212,9 +212,7 @@ class Round:
     def play(self, play: Play) -> None:
         '''Play the specified card from the identified player's hand'''
 
-        active_player_trump_cards = [
-            card for card in self.active_player.hand
-            if card.suit == self.trump or card.always_trump]
+        active_player_trump_cards = self.active_player.trumps(self.trump)
 
         if self.active_player.identifier != play.identifier:
             raise HundredAndTenError("Cannot play a card out of turn.")

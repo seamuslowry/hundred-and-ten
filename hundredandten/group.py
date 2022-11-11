@@ -2,7 +2,7 @@
 from dataclasses import dataclass, field
 from typing import Optional, TypeVar
 
-from hundredandten.constants import AnyRole
+from hundredandten.constants import AnyRole, SelectableSuit
 from hundredandten.deck import Card
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 
@@ -19,6 +19,11 @@ class Person:
 class Player(Person):
     '''A class to keep track of player information'''
     hand: list[Card] = field(default_factory=list, compare=False)
+
+    def trumps(self, trump: Optional[SelectableSuit]):
+        '''Return a list of the trump cards in this player's hand'''
+        return [card for card in self.hand
+                if card.suit == trump or card.always_trump]
 
 
 P = TypeVar('P', bound=Person)
