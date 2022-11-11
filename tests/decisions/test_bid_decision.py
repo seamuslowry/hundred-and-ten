@@ -21,6 +21,14 @@ class TestBidDecision(TestCase):
                 Card(CardNumber.QUEEN, SelectableSuit.CLUBS, 8, 0)
             ]))
 
+    def test_wont_go_fifteen_without_five(self):
+        '''Decide not to go to fifteen without the five'''
+        self.assertEqual(BidAmount.PASS, max_bid(
+            [
+                Card(CardNumber.JACK, SelectableSuit.CLUBS, 13, 0),
+                Card(CardNumber.QUEEN, SelectableSuit.CLUBS, 8, 0)
+            ]))
+
     def test_goes_twenty(self):
         '''Decide to go up to twenty'''
         self.assertEqual(BidAmount.TWENTY, max_bid(

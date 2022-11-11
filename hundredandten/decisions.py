@@ -1,5 +1,5 @@
 '''A module to make machine decisions about how to act in a game'''
-from hundredandten.constants import BidAmount, SelectableSuit
+from hundredandten.constants import BidAmount, CardNumber, SelectableSuit
 from hundredandten.deck import Card
 
 
@@ -30,9 +30,9 @@ def desired_trump(cards: list[Card]) -> SelectableSuit:
 
 def __bid_value(cards: list[Card]) -> int:
     '''Returns the bid value for a list of cards, assuming they are all trump'''
-    # add some logic to discourage bidding without the five
+    discouragement = -10 if CardNumber.FIVE not in list(map(lambda c: c.number, cards)) else 0
 
-    return sum(map(lambda card: card.trump_value, cards))
+    return sum(map(lambda card: card.trump_value, cards)) + discouragement
 
 
 def __most_valuable_suit(cards: list[Card]) -> tuple[SelectableSuit, int]:
