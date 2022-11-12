@@ -557,3 +557,29 @@ from hundredandten import HundredAndTen, Play
 
 game.act(Play('active_player', game.active_round.active_player.hand[0]))
 ```
+
+## Machine Play
+
+### `HundredAndTen.suggestion`
+
+At any state of active play (when the game is not `GameStatus.WON` or `GameStatus.WAITING_FOR_PLAYERS`), the game can provide a suggested action.
+
+```python
+from hundredandten import HundredAndTen
+
+# set up and start the game
+
+print(game.suggestion()) # will be a Bid, SelectTrump, Discard, or Play action
+```
+
+### `HundredAndTen.automate`
+
+Any player can be automated at any time. But, once automated, a player cannot be unautomated. Automated players will always play the suggested action.
+
+```python
+from hundredandten import HundredAndTen
+
+game = HundredAndTen()
+game.join('machine_player')
+game.automate('machine_player')
+```

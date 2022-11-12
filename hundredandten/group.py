@@ -12,6 +12,7 @@ class Person:
     '''A class to keep track of a person'''
     identifier: str
     roles: set[AnyRole] = field(default_factory=set, compare=False)
+    automate: bool = field(default=False, compare=False)
 
 
 @dataclass
