@@ -152,6 +152,14 @@ class Game:
         if person in self.people:
             self.people.remove(person)
 
+    def automate(self, player: str) -> None:
+        '''Automate a player in the game'''
+
+        person = self.people.find_or_use(Person(player))
+        person.automate = True
+
+        self.people.upsert(person)
+
     def start_game(self) -> None:
         '''Start the game'''
 
@@ -168,12 +176,16 @@ class Game:
         self.__act(action)
         self.__automated_act()
 
+    def suggest(self) -> Action:
+        '''Return the suggested action given the state of the game'''
+        return self.active_round.suggestion()
+
     def __automated_act(self):
         while self.status != GameStatus.WON and self.active_round.active_player.automate:
             self.__act(self.__automated_action())
 
     def __automated_action(self) -> Action:
-        return self.active_round.suggestion()
+        return self.suggest()
 
     def __act(self, action: Action) -> None:
         '''Perform an action as a player of the game'''
@@ -233,7 +245,7 @@ class Game:
         deck = Deck(seed=str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4)))
 
         round_players = Group(map(lambda p: Player(
-            p.identifier, hand=deck.draw(HAND_SIZE)), self.players))
+            p.identifier, hand=deck.draw(HAND_SIZE), automate=p.automate), self.players))
         round_players.add_role(dealer, RoundRole.DEALER)
 
         self.rounds.append(Round(players=round_players, deck=deck))

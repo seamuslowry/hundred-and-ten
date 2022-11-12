@@ -256,9 +256,9 @@ class Round:
 
         maximum_bid = max_bid(self.active_player.hand)
         available_bids = self.available_bids(self.active_player.identifier)
-        willing_bids = filter(lambda b: b <= maximum_bid, available_bids)
+        willing_bids = list(filter(lambda b: b and b <= maximum_bid, available_bids))
 
-        return Bid(self.active_player.identifier, next(willing_bids))
+        return Bid(self.active_player.identifier, next(iter(willing_bids), BidAmount.PASS))
 
     def __suggested_trump_selection(self) -> SelectTrump:
         '''Return the suggested trump selection for the current player'''
