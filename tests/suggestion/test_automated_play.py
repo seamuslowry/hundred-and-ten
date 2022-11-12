@@ -25,4 +25,4 @@ class TestAutomatedPlay(TestCase):
         '''When playing with all automated players, the game will complete'''
         game = arrange.game(GameStatus.WON, seed=AUTOMATED_SEED)
 
-        self.assertRaises(HundredAndTenError, game.suggest)
+        self.assertRaises(HundredAndTenError, game.suggestion)

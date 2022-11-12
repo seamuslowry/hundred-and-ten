@@ -176,7 +176,7 @@ class Game:
         self.__act(action)
         self.__automated_act()
 
-    def suggest(self) -> Action:
+    def suggestion(self) -> Action:
         '''Return the suggested action given the state of the game'''
         return self.active_round.suggestion()
 
@@ -185,7 +185,7 @@ class Game:
             self.__act(self.__automated_action())
 
     def __automated_action(self) -> Action:
-        return self.suggest()
+        return self.suggestion()
 
     def __act(self, action: Action) -> None:
         '''Perform an action as a player of the game'''
