@@ -27,7 +27,7 @@ class TestTrick(TestCase):
     def test_winning_play_with_one_play(self):
         '''With only one play, that is always the winning play'''
 
-        play = Play('', Card(CardNumber.TWO, SelectableSuit.HEARTS, 0, 0))
+        play = Play('', Card(CardNumber.TWO, SelectableSuit.HEARTS))
 
         for suit in SelectableSuit:
             self.assertEqual(play, Trick(suit, plays=[play]).winning_play)
@@ -35,10 +35,10 @@ class TestTrick(TestCase):
     def test_winning_play_with_strong_trump(self):
         '''When a strong trump is played, it will beat non-trumps'''
 
-        plays = [Play('', Card(CardNumber.TWO, SelectableSuit.HEARTS, 0, 0)),
-                 Play('', Card(CardNumber.TWO, SelectableSuit.DIAMONDS, 0, 0)),
-                 Play('', Card(CardNumber.TWO, SelectableSuit.CLUBS, 0, 0)),
-                 Play('', Card(CardNumber.TWO, SelectableSuit.SPADES, 0, 0))]
+        plays = [Play('', Card(CardNumber.TWO, SelectableSuit.HEARTS)),
+                 Play('', Card(CardNumber.TWO, SelectableSuit.DIAMONDS)),
+                 Play('', Card(CardNumber.TWO, SelectableSuit.CLUBS)),
+                 Play('', Card(CardNumber.TWO, SelectableSuit.SPADES))]
 
         for play in plays:
             assert isinstance(play.card.suit, SelectableSuit)
@@ -49,22 +49,22 @@ class TestTrick(TestCase):
 
         trick = Trick(
             SelectableSuit.CLUBS,
-            plays=[Play('', Card(CardNumber.TWO, SelectableSuit.HEARTS, 0, 0)),
-                   Play('', Card(CardNumber.TWO, SelectableSuit.DIAMONDS, 0, 0)),
-                   Play('', Card(CardNumber.THREE, SelectableSuit.DIAMONDS, 0, 0)),
-                   Play('', Card(CardNumber.FOUR, SelectableSuit.DIAMONDS, 0, 0))])
+            plays=[Play('', Card(CardNumber.TWO, SelectableSuit.HEARTS)),
+                   Play('', Card(CardNumber.TWO, SelectableSuit.DIAMONDS)),
+                   Play('', Card(CardNumber.THREE, SelectableSuit.DIAMONDS)),
+                   Play('', Card(CardNumber.FOUR, SelectableSuit.DIAMONDS))])
 
         self.assertEqual(trick.plays[0], trick.winning_play)
 
     def test_winning_play_with_all_trump(self):
         '''When all strong trumps are played, the highest trump value wins'''
 
-        winning_play = Play('', Card(CardNumber.FIVE, SelectableSuit.DIAMONDS, 3, 0))
+        winning_play = Play('', Card(CardNumber.FIVE, SelectableSuit.DIAMONDS))
         trick = Trick(
             SelectableSuit.DIAMONDS,
-            plays=[Play('', Card(CardNumber.TWO, SelectableSuit.DIAMONDS, 0, 3)),
-                   Play('', Card(CardNumber.TWO, SelectableSuit.DIAMONDS, 1, 2)),
+            plays=[Play('', Card(CardNumber.TWO, SelectableSuit.DIAMONDS)),
+                   Play('', Card(CardNumber.TWO, SelectableSuit.DIAMONDS)),
                    winning_play,
-                   Play('', Card(CardNumber.FOUR, SelectableSuit.DIAMONDS, 2, 1))])
+                   Play('', Card(CardNumber.FOUR, SelectableSuit.DIAMONDS))])
 
         self.assertEqual(winning_play, trick.winning_play)
