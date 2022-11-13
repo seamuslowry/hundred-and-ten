@@ -13,8 +13,8 @@ class TestTrumpDecision(TestCase):
         '''Select trump with the highest value'''
         self.assertEqual(SelectableSuit.HEARTS, desired_trump(
             [
-                Card(CardNumber.FIVE, SelectableSuit.CLUBS, 14, 0),
-                Card(CardNumber.QUEEN, SelectableSuit.CLUBS, 8, 0),
-                Card(CardNumber.FIVE, SelectableSuit.HEARTS, 14, 0),
-                Card(CardNumber.KING, SelectableSuit.HEARTS, 9, 0)
+                Card(CardNumber.FIVE, SelectableSuit.CLUBS),
+                Card(CardNumber.QUEEN, SelectableSuit.CLUBS),
+                Card(CardNumber.FIVE, SelectableSuit.HEARTS),
+                Card(CardNumber.KING, SelectableSuit.HEARTS)
             ]))

@@ -22,5 +22,5 @@ class TestPerson(TestCase):
             Player(identifier),
             Player(
                 identifier, {GameRole.INVITEE},
-                hand=[Card(CardNumber.ACE, SelectableSuit.CLUBS, 0, 0)]))
+                hand=[Card(CardNumber.ACE, SelectableSuit.CLUBS)]))
         self.assertNotEqual(Player('one'), Player('two'))
