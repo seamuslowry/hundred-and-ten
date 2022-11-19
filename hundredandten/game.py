@@ -158,7 +158,12 @@ class Game:
         person = self.people.find_or_use(Person(player))
         person.automate = True
 
-        self.people.upsert(person)
+        if self.rounds:
+            self.active_round.automate(player)
+
+        if person in self.people:
+            self.people.update(person)
+            self.__automated_act()
 
     def start_game(self) -> None:
         '''Start the game'''
@@ -181,7 +186,7 @@ class Game:
         return self.active_round.suggestion()
 
     def __automated_act(self):
-        while self.status != GameStatus.WON and self.active_round.active_player.automate:
+        while isinstance(self.status, RoundStatus) and self.active_round.active_player.automate:
             self.__act(self.__automated_action())
 
     def __automated_action(self) -> Action:
