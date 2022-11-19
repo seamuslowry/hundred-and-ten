@@ -232,6 +232,15 @@ class Round:
         self.active_trick.plays.append(play)
         self.__end_play()
 
+    def automate(self, player: str) -> None:
+        '''Automate a player in the round'''
+
+        person = self.players.find_or_use(Player(player))
+        person.automate = True
+
+        if person in self.players:
+            self.players.update(person)
+
     def available_bids(self, identifier: str) -> list[BidAmount]:
         '''Compute the bid amounts available to the identified player'''
         return [
