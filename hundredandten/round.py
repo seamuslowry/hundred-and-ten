@@ -20,10 +20,10 @@ class Round:
     '''A round in the game of Hundred and Ten'''
     players: Group[Player] = field(default_factory=Group)
     bids: list[Bid] = field(default_factory=list)
-    deck: Deck = field(default_factory=Deck)
     trump: Optional[SelectableSuit] = None
     discards: list[Discard] = field(default_factory=list)
     tricks: list[Trick] = field(default_factory=list)
+    deck: Deck = field(default_factory=Deck)
 
     @property
     def dealer(self) -> Player:
