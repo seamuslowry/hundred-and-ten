@@ -3,10 +3,11 @@ from dataclasses import dataclass, field
 
 from hundredandten.constants import BidAmount, SelectableSuit
 from hundredandten.deck import Card
+from hundredandten.events import Event
 
 
 @dataclass
-class Action:
+class Action(Event):
     '''A superclass for actions in the game'''
     identifier: str
 
