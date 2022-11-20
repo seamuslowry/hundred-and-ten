@@ -74,7 +74,7 @@ def play_trick(game_to_play: Game) -> None:
     starting_active_trick = game_to_play.active_round.active_trick
     while len(starting_active_trick.plays) < len(game_to_play.players):
         active_player = game_to_play.active_round.active_player
-        trump_cards = trumps(active_player.hand, game_to_play.active_round.selection)
+        trump_cards = trumps(active_player.hand, game_to_play.active_round.trump)
         game_to_play.act(
             Play(
                 active_player.identifier, next(

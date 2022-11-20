@@ -61,7 +61,7 @@ class TestPlayCard(TestCase):
         '''A player can only play trumps while the trick is bleeding'''
 
         game = arrange.game(RoundStatus.TRICKS)
-        assert game.active_round.selection
+        assert game.active_round.trump
 
         non_trump = next(iter(SelectableSuit))
 
@@ -69,10 +69,10 @@ class TestPlayCard(TestCase):
         next_player = game.active_round.players.after(active_player.identifier)
 
         # overwrite to ensure this trick will bleed
-        active_player.hand[0] = Card(CardNumber.TEN, game.active_round.selection)
+        active_player.hand[0] = Card(CardNumber.TEN, game.active_round.trump)
         # overwrite to ensure next player breaks rules
         next_player.hand = [Card(CardNumber.TWO, non_trump)
-                            ]*4 + [Card(CardNumber.NINE, game.active_round.selection)]
+                            ]*4 + [Card(CardNumber.NINE, game.active_round.trump)]
 
         self.assertFalse(game.active_round.active_trick.bleeding)
 
@@ -88,7 +88,7 @@ class TestPlayCard(TestCase):
         '''A player can play non-trumps while the trick is bleeding if they have no trumps'''
 
         game = arrange.game(RoundStatus.TRICKS)
-        assert game.active_round.selection
+        assert game.active_round.trump
 
         non_trump = next(iter(SelectableSuit))
 
@@ -96,7 +96,7 @@ class TestPlayCard(TestCase):
         next_player = game.active_round.players.after(active_player.identifier)
 
         # overwrite to ensure this trick will bleed
-        active_player.hand[0] = Card(CardNumber.TEN, game.active_round.selection)
+        active_player.hand[0] = Card(CardNumber.TEN, game.active_round.trump)
         # overwrite to ensure next player breaks rules
         next_player.hand = [Card(CardNumber.TWO, non_trump)]*5
 
