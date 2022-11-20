@@ -163,7 +163,11 @@ class Game:
             self.people.remove(person)
 
     def automate(self, player: str) -> list[Action]:
-        '''Automate a player in the game'''
+        '''
+        Automate a player in the game
+        Returns a list of all actions taken as a result of this act.
+        May be multiple if automated players also acted.
+        '''
 
         person = self.people.find_or_use(Person(player))
         person.automate = True
@@ -177,7 +181,11 @@ class Game:
         return []
 
     def start_game(self) -> list[Action]:
-        '''Start the game'''
+        '''
+        Start the game
+        Returns a list of all actions taken as a result of this act.
+        May be multiple if automated players also acted.
+        '''
 
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("Cannot start a game that's already started.")
@@ -188,7 +196,11 @@ class Game:
         return self.__automated_act()
 
     def act(self, action: Action) -> list[Action]:
-        '''Perform an action as a player of the game'''
+        '''
+        Perform an action as a player of the game.
+        Returns a list of all actions taken as a result of this act.
+        May be multiple if automated players also acted.
+        '''
         self.__act(action)
         return [
             action,
