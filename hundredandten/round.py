@@ -1,19 +1,19 @@
 '''Represent one round of a game of Hundred and Ten'''
 from dataclasses import dataclass, field
-from typing import Optional, Union
+from typing import Optional
 
-from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
+from hundredandten.actions import (Action, Bid, Discard, Play, SelectTrump,
+                                   Unpass)
 from hundredandten.constants import (TRICK_VALUE, BidAmount, RoundRole,
                                      RoundStatus, SelectableSuit)
 from hundredandten.decisions import (best_card, desired_trump, max_bid,
                                      non_trumps, trumps, worst_card,
                                      worst_card_beating)
 from hundredandten.deck import Deck
+from hundredandten.events import Event, TrickEnd, TrickStart
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.trick import Score, Trick
-
-Action = Union[Bid, Discard, Play, SelectTrump, Unpass]
 
 
 @dataclass
@@ -21,10 +21,10 @@ class Round:
     '''A round in the game of Hundred and Ten'''
     players: Group[Player] = field(default_factory=Group)
     bids: list[Bid] = field(default_factory=list)
-    deck: Deck = field(default_factory=Deck)
-    trump: Optional[SelectableSuit] = None
+    selection: Optional[SelectTrump] = None
     discards: list[Discard] = field(default_factory=list)
     tricks: list[Trick] = field(default_factory=list)
+    deck: Deck = field(default_factory=Deck)
 
     @property
     def dealer(self) -> Player:
@@ -57,7 +57,6 @@ class Round:
         # trick number, trick status, and winner of last trick
         if self.status == RoundStatus.TRICKS:
             assert self.active_bidder
-            assert self.trump
             # when we're starting a new trick
             if not self.active_trick.plays:
                 # the player after the bidder goes first on the first trick
@@ -108,13 +107,25 @@ class Round:
         return self.tricks[-1]
 
     @property
+    def trump(self) -> Optional[SelectableSuit]:
+        '''The selected trump'''
+        if not self.selection:
+            return None
+        return self.selection.suit
+
+    @property
+    def completed(self) -> bool:
+        '''True if the round is complete, False otherwise'''
+        return self.status in [RoundStatus.COMPLETED, RoundStatus.COMPLETED_NO_BIDDERS]
+
+    @property
     def status(self) -> RoundStatus:
         '''The status property.'''
         if self.tricks and all(not player.hand for player in self.players):
             return RoundStatus.COMPLETED
         if len(self.discards) == len(self.players):
             return RoundStatus.TRICKS
-        if self.trump:
+        if self.selection:
             return RoundStatus.DISCARD
         if self.active_bidder:
             return RoundStatus.TRUMP_SELECTION
@@ -123,6 +134,25 @@ class Round:
         return RoundStatus.BIDDING
 
     @property
+    def events(self) -> list[Event]:
+        '''The events that occurred in the round.'''
+        trick_events: list[list[Event]] = [
+            [
+                TrickStart(),
+                *trick.plays,
+                # don't include the trick end event if it hasn't ended
+                *([TrickEnd(trick.winning_play.identifier)] if trick.winning_play else [])
+            ]
+            for trick in self.tricks]
+
+        return [
+            *self.bids,
+            *([self.selection] if self.selection else []),
+            *self.discards,
+            *[trick_event for event_list in trick_events for trick_event in event_list]
+        ]
+
+    @ property
     def scores(self) -> list[Score]:
         '''
         The scores each player earned for this round
@@ -195,7 +225,7 @@ class Round:
         if not self.active_bidder or select_trump.identifier != self.active_bidder.identifier:
             raise HundredAndTenError("Only the bidder can select trump.")
 
-        self.trump = select_trump.suit
+        self.selection = select_trump
 
     def discard(self, discard: Discard) -> None:
         '''
@@ -297,7 +327,8 @@ class Round:
             else:
                 card = worst_card(playable_cards, self.trump)
         else:
-            worst_winning_card = worst_card_beating(playable_cards, winning_play.card, self.trump)
+            worst_winning_card = worst_card_beating(
+                playable_cards, winning_play.card, self.trump)
             # if you can beat the current winning card, do it with the lowest card that will do it
             # otherwise, play nothing
             card = worst_winning_card or worst_card(playable_cards, self.trump)

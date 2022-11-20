@@ -5,14 +5,17 @@ from random import Random
 from typing import Optional
 from uuid import UUID, uuid4
 
-from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
+from hundredandten.actions import (Action, Bid, Discard, Play, SelectTrump,
+                                   Unpass)
 from hundredandten.constants import (HAND_SIZE, WINNING_SCORE, Accessibility,
                                      AnyStatus, GameRole, GameStatus,
                                      RoundRole, RoundStatus)
 from hundredandten.deck import Deck
+from hundredandten.events import (Event, GameEnd, GameStart, RoundEnd,
+                                  RoundStart)
 from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.round import Action, Round
+from hundredandten.round import Round
 from hundredandten.trick import Score
 
 
@@ -71,7 +74,7 @@ class Game:
         The winner of the game
         '''
         # if a round is in progess, don't attempt the computation
-        if self.active_round.status != RoundStatus.COMPLETED:
+        if not self.rounds or self.active_round.status != RoundStatus.COMPLETED:
             return None
 
         winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
@@ -88,22 +91,32 @@ class Game:
         return winner
 
     @property
+    def events(self) -> list[Event]:
+        '''The events that occurred in the game.'''
+
+        round_events: list[list[Event]] = [
+            [
+                RoundStart(round.dealer.identifier),
+                *round.events,
+                # don't include the round end event if it hasn't ended
+                *([RoundEnd(scores=self.__scores(index + 1))] if round.completed else [])
+            ]
+            for index, round in enumerate(self.rounds)]
+
+        return [
+            # don't include game start event if it hasn't started
+            *([GameStart()] if self.status != GameStatus.WAITING_FOR_PLAYERS else []),
+            *[round_event
+              for event_list in round_events for round_event in event_list],
+            # don't include the game end event if it hasn't ended
+            *([GameEnd(self.winner.identifier)] if self.winner else [])
+        ]
+
+    @property
     def score_history(self) -> list[Score]:
         '''A list of all players' scores over time'''
 
-        scores = {}
-        score_history = []
-
-        all_final_scores = [
-            score for round in self.rounds for score in round.scores
-            if round.status == RoundStatus.COMPLETED]
-
-        for score in all_final_scores:
-            new_score = scores.get(score.identifier, 0) + score.value
-            scores[score.identifier] = new_score
-            score_history.append(Score(score.identifier, new_score))
-
-        return score_history
+        return self.__score_history(len(self.rounds))
 
     @property
     def scores(self) -> dict[str, int]:
@@ -113,10 +126,7 @@ class Game:
         key: player identifier
         value: the player's score
         '''
-
-        return reduce(lambda acc,
-                      player: {**acc, player.identifier: self.__current_score(player.identifier)},
-                      self.players, {player.identifier: 0 for player in self.players})
+        return self.__scores(len(self.rounds))
 
     def invite(self, inviter: str, invitee: str) -> None:
         '''Invite a player to the game'''
@@ -255,10 +265,42 @@ class Game:
 
         self.rounds.append(Round(players=round_players, deck=deck))
 
-    def __current_score(self, identifier: str) -> int:
-        '''Return the most recent score for the provided player'''
+    def __score_history(self, to_round: int) -> list[Score]:
+        '''A list of all players' scores up to the provided round'''
+
+        scores = {}
+        score_history = []
+
+        all_final_scores = [
+            score for round in self.rounds[:to_round] for score in round.scores
+            if round.status == RoundStatus.COMPLETED]
+
+        for score in all_final_scores:
+            new_score = scores.get(score.identifier, 0) + score.value
+            scores[score.identifier] = new_score
+            score_history.append(Score(score.identifier, new_score))
+
+        return score_history
+
+    def __scores(self, to_round) -> dict[str, int]:
+        '''
+        The scores each player earned for this game up to the provided round
+        A dictionary in the form
+        key: player identifier
+        value: the player's score
+        '''
+
+        return reduce(lambda acc,
+                      player: {
+                          **acc,
+                          player.identifier: self.__score_at_round(player.identifier, to_round)
+                      },
+                      self.players, {player.identifier: 0 for player in self.players})
+
+    def __score_at_round(self, identifier: str, to_round: int) -> int:
+        '''Return the most recent score for the provided player at the provided round'''
 
         most_recent_score = next((score for score in reversed(
-            self.score_history) if score.identifier == identifier), None)
+            self.__score_history(to_round)) if score.identifier == identifier), None)
 
         return most_recent_score.value if most_recent_score else 0
