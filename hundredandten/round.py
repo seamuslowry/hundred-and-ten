@@ -20,7 +20,7 @@ class Round:
     '''A round in the game of Hundred and Ten'''
     players: Group[Player] = field(default_factory=Group)
     bids: list[Bid] = field(default_factory=list)
-    trump: Optional[SelectableSuit] = None
+    selection: Optional[SelectableSuit] = None
     discards: list[Discard] = field(default_factory=list)
     tricks: list[Trick] = field(default_factory=list)
     deck: Deck = field(default_factory=Deck)
@@ -56,7 +56,7 @@ class Round:
         # trick number, trick status, and winner of last trick
         if self.status == RoundStatus.TRICKS:
             assert self.active_bidder
-            assert self.trump
+            assert self.selection
             # when we're starting a new trick
             if not self.active_trick.plays:
                 # the player after the bidder goes first on the first trick
@@ -113,7 +113,7 @@ class Round:
             return RoundStatus.COMPLETED
         if len(self.discards) == len(self.players):
             return RoundStatus.TRICKS
-        if self.trump:
+        if self.selection:
             return RoundStatus.DISCARD
         if self.active_bidder:
             return RoundStatus.TRUMP_SELECTION
@@ -137,7 +137,7 @@ class Round:
                          if winning_play is not None]
 
         trump_wins = [play for play in winning_plays
-                      if play.card.suit == self.trump or play.card.always_trump]
+                      if play.card.suit == self.selection or play.card.always_trump]
         highest_play = max(
             trump_wins, key=lambda play: play.card.trump_value, default=None)
 
@@ -194,7 +194,7 @@ class Round:
         if not self.active_bidder or select_trump.identifier != self.active_bidder.identifier:
             raise HundredAndTenError("Only the bidder can select trump.")
 
-        self.trump = select_trump.suit
+        self.selection = select_trump.suit
 
     def discard(self, discard: Discard) -> None:
         '''
@@ -216,7 +216,7 @@ class Round:
     def play(self, play: Play) -> None:
         '''Play the specified card from the identified player's hand'''
 
-        active_player_trump_cards = trumps(self.active_player.hand, self.trump)
+        active_player_trump_cards = trumps(self.active_player.hand, self.selection)
 
         if self.active_player.identifier != play.identifier:
             raise HundredAndTenError("Cannot play a card out of turn.")
@@ -277,29 +277,30 @@ class Round:
         '''Return the suggested dicard action for the current player'''
 
         return Discard(self.active_player.identifier,
-                       non_trumps(self.active_player.hand, self.trump))
+                       non_trumps(self.active_player.hand, self.selection))
 
     def __suggested_play(self) -> Play:
         '''Return the suggested play action for the current player'''
 
         playable_cards = self.active_player.hand
         if self.active_trick.bleeding:
-            playable_cards = trumps(self.active_player.hand, self.trump) or playable_cards
+            playable_cards = trumps(self.active_player.hand, self.selection) or playable_cards
 
         winning_play = self.active_trick.winning_play
 
         if not winning_play:
             # if you are the bidder and you can bleed, do so
             if self.active_player == self.active_bidder:
-                card = best_card(playable_cards, self.trump)
+                card = best_card(playable_cards, self.selection)
             # otherwise, don't bleed if you can help it
             else:
-                card = worst_card(playable_cards, self.trump)
+                card = worst_card(playable_cards, self.selection)
         else:
-            worst_winning_card = worst_card_beating(playable_cards, winning_play.card, self.trump)
+            worst_winning_card = worst_card_beating(
+                playable_cards, winning_play.card, self.selection)
             # if you can beat the current winning card, do it with the lowest card that will do it
             # otherwise, play nothing
-            card = worst_winning_card or worst_card(playable_cards, self.trump)
+            card = worst_winning_card or worst_card(playable_cards, self.selection)
 
         return Play(self.active_player.identifier, card)
 
@@ -347,5 +348,5 @@ class Round:
             self.__new_trick()
 
     def __new_trick(self) -> None:
-        assert self.trump
-        self.tricks.append(Trick(self.trump))
+        assert self.selection
+        self.tricks.append(Trick(self.selection))

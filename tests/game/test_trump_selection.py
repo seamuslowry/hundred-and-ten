@@ -17,7 +17,7 @@ class TestTrumpSelection(TestCase):
 
         self.assertRaises(HundredAndTenError, game.act, SelectTrump(
             game.active_round.active_player.identifier, SelectableSuit.CLUBS))
-        self.assertIsNone(game.active_round.trump)
+        self.assertIsNone(game.active_round.selection)
 
     def test_selecting_trump_as_inactive_player(self):
         '''Only the active bidder can select trump'''
@@ -26,7 +26,7 @@ class TestTrumpSelection(TestCase):
 
         self.assertRaises(HundredAndTenError, game.act, SelectTrump(
             game.active_round.inactive_players[0].identifier, SelectableSuit.CLUBS))
-        self.assertIsNone(game.active_round.trump)
+        self.assertIsNone(game.active_round.selection)
 
     def test_selecting_trump(self):
         '''The active bidder can select trump'''
@@ -37,5 +37,5 @@ class TestTrumpSelection(TestCase):
 
         game.act(SelectTrump(game.active_round.active_player.identifier, trump))
 
-        self.assertEqual(trump, game.active_round.trump)
+        self.assertEqual(trump, game.active_round.selection)
         self.assertEqual(RoundStatus.DISCARD, game.status)
