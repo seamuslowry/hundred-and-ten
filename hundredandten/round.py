@@ -10,6 +10,7 @@ from hundredandten.decisions import (best_card, desired_trump, max_bid,
                                      non_trumps, trumps, worst_card,
                                      worst_card_beating)
 from hundredandten.deck import Deck
+from hundredandten.events import Event, TrickEnd, TrickStart
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.trick import Score, Trick
@@ -113,6 +114,11 @@ class Round:
         return self.selection.suit
 
     @property
+    def completed(self) -> bool:
+        '''True if the round is complete, False otherwise'''
+        return self.status in [RoundStatus.COMPLETED, RoundStatus.COMPLETED_NO_BIDDERS]
+
+    @property
     def status(self) -> RoundStatus:
         '''The status property.'''
         if self.tricks and all(not player.hand for player in self.players):
@@ -128,6 +134,25 @@ class Round:
         return RoundStatus.BIDDING
 
     @property
+    def events(self) -> list[Event]:
+        '''The events that occurred in the round.'''
+        trick_events: list[list[Event]] = [
+            [
+                TrickStart(),
+                *trick.plays,
+                # don't include the trick end event if it hasn't ended
+                *([TrickEnd(trick.winning_play.identifier)] if trick.winning_play else [])
+            ]
+            for trick in self.tricks]
+
+        return [
+            *self.bids,
+            *([self.selection] if self.selection else []),
+            *self.discards,
+            *[trick_event for event_list in trick_events for trick_event in event_list]
+        ]
+
+    @ property
     def scores(self) -> list[Score]:
         '''
         The scores each player earned for this round

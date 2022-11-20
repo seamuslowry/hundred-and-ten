@@ -1,6 +1,5 @@
 '''The events that can occur during the game'''
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
@@ -20,9 +19,14 @@ class RoundStart(Event):
 
 
 @dataclass
+class TrickStart(Event):
+    '''A class to represent the start of trick event'''
+
+
+@dataclass
 class RoundEnd(Event):
     '''A class to represent the end of round event'''
-    winner: Optional[str] = None
+    scores: dict[str, int]
 
 
 @dataclass
