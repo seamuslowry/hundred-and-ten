@@ -162,12 +162,8 @@ class Game:
         if person in self.people:
             self.people.remove(person)
 
-    def automate(self, player: str) -> list[Action]:
-        '''
-        Automate a player in the game
-        Returns a list of all actions taken as a result of this act.
-        May be multiple if automated players also acted.
-        '''
+    def automate(self, player: str) -> None:
+        '''Automate a player in the game'''
 
         person = self.people.find_or_use(Person(player))
         person.automate = True
@@ -177,15 +173,10 @@ class Game:
 
         if person in self.people:
             self.people.update(person)
-            return self.__automated_act()
-        return []
+            self.__automated_act()
 
-    def start_game(self) -> list[Action]:
-        '''
-        Start the game
-        Returns a list of all actions taken as a result of this act.
-        May be multiple if automated players also acted.
-        '''
+    def start_game(self) -> None:
+        '''Start the game'''
 
         if self.status != GameStatus.WAITING_FOR_PLAYERS:
             raise HundredAndTenError("Cannot start a game that's already started.")
@@ -193,31 +184,20 @@ class Game:
             raise HundredAndTenError("You cannot play with fewer than two players.")
 
         self.__new_round(self.players[0].identifier)
-        return self.__automated_act()
+        self.__automated_act()
 
-    def act(self, action: Action) -> list[Action]:
-        '''
-        Perform an action as a player of the game.
-        Returns a list of all actions taken as a result of this act.
-        May be multiple if automated players also acted.
-        '''
+    def act(self, action: Action) -> None:
+        '''Perform an action as a player of the game'''
         self.__act(action)
-        return [
-            action,
-            *self.__automated_act()
-        ]
+        self.__automated_act()
 
     def suggestion(self) -> Action:
         '''Return the suggested action given the state of the game'''
         return self.active_round.suggestion()
 
-    def __automated_act(self) -> list[Action]:
-        actions = []
+    def __automated_act(self):
         while isinstance(self.status, RoundStatus) and self.active_round.active_player.automate:
-            action = self.__automated_action()
-            self.__act(action)
-            actions.append(action)
-        return actions
+            self.__act(self.__automated_action())
 
     def __automated_action(self) -> Action:
         return self.suggestion()
