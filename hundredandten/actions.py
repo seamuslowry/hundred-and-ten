@@ -6,13 +6,18 @@ from hundredandten.deck import Card
 
 
 @dataclass
-class Unpass:
-    '''A class to represent the unpass action'''
+class Action:
+    '''A superclass for actions in the game'''
     identifier: str
 
 
+@dataclass
+class Unpass(Action):
+    '''A class to represent the unpass action'''
+
+
 @dataclass(order=True)
-class Bid:
+class Bid(Action):
     '''A class to keep track of bid information'''
     identifier: str = field(compare=False)
     amount: BidAmount
@@ -22,21 +27,18 @@ class Bid:
 
 
 @dataclass
-class SelectTrump:
+class SelectTrump(Action):
     '''A class to represent the select trump action'''
-    identifier: str
     suit: SelectableSuit
 
 
 @dataclass
-class Discard:
+class Discard(Action):
     '''A class to keep track of one player's discard action'''
-    identifier: str
     cards: list[Card]
 
 
 @dataclass
-class Play:
+class Play(Action):
     '''A class to keep track of one play in a trick'''
-    identifier: str
     card: Card

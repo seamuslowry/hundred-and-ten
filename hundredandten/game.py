@@ -5,14 +5,15 @@ from random import Random
 from typing import Optional
 from uuid import UUID, uuid4
 
-from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
+from hundredandten.actions import (Action, Bid, Discard, Play, SelectTrump,
+                                   Unpass)
 from hundredandten.constants import (HAND_SIZE, WINNING_SCORE, Accessibility,
                                      AnyStatus, GameRole, GameStatus,
                                      RoundRole, RoundStatus)
 from hundredandten.deck import Deck
 from hundredandten.group import Group, Person, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.round import Action, Round
+from hundredandten.round import Round
 from hundredandten.trick import Score
 
 
