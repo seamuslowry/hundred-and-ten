@@ -152,7 +152,7 @@ class Round:
             *[trick_event for event_list in trick_events for trick_event in event_list]
         ]
 
-    @ property
+    @property
     def scores(self) -> list[Score]:
         '''
         The scores each player earned for this round
