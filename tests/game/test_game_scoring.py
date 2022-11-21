@@ -26,6 +26,7 @@ class TestGameScoring(TestCase):
         game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
 
         self.assertEqual([0] * len(game.players), list(game.scores.values()))
+        self.assertEqual([0] * len(game.players), list(game.scores_by_round[-1].values()))
 
     def test_win_at_winning_score(self):
         '''At the end of the game, the winner has 110'''
@@ -33,6 +34,7 @@ class TestGameScoring(TestCase):
         game = arrange.game(GameStatus.WON, seed=seed)
 
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores)
+        self.assertEqual(SEEDS_TO_SCORES[seed], game.scores_by_round[-1])
 
     def test_bidder_wins_when_sharing(self):
         '''If multiple players including the bidder reach 110, the bidder wins'''
@@ -45,6 +47,7 @@ class TestGameScoring(TestCase):
         self.assertTrue(
             len([score for score in game.scores.values() if score >= WINNING_SCORE]) == 2)
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores)
+        self.assertEqual(SEEDS_TO_SCORES[seed], game.scores_by_round[-1])
 
     def test_first_to_score_wins_when_sharing(self):
         '''If multiple players NOT including the bidder reach 110, the first to 110 wins'''
@@ -63,3 +66,4 @@ class TestGameScoring(TestCase):
         self.assertLess(game.scores[game.active_round.active_bidder.identifier], WINNING_SCORE)
         self.assertTrue(len(winners) > 1)
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores)
+        self.assertEqual(SEEDS_TO_SCORES[seed], game.scores_by_round[-1])
