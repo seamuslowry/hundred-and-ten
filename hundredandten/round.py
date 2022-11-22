@@ -9,7 +9,7 @@ from hundredandten.constants import (TRICK_VALUE, BidAmount, RoundRole,
 from hundredandten.decisions import (best_card, desired_trump, max_bid,
                                      non_trumps, trumps, worst_card,
                                      worst_card_beating)
-from hundredandten.deck import Deck
+from hundredandten.deck import Card, Deck
 from hundredandten.events import Event, TrickEnd, TrickStart
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
@@ -279,6 +279,13 @@ class Round:
             bid_amount for bid_amount in BidAmount
             if self.__is_available_bid(identifier, bid_amount)
         ]
+
+    def original_hand(self, identifier: str) -> list[Card]:
+        '''Return the identified player's original hand'''
+        player = self.players.find_or_use(Player(identifier))
+        discard = next((d for d in self.discards if d.identifier == identifier), None)
+
+        return discard.cards + discard.kept if discard else player.hand
 
     def suggestion(self) -> Action:
         '''Return the suggested action given the game state'''
