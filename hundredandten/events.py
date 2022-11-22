@@ -1,6 +1,8 @@
 '''The events that can occur during the game'''
 from dataclasses import dataclass
 
+from hundredandten.deck import Card
+
 
 @dataclass
 class Event:
@@ -16,6 +18,7 @@ class GameStart(Event):
 class RoundStart(Event):
     '''A class to represent the start of round event'''
     dealer: str
+    hands: dict[str, list[Card]]
 
 
 @dataclass
