@@ -40,6 +40,12 @@ class Discard(Action):
 
 
 @dataclass
+class DetailedDiscard(Discard):
+    '''A class to keep track of all details of one player's discard action'''
+    kept: list[Card]
+
+
+@dataclass
 class Play(Action):
     '''A class to keep track of one play in a trick'''
     card: Card
