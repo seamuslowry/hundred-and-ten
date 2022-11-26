@@ -96,7 +96,9 @@ class Game:
 
         round_events: list[list[Event]] = [
             [
-                RoundStart(round.dealer.identifier),
+                RoundStart(
+                    round.dealer.identifier,
+                    {p.identifier: round.original_hand(p.identifier) for p in round.players}),
                 *round.events,
                 # don't include the round end event if it hasn't ended
                 *([RoundEnd(scores=self.__scores(index + 1))] if round.completed else [])

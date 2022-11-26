@@ -2,14 +2,14 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from hundredandten.actions import (Action, Bid, Discard, Play, SelectTrump,
-                                   Unpass)
+from hundredandten.actions import (Action, Bid, DetailedDiscard, Discard, Play,
+                                   SelectTrump, Unpass)
 from hundredandten.constants import (TRICK_VALUE, BidAmount, RoundRole,
                                      RoundStatus, SelectableSuit)
 from hundredandten.decisions import (best_card, desired_trump, max_bid,
                                      non_trumps, trumps, worst_card,
                                      worst_card_beating)
-from hundredandten.deck import Deck
+from hundredandten.deck import Card, Deck
 from hundredandten.events import Event, TrickEnd, TrickStart
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
@@ -22,7 +22,7 @@ class Round:
     players: Group[Player] = field(default_factory=Group)
     bids: list[Bid] = field(default_factory=list)
     selection: Optional[SelectTrump] = None
-    discards: list[Discard] = field(default_factory=list)
+    discards: list[DetailedDiscard] = field(default_factory=list)
     tricks: list[Trick] = field(default_factory=list)
     deck: Deck = field(default_factory=Deck)
 
@@ -238,10 +238,12 @@ class Round:
         if any(card not in self.active_player.hand for card in discard.cards):
             raise HundredAndTenError("You may only discard cards that are in your hand.")
 
-        self.active_player.hand = list(
+        remaining = list(
             filter(lambda c: c not in discard.cards, self.active_player.hand))
+
+        self.active_player.hand = [*remaining]
         self.active_player.hand.extend(self.deck.draw(len(discard.cards)))
-        self.discards.append(discard)
+        self.discards.append(DetailedDiscard(discard.identifier, discard.cards, remaining))
         self.__end_discard()
 
     def play(self, play: Play) -> None:
@@ -277,6 +279,13 @@ class Round:
             bid_amount for bid_amount in BidAmount
             if self.__is_available_bid(identifier, bid_amount)
         ]
+
+    def original_hand(self, identifier: str) -> list[Card]:
+        '''Return the identified player's original hand'''
+        player = self.players.find_or_use(Player(identifier))
+        discard = next((d for d in self.discards if d.identifier == identifier), None)
+
+        return discard.cards + discard.kept if discard else player.hand
 
     def suggestion(self) -> Action:
         '''Return the suggested action given the game state'''
