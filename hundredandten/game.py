@@ -121,6 +121,16 @@ class Game:
         return self.__score_history(len(self.rounds))
 
     @property
+    def scores_by_round(self) -> list[dict[str, int]]:
+        '''
+        The scores each player earned for this game
+        A dictionary in the form
+        key: player identifier
+        value: the player's score
+        '''
+        return [self.__scores(round_num) for round_num in range(len(self.rounds) + 1)]
+
+    @property
     def scores(self) -> dict[str, int]:
         '''
         The scores each player earned for this game
