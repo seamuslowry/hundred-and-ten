@@ -202,23 +202,36 @@ class Round:
 
         return base_scores
 
-    def bid(self, bid: Bid) -> None:
+    def act(self, action: Action) -> None:
+        '''Perform an action as a player of the game'''
+        if isinstance(action, Bid):
+            self.__bid(action)
+        if isinstance(action, Unpass):
+            self.__unpass(action)
+        if isinstance(action, SelectTrump):
+            self.__select_trump(action)
+        if isinstance(action, Discard):
+            self.__discard(action)
+        if isinstance(action, Play):
+            self.__play(action)
+
+    def __bid(self, bid: Bid) -> None:
         '''Record a bid from a player'''
         identifier = bid.identifier
         amount = bid.amount
         if self.status == RoundStatus.BIDDING and self.active_player == self.players.by_identifier(
                 identifier):
-            self.__bid(identifier, amount)
+            self.__handle_bid(identifier, amount)
         elif amount == BidAmount.PASS:
             self.players.add_role(identifier, RoundRole.PRE_PASSED)
         else:
             raise HundredAndTenError("Cannot bid out of order")
 
-    def unpass(self, unpass: Unpass) -> None:
+    def __unpass(self, unpass: Unpass) -> None:
         '''Discount a prepass bid from the identified player'''
         self.players.remove_role(unpass.identifier, RoundRole.PRE_PASSED)
 
-    def select_trump(self, select_trump: SelectTrump) -> None:
+    def __select_trump(self, select_trump: SelectTrump) -> None:
         '''Select the passed suit as trump'''
         if self.status != RoundStatus.TRUMP_SELECTION:
             raise HundredAndTenError("Cannot select trump outside of the trump selection phase.")
@@ -227,7 +240,7 @@ class Round:
 
         self.selection = select_trump
 
-    def discard(self, discard: Discard) -> None:
+    def __discard(self, discard: Discard) -> None:
         '''
         Discard the selected cards from the identified player's hand and replace them
         '''
@@ -246,7 +259,7 @@ class Round:
         self.discards.append(DetailedDiscard(discard.identifier, discard.cards, remaining))
         self.__end_discard()
 
-    def play(self, play: Play) -> None:
+    def __play(self, play: Play) -> None:
         '''Play the specified card from the identified player's hand'''
 
         active_player_trump_cards = trumps(self.active_player.hand, self.trump)
@@ -344,7 +357,7 @@ class Round:
 
         return Play(self.active_player.identifier, card)
 
-    def __bid(self, identifier: str, amount: BidAmount) -> None:
+    def __handle_bid(self, identifier: str, amount: BidAmount) -> None:
         if amount in self.available_bids(identifier):
             self.bids.append(Bid(identifier, amount))
             self.__handle_prepass()
@@ -354,7 +367,7 @@ class Round:
     def __handle_prepass(self) -> None:
         if self.status == RoundStatus.BIDDING and RoundRole.PRE_PASSED in self.active_player.roles:
             self.players.remove_role(self.active_player.identifier, RoundRole.PRE_PASSED)
-            self.__bid(self.active_player.identifier, BidAmount.PASS)
+            self.__handle_bid(self.active_player.identifier, BidAmount.PASS)
 
     def __is_available_bid(self, identifier: str, amount: BidAmount) -> bool:
         '''Determine if the listed bid amount is available to the listed player'''
