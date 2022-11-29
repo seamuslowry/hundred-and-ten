@@ -141,7 +141,9 @@ class Round:
                 TrickStart(),
                 *trick.plays,
                 # don't include the trick end event if it hasn't ended
-                *([TrickEnd(trick.winning_play.identifier)] if trick.winning_play else [])
+                *([TrickEnd(trick.winning_play.identifier)]
+                  if (trick.winning_play and len(trick.plays) == len(self.players))
+                  else [])
             ]
             for trick in self.tricks]
 

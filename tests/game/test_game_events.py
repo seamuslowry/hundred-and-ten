@@ -2,7 +2,8 @@
 from unittest import TestCase
 
 from hundredandten.constants import GameStatus, RoundStatus
-from hundredandten.events import GameEnd, GameStart, RoundEnd, RoundStart
+from hundredandten.events import (GameEnd, GameStart, RoundEnd, RoundStart,
+                                  TrickEnd)
 from tests import arrange
 
 # tests in this file run off of seeded games to avoid setting up everything necessary for the tests
@@ -28,6 +29,17 @@ class TestGameEvents(TestCase):
         self.assertEqual(2, len(events))
         self.assertIsInstance(events[0], GameStart)
         self.assertIsInstance(events[1], RoundStart)
+
+    def test_partial_trick(self):
+        '''While round isn't over, no RoundEnd event exists'''
+
+        game = arrange.game(RoundStatus.TRICKS)
+        init_events = game.events
+
+        self.assertGreater(len(init_events), 0)
+        self.assertFalse(any(isinstance(e, TrickEnd) for e in init_events))
+        arrange.play_trick(game)
+        self.assertTrue(any(isinstance(e, TrickEnd) for e in game.events))
 
     def test_partial_round(self):
         '''While round isn't over, no RoundEnd event exists'''
