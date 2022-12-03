@@ -5,8 +5,7 @@ from random import Random
 from typing import Optional
 from uuid import UUID, uuid4
 
-from hundredandten.actions import (Action, Bid, Discard, Play, SelectTrump,
-                                   Unpass)
+from hundredandten.actions import Action, Bid, Play
 from hundredandten.constants import (HAND_SIZE, WINNING_SCORE, Accessibility,
                                      AnyStatus, GameRole, GameStatus,
                                      RoundRole, RoundStatus)
@@ -216,40 +215,12 @@ class Game:
 
     def __act(self, action: Action) -> None:
         '''Perform an action as a player of the game'''
+        self.active_round.act(action)
+        # handle creation of new round if appropriate
         if isinstance(action, Bid):
-            self.__bid(action)
-        if isinstance(action, Unpass):
-            self.__unpass(action)
-        if isinstance(action, SelectTrump):
-            self.__select_trump(action)
-        if isinstance(action, Discard):
-            self.__discard(action)
+            self.__end_bid()
         if isinstance(action, Play):
-            self.__play(action)
-
-    def __bid(self, bid: Bid) -> None:
-        '''Place a bid from the identified player'''
-        self.active_round.bid(bid)
-        self.__end_bid()
-
-    def __unpass(self, unpass: Unpass) -> None:
-        '''Discount a pre-pass bid from the identified player'''
-        self.active_round.unpass(unpass)
-
-    def __select_trump(self, select_trump: SelectTrump) -> None:
-        '''Select the passed suit as trump'''
-        self.active_round.select_trump(select_trump)
-
-    def __discard(self, discard: Discard) -> None:
-        '''
-        Discard the selected cards from the identified player's hand and replace them
-        '''
-        self.active_round.discard(discard)
-
-    def __play(self, play: Play) -> None:
-        '''Play the specified card from the identified player's hand'''
-        self.active_round.play(play)
-        self.__end_play()
+            self.__end_play()
 
     def __end_bid(self):
         if self.status == RoundStatus.COMPLETED_NO_BIDDERS:
