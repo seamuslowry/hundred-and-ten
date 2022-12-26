@@ -3,8 +3,8 @@ from typing import Callable, Optional
 
 from hundredandten.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
-                                     GameStatus, RoundStatus, SelectableSuit)
-from hundredandten.decisions import trumps
+                                     GameStatus, RoundStatus)
+from hundredandten.decisions import desired_trump, trumps
 from hundredandten.game import Game
 from hundredandten.group import Group, Person
 
@@ -59,8 +59,10 @@ def bid(game_to_bid: Game) -> None:
 
 def select_trump(game_to_select: Game) -> None:
     '''Have the active player select a trump'''
-    game_to_select.act(SelectTrump(
-        game_to_select.active_round.active_player.identifier, SelectableSuit.SPADES))
+    game_to_select.act(
+        SelectTrump(
+            game_to_select.active_round.active_player.identifier,
+            desired_trump(game_to_select.active_round.active_player.hand)))
 
 
 def discard(game_to_discard: Game) -> None:
