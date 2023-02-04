@@ -73,7 +73,7 @@ Additionally, the Ace of Hearts and the Joker are both considered trump cards re
 
 A trick is won by the highest value card in the trick. Trump cards will always beat non-trump cards.
 
-See below for the card heirarchy for each suit, when it is trump. Recall the additional [trump cards](#trump-cards) that will not necessarily be of the selected suit. Note that red suits and black suits follow the same trump heirarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
+See below for the card hierarchy for each suit, when it is trump. Recall the additional [trump cards](#trump-cards) that will not necessarily be of the selected suit. Note that red suits and black suits follow the same trump heirarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
 
 <table align="center">
   <tr>
