@@ -9,7 +9,7 @@ with open("README.md", "r", encoding='utf-8') as fh:
 
 setuptools.setup(
     name="hundredandten",
-    version=os.environ['RELEASE_VERSION'] or "0.0.1",
+    version=os.environ.get('RELEASE_VERSION', "0.0.1"),
     author="Seamus Lowry",
     description="A package to play the game Hundred and Ten",
     long_description=long_description,
