@@ -1,7 +1,9 @@
 '''Test behavior of the Game while it is Waiting for Players'''
 from unittest import TestCase
+from uuid import UUID
 
 from hundredandten.constants import Accessibility, GameStatus
+from hundredandten.game import Game
 from hundredandten.group import Person
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import arrange
@@ -9,6 +11,13 @@ from tests import arrange
 
 class TestWaitingForPlayersGame(TestCase):
     '''Unit tests for a Waiting for Players Game'''
+
+    def test_generates_seed_when_none_passed(self):
+        '''Game defaults a seed if none is passed'''
+        game = Game()
+
+        self.assertIsNotNone(game.seed)
+        self.assertEqual(str(UUID(game.seed)), game.seed)
 
     def test_default_inits_to_waiting(self):
         '''Game status defaults to waiting for players'''
