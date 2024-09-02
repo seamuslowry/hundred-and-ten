@@ -1,5 +1,6 @@
 '''Helpers to set up a game for testing'''
 from typing import Callable, Optional
+from uuid import uuid4
 
 from hundredandten.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.constants import (AnyStatus, BidAmount, GameRole,
@@ -93,7 +94,7 @@ def __get_waiting_for_players_game(seed: Optional[str]) -> Game:
         people=Group(
             list(map(
                 lambda identifier: Person(str(identifier), roles={GameRole.PLAYER}),
-                range(4)))), **{k: v for k, v in {'seed': seed}.items() if v is not None})
+                range(4)))), seed=seed or str(uuid4()))
     new_game.people.add_role(new_game.people[0].identifier, GameRole.ORGANIZER)
     return new_game
 
