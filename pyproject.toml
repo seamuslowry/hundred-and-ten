@@ -33,3 +33,9 @@ test = [
 ]
 
 [tool.setuptools_scm]
+
+[tool.coverage.run]
+omit = [
+    "tests/*"
+    "setup.py"
+]
