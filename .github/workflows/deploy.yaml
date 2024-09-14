@@ -7,13 +7,13 @@ on:
 
 jobs:
   tag-new-version:
-    uses: seamuslowry/workflows/.github/workflows/tag.yml@main
+    uses: seamuslowry/workflows/.github/workflows/tag.yml@feat/python_setup
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
     needs: tag-new-version
-    uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
+    uses: seamuslowry/workflows/.github/workflows/publish_python.yml@feat/python_setup
     with:
       release-version: ${{ needs.tag-new-version.outputs.tag }}
     secrets:

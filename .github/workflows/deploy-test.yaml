@@ -20,7 +20,7 @@ jobs:
 
   publish:
     needs: get-tag
-    uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
+    uses: seamuslowry/workflows/.github/workflows/publish_python.yml@feat/python_setup
     with:
       repo: testpypi
       release-version: "${{ needs.get-tag.outputs.tag }}-${{ github.run_number }}"
