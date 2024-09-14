@@ -15,6 +15,21 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(exclude=["tests"]),
+    install_requires=[],
+    extras_require={
+        "lint": [
+            "pylint==3.2.7",
+            "pyright==1.1.379",
+        ],
+        "publish": [
+            "build==1.2.2",
+            "twine==5.1.1",
+        ],
+        "test": [
+            "pytest==8.3.2",
+            "coverage==7.6.1",
+        ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
