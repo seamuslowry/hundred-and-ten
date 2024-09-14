@@ -36,6 +36,6 @@ test = [
 
 [tool.coverage.run]
 omit = [
-    "tests/*"
-    "setup.py"
+    "tests/*",
+    "setup.py",
 ]
