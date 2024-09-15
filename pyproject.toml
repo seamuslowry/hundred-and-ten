@@ -21,7 +21,7 @@ dependencies = []
 [project.optional-dependencies]
 lint = [
     "pylint==3.2.7",
-    "pyright==1.1.379",
+    "pyright==1.1.380",
 ]
 publish = [
     "build==1.2.2",
