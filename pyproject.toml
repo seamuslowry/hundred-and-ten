@@ -1,38 +1,36 @@
 [build-system]
-requires = ["setuptools >= 74.0", "setuptools-scm >= 8"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
 
-[project]
+[tool.poetry]
 name = "hundredandten"
-dynamic = ["version"]
+version = "0.0.1"
 description = "A package to play the game Hundred and Ten"
 readme = "README.md"
-requires-python = ">=3.9"
-authors = [
-    { name = "Seamus Lowry" },
-]
-classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-]
-dependencies = []
+license = "MIT"
+authors = ["Seamus Lowry"]
 
-[project.optional-dependencies]
-lint = [
-    "pylint==3.2.7",
-    "pyright==1.1.379",
-]
-publish = [
-    "build==1.2.2",
-    "twine==5.1.1",
-]
-test = [
-    "coverage==7.6.1",
-    "pytest==8.3.2",
-]
+[tool.poetry.dependencies]
+python = "^3.9"
 
-[tool.setuptools_scm]
+[tool.poetry.group.dev.dependencies]
+pylint = {version="3.2.7", extras=["lint"]}
+pyright = {version="1.1.379", extras=["lint"]}
+build = {version="1.2.2", extras=["publish"]}
+twine = {version="5.1.1", extras=["publish"]}
+coverage = {version="7.6.1", extras=["test"]}
+pytest = {version="8.3.2", extras=["test"]}
+
+[tool.poetry-dynamic-versioning]
+enable = true
+source = "git"
+format-jinja = """
+    {%- if distance == 0 -%}
+        {{ base }}
+    {%- else -%}
+        {{ base }}+{{ distance }}.{{ commit }}
+    {%- endif -%}
+"""
 
 [tool.coverage.run]
 omit = [
