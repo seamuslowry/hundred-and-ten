@@ -7,7 +7,7 @@ name = "hundredandten"
 dynamic = ["version"]
 description = "A package to play the game Hundred and Ten"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 authors = [
     { name = "Seamus Lowry" },
 ]
