@@ -29,7 +29,7 @@ publish = [
 ]
 test = [
     "coverage==7.10.6",
-    "pytest==8.4.1",
+    "pytest==8.4.2",
 ]
 
 [tool.setuptools_scm]
