@@ -20,7 +20,7 @@ dependencies = []
 
 [project.optional-dependencies]
 lint = [
-    "pylint==4.0.3",
+    "pylint==4.0.4",
     "pyright==1.1.407",
 ]
 publish = [
