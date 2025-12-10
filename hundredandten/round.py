@@ -2,13 +2,17 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
-from hundredandten.actions import (Action, Bid, DetailedDiscard, Discard, Play,
-                                   SelectTrump, Unpass)
-from hundredandten.constants import (TRICK_VALUE, BidAmount, RoundRole,
-                                     RoundStatus, SelectableSuit)
-from hundredandten.decisions import (best_card, desired_trump, max_bid,
-                                     non_trumps, trumps, worst_card,
-                                     worst_card_beating)
+from hundredandten.actions import Action, Bid, DetailedDiscard, Discard, Play, SelectTrump, Unpass
+from hundredandten.constants import TRICK_VALUE, BidAmount, RoundRole, RoundStatus, SelectableSuit
+from hundredandten.decisions import (
+    best_card,
+    desired_trump,
+    max_bid,
+    non_trumps,
+    trumps,
+    worst_card,
+    worst_card_beating,
+)
 from hundredandten.deck import Card, Deck
 from hundredandten.events import Event, TrickEnd, TrickStart
 from hundredandten.group import Group, Player
@@ -272,7 +276,7 @@ class Round:
             raise HundredAndTenError("Cannot play a card you do not have.")
         if (self.active_trick.bleeding and
                 active_player_trump_cards and
-                not play.card in active_player_trump_cards):
+                play.card not in active_player_trump_cards):
             raise HundredAndTenError("You must play a trump card when the trick is bleeding.")
 
         self.active_player.hand.remove(play.card)

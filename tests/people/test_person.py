@@ -1,7 +1,7 @@
 '''Person unit tests'''
 from unittest import TestCase
 
-from hundredandten.constants import CardNumber, SelectableSuit, RoundRole
+from hundredandten.constants import CardNumber, RoundRole, SelectableSuit
 from hundredandten.deck import Card
 from hundredandten.group import Player
 

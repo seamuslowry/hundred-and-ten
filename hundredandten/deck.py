@@ -3,8 +3,7 @@ from dataclasses import dataclass, field
 from random import Random
 from uuid import uuid4
 
-from hundredandten.constants import (CardNumber, CardSuit, SelectableSuit,
-                                     UnselectableSuit)
+from hundredandten.constants import CardNumber, CardSuit, SelectableSuit, UnselectableSuit
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 

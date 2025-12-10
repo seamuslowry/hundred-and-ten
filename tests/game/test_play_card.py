@@ -2,8 +2,7 @@
 from unittest import TestCase
 
 from hundredandten.actions import Play
-from hundredandten.constants import (HAND_SIZE, CardNumber, RoundStatus,
-                                     SelectableSuit)
+from hundredandten.constants import HAND_SIZE, CardNumber, RoundStatus, SelectableSuit
 from hundredandten.deck import Card
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import arrange

@@ -1,6 +1,5 @@
 '''Test to ensure automated games will play completely'''
 from unittest import TestCase
-from uuid import uuid4
 
 from hundredandten.constants import GameStatus, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError

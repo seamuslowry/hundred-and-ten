@@ -3,8 +3,7 @@ from typing import Callable, Optional
 from uuid import uuid4
 
 from hundredandten.actions import Bid, Discard, Play, SelectTrump
-from hundredandten.constants import (AnyStatus, BidAmount,
-                                     GameStatus, RoundStatus, SelectableSuit)
+from hundredandten.constants import AnyStatus, BidAmount, GameStatus, RoundStatus, SelectableSuit
 from hundredandten.decisions import trumps
 from hundredandten.game import Game
 from hundredandten.group import Group, Player

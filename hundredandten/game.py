@@ -6,12 +6,16 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from hundredandten.actions import Action, Bid, Play
-from hundredandten.constants import (HAND_SIZE, WINNING_SCORE,
-                                     AnyStatus, GameStatus,
-                                     RoundRole, RoundStatus)
+from hundredandten.constants import (
+    HAND_SIZE,
+    WINNING_SCORE,
+    AnyStatus,
+    GameStatus,
+    RoundRole,
+    RoundStatus,
+)
 from hundredandten.deck import Deck
-from hundredandten.events import (Event, GameEnd, GameStart, RoundEnd,
-                                  RoundStart)
+from hundredandten.events import Event, GameEnd, GameStart, RoundEnd, RoundStart
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
