@@ -4,7 +4,7 @@ from uuid import UUID
 
 from hundredandten import RoundStatus
 from hundredandten.game import Game
-from hundredandten.group import Player, Group
+from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import arrange
 

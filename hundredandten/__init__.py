@@ -1,5 +1,18 @@
 '''Init the hundredandten module'''
-from hundredandten.actions import Bid, Discard, Play, SelectTrump, Unpass
-from hundredandten.constants import (BidAmount, GameStatus, RoundStatus,
-                                     SelectableSuit)
-from hundredandten.game import Game as HundredAndTen
+
+from .actions import Bid, Discard, Play, SelectTrump, Unpass
+from .constants import BidAmount, GameStatus, RoundStatus, SelectableSuit
+from .game import Game as HundredAndTen
+
+__all__ = [
+    "Bid",
+    "Discard",
+    "Play",
+    "SelectTrump",
+    "Unpass",
+    "BidAmount",
+    "GameStatus",
+    "RoundStatus",
+    "SelectableSuit",
+    "HundredAndTen",
+]

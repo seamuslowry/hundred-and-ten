@@ -1,8 +1,7 @@
 '''Test to ensure bidding decisions are made consistently'''
 from unittest import TestCase
 
-from hundredandten.constants import (BidAmount, CardNumber, SelectableSuit,
-                                     UnselectableSuit)
+from hundredandten.constants import BidAmount, CardNumber, SelectableSuit, UnselectableSuit
 from hundredandten.decisions import max_bid
 from hundredandten.deck import Card
 

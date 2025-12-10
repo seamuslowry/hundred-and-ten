@@ -2,7 +2,7 @@
 from unittest import TestCase
 
 from hundredandten.constants import RoundRole
-from hundredandten.group import Player, Group
+from hundredandten.group import Group, Player
 
 
 class TestPeopleRoles(TestCase):

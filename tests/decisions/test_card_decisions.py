@@ -1,8 +1,7 @@
 '''Test to ensure card decisions are made consistently'''
 from unittest import TestCase
 
-from hundredandten.constants import (CardNumber, SelectableSuit,
-                                     UnselectableSuit)
+from hundredandten.constants import CardNumber, SelectableSuit, UnselectableSuit
 from hundredandten.decisions import best_card, worst_card, worst_card_beating
 from hundredandten.deck import Card
 
