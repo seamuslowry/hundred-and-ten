@@ -3,7 +3,7 @@
 from unittest import TestCase
 from uuid import UUID
 
-from hundredandten import RoundStatus, SelectTrump, SelectableSuit, BidAmount, Bid
+from hundredandten import Bid, BidAmount, RoundStatus
 from hundredandten.game import Game
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
@@ -34,7 +34,7 @@ class TestNewGame(TestCase):
         players = Group(list(map(lambda identifier: Player(str(identifier)), range(4))))
         force_round = Round(
             players=players,
-            bids=[Bid(amount=BidAmount.PASS, identifier='0')],
+            bids=[Bid(amount=BidAmount.PASS, identifier="0")],
         )
         game = Game(players=players, rounds=[force_round])
 
