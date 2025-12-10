@@ -15,7 +15,7 @@ class TestNewGame(TestCase):
 
     def test_will_not_allow_zero_players(self):
         """Game throws if initialized with no players"""
-        self.assertRaises(HundredAndTenError, lambda: Game())
+        self.assertRaises(HundredAndTenError, Game)
 
     def test_will_not_allow_one_players(self):
         """Game throws if initialized with one player"""
