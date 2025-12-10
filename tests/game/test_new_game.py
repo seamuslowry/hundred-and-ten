@@ -3,10 +3,11 @@
 from unittest import TestCase
 from uuid import UUID
 
-from hundredandten import RoundStatus
+from hundredandten import RoundStatus, SelectTrump, SelectableSuit, BidAmount, Bid
 from hundredandten.game import Game
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.round import Round
 from tests import arrange
 
 
@@ -21,12 +22,30 @@ class TestNewGame(TestCase):
         """Game throws if initialized with one player"""
         self.assertRaises(HundredAndTenError, lambda: Game(Group([Player("one")])))
 
-    def test_will_not_allow_give_players(self):
-        """Game throws if initialized with give players"""
+    def test_will_not_allow_five_players(self):
+        """Game throws if initialized with five players"""
         self.assertRaises(
             HundredAndTenError,
             lambda: Game(Group(list(map(lambda identifier: Player(str(identifier)), range(5))))),
         )
+
+    def test_will_initialize_with_round(self):
+        """Game will initialize with a round"""
+        players = Group(list(map(lambda identifier: Player(str(identifier)), range(4))))
+        force_round = Round(
+            players=players,
+            bids=[Bid(amount=BidAmount.PASS, identifier='0')],
+        )
+        game = Game(players=players, rounds=[force_round])
+
+        self.assertEqual(force_round, game.active_round)
+
+    def test_errors_if_rounds_cleared(self):
+        """Game with throw if round is cleared"""
+        game = Game(players=Group(list(map(lambda identifier: Player(str(identifier)), range(4)))))
+        game.rounds = []
+
+        self.assertRaises(HundredAndTenError, lambda: game.active_round)
 
     def test_generates_seed_when_none_passed(self):
         """Game defaults a seed if none is passed"""
