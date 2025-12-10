@@ -6,13 +6,13 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from hundredandten.actions import Action, Bid, Play
-from hundredandten.constants import (HAND_SIZE, WINNING_SCORE, Accessibility,
-                                     AnyStatus, GameRole, GameStatus,
+from hundredandten.constants import (HAND_SIZE, WINNING_SCORE,
+                                     AnyStatus, GameStatus,
                                      RoundRole, RoundStatus)
 from hundredandten.deck import Deck
 from hundredandten.events import (Event, GameEnd, GameStart, RoundEnd,
                                   RoundStart)
-from hundredandten.group import Group, Person, Player
+from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
 from hundredandten.trick import Score
@@ -22,16 +22,22 @@ from hundredandten.trick import Score
 class Game:
     '''A game of Hundred and Ten'''
 
-    people: Group[Person] = field(default_factory=Group)
+    players: Group = field(default_factory=Group)
     rounds: list[Round] = field(default_factory=list)
-    accessibility: Accessibility = field(default=Accessibility.PUBLIC)
     seed: str = field(default_factory=lambda: str(uuid4()))
+
+    def __post_init__(self):
+        if len(self.players) < 2:
+            raise HundredAndTenError("Cannot have a game with less than 2 players")
+        if len(self.players) > 4:
+            raise HundredAndTenError("Cannot have a game with more than 4 players")
+        if not self.rounds:
+            self.__new_round(self.players[0].identifier)
+        self.__automated_act()
 
     @property
     def status(self) -> AnyStatus:
         '''The status property.'''
-        if not self.rounds:
-            return GameStatus.WAITING_FOR_PLAYERS
         if self.winner:
             return GameStatus.WON
         return self.active_round.status
@@ -44,35 +50,11 @@ class Game:
         return self.rounds[-1]
 
     @property
-    def organizer(self) -> Person:
-        '''
-        The organizer of the game
-        If no player has the role, pick a random player
-        '''
-        return next(
-            iter(self.people.by_role(GameRole.ORGANIZER) or self.people),
-            Person('unknown'))
-
-    @property
-    def invitees(self) -> Group[Person]:
-        '''
-        The invitees to the game
-        '''
-        return self.people.by_role(GameRole.INVITEE)
-
-    @property
-    def players(self) -> Group[Person]:
-        '''
-        The players of the game
-        '''
-        return self.people.by_role(GameRole.PLAYER)
-
-    @property
-    def winner(self) -> Optional[Person]:
+    def winner(self) -> Optional[Player]:
         '''
         The winner of the game
         '''
-        # if a round is in progess, don't attempt the computation
+        # if a round is in progress, don't attempt the computation
         if not self.rounds or self.active_round.status != RoundStatus.COMPLETED:
             return None
 
@@ -105,8 +87,7 @@ class Game:
             for index, round in enumerate(self.rounds)]
 
         return [
-            # don't include game start event if it hasn't started
-            *([GameStart()] if self.status != GameStatus.WAITING_FOR_PLAYERS else []),
+            GameStart(),
             *[round_event
               for event_list in round_events for round_event in event_list],
             # don't include the game end event if it hasn't ended
@@ -138,64 +119,6 @@ class Game:
         value: the player's score
         '''
         return self.__scores(len(self.rounds))
-
-    def invite(self, inviter: str, invitee: str) -> None:
-        '''Invite a player to the game'''
-
-        if self.status != GameStatus.WAITING_FOR_PLAYERS:
-            raise HundredAndTenError("You cannot invite a player to an in progress game.")
-        if self.people.find_or_use(Person(inviter)) not in self.players:
-            raise HundredAndTenError("You cannot invite a player to a game you aren't a part of.")
-
-        self.people.upsert(self.people.find_or_use(Person(invitee, {GameRole.INVITEE})))
-
-    def join(self, player: str) -> None:
-        '''Add a player to the game'''
-
-        if self.status != GameStatus.WAITING_FOR_PLAYERS:
-            raise HundredAndTenError("You cannot join this game. It has already started.")
-        if len(self.players) >= 4:
-            raise HundredAndTenError("You cannot join this game. It is at capacity.")
-        if (self.accessibility != Accessibility.PUBLIC
-                and GameRole.INVITEE not in self.people.find_or_use(Player(player)).roles):
-            raise HundredAndTenError("You cannot join this game. You must be invited first.")
-
-        self.people.upsert(self.people.find_or_use(Person(player, {GameRole.PLAYER})))
-
-    def leave(self, player: str) -> None:
-        '''Remove a player from the game'''
-
-        if self.status != GameStatus.WAITING_FOR_PLAYERS:
-            raise HundredAndTenError("You cannot leave an in-progress game.")
-
-        person = Person(player)
-
-        if person in self.people:
-            self.people.remove(person)
-
-    def automate(self, player: str) -> None:
-        '''Automate a player in the game'''
-
-        person = self.people.find_or_use(Person(player))
-        person.automate = True
-
-        if self.rounds:
-            self.active_round.automate(player)
-
-        if person in self.people:
-            self.people.update(person)
-            self.__automated_act()
-
-    def start_game(self) -> None:
-        '''Start the game'''
-
-        if self.status != GameStatus.WAITING_FOR_PLAYERS:
-            raise HundredAndTenError("Cannot start a game that's already started.")
-        if len(self.players) < 2:
-            raise HundredAndTenError("You cannot play with fewer than two players.")
-
-        self.__new_round(self.players[0].identifier)
-        self.__automated_act()
 
     def act(self, action: Action) -> None:
         '''Perform an action as a player of the game'''

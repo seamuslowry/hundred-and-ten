@@ -15,12 +15,6 @@ PLAYER_3_WIN_SEED = 'ba297348-77d7-42bb-9164-03712b05ba21'
 class TestGameEvents(TestCase):
     '''Unit tests for returning events in a game'''
 
-    def test_start_with_no_events(self):
-        '''At game start, event list is empty'''
-        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
-
-        self.assertEqual([], game.events)
-
     def test_new_game(self):
         '''Before any plays, just the game start event exists'''
         game = arrange.game(RoundStatus.BIDDING)

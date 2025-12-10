@@ -7,16 +7,9 @@ TRICK_VALUE = 5
 WINNING_SCORE = 110
 
 
-class Accessibility(Enum):
-    '''The accessibility options for a game'''
-    PUBLIC = 1
-    PRIVATE = 2
-
-
 class GameStatus(Enum):
     '''The statuses the game can be in'''
-    WAITING_FOR_PLAYERS = 1
-    WON = 2
+    WON = 1
 
 
 class RoundStatus(Enum):
@@ -31,21 +24,13 @@ class RoundStatus(Enum):
 
 AnyStatus = Union[GameStatus, RoundStatus]
 
-
-class GameRole(Enum):
-    '''The roles a person can have in a game'''
-    PLAYER = 1
-    ORGANIZER = 2
-    INVITEE = 3
-
-
 class RoundRole(Enum):
     '''The roles a person can have in a round'''
     DEALER = 1
     PRE_PASSED = 2
 
 
-AnyRole = Union[GameRole, RoundRole]
+AnyRole = Union[RoundRole]
 
 
 class BidAmount(IntEnum):
