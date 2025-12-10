@@ -1,6 +1,7 @@
 '''Test to ensure games are scored properly'''
 from unittest import TestCase
 
+from hundredandten import RoundStatus
 from hundredandten.constants import WINNING_SCORE, GameStatus
 from tests import arrange
 
@@ -23,7 +24,7 @@ class TestGameScoring(TestCase):
 
     def test_start_at_zeroes(self):
         '''At game start, scores are all zeroes'''
-        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS)
+        game = arrange.game(RoundStatus.BIDDING)
 
         self.assertEqual([0] * len(game.players), list(game.scores.values()))
         self.assertEqual([0] * len(game.players), list(game.scores_by_round[-1].values()))

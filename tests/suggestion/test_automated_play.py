@@ -14,22 +14,7 @@ class TestAutomatedPlay(TestCase):
 
     def test_game_will_complete_from_start(self):
         '''When playing with all automated players, the game will complete'''
-        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS, seed=AUTOMATED_SEED)
-        for player in game.players:
-            game.automate(player.identifier)
-
-        game.start_game()
-
-        self.assertIsNotNone(game.winner)
-
-    def test_game_will_complete_after_start(self):
-        '''When playing with all automated players after starting, the game will complete'''
-        game = arrange.game(GameStatus.WAITING_FOR_PLAYERS, seed=AUTOMATED_SEED)
-
-        game.start_game()
-
-        for player in game.players:
-            game.automate(player.identifier)
+        game = arrange.automated_game(RoundStatus.BIDDING, seed=AUTOMATED_SEED)
 
         self.assertIsNotNone(game.winner)
 
@@ -38,14 +23,3 @@ class TestAutomatedPlay(TestCase):
         game = arrange.game(GameStatus.WON, seed=AUTOMATED_SEED)
 
         self.assertRaises(HundredAndTenError, game.suggestion)
-
-    def test_wont_automate_unknown_player(self):
-        '''Trying to automate an unknown player will do nothing'''
-        game = arrange.game(RoundStatus.BIDDING)
-
-        unknown_id = str(uuid4())
-
-        game.automate(unknown_id)
-
-        self.assertFalse(any(person.identifier == unknown_id for person in game.people))
-        self.assertFalse(any(person.automate for person in game.people))
