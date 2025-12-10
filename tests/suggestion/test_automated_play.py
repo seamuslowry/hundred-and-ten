@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.constants import GameStatus, RoundStatus
+from hundredandten.constants import GameStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import arrange
 
@@ -14,7 +14,7 @@ class TestAutomatedPlay(TestCase):
 
     def test_game_will_complete_from_start(self):
         """When playing with all automated players, the game will complete"""
-        game = arrange.automated_game(RoundStatus.BIDDING, seed=AUTOMATED_SEED)
+        game = arrange.automated_game(seed=AUTOMATED_SEED)
 
         self.assertIsNotNone(game.winner)
 

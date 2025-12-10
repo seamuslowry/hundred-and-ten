@@ -11,11 +11,18 @@ from hundredandten.group import Group, Player
 
 
 def automated_game(
-    status: AnyStatus,
-    massage: Callable[[Game], None] = lambda f_game: None,
     seed: Optional[str] = None,
 ) -> Game:
-    return __game(status, massage, seed, True)
+    """
+    Return a game with all automated players in the requested status.
+    If passed, will call the massage function on the game before returning
+    """
+    return __game(
+        # Round status is irrelevant here since the game will automate to the end
+        RoundStatus.BIDDING,
+        seed=seed,
+        automate=True,
+    )
 
 
 def game(
@@ -23,6 +30,11 @@ def game(
     massage: Callable[[Game], None] = lambda f_game: None,
     seed: Optional[str] = None,
 ) -> Game:
+    """
+    Return a game in the requested status.
+    If passed, will call the massage function on the game before returning
+    """
+
     return __game(status, massage, seed, False)
 
 
@@ -34,7 +46,8 @@ def __game(
 ) -> Game:
     """
     Return a game in the requested status.
-    If passed, will call the massage function on the game before returning
+    If passed, will call the massage function on the game before returning.
+    Will automate players based on the automated flag.
     """
 
     new_game = {
