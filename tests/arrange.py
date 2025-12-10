@@ -42,7 +42,7 @@ def __game(
     status: AnyStatus,
     massage: Callable[[Game], None] = lambda f_game: None,
     seed: Optional[str] = None,
-    automate: Optional[bool] = False,
+    automate: bool = False,
 ) -> Game:
     """
     Return a game in the requested status.
@@ -113,7 +113,7 @@ def play_round(game_to_play: Game) -> None:
         play_trick(game_to_play)
 
 
-def __get_bidding_game(seed: Optional[str], automate: Optional[bool] = False) -> Game:
+def __get_bidding_game(seed: Optional[str], automate: bool = False) -> Game:
     """Returns a game with no moves"""
     new_game = Game(
         players=Group(
@@ -124,28 +124,28 @@ def __get_bidding_game(seed: Optional[str], automate: Optional[bool] = False) ->
     return new_game
 
 
-def __get_completed_no_bidders_game(seed: Optional[str], automate: Optional[bool] = False) -> Game:
+def __get_completed_no_bidders_game(seed: Optional[str], automate: bool = False) -> Game:
     """Returns a game in the completed no bidders status"""
     new_game = __get_bidding_game(seed, automate)
     pass_round(new_game)
     return new_game
 
 
-def __get_trump_selection_game(seed: Optional[str], automate: Optional[bool] = False) -> Game:
+def __get_trump_selection_game(seed: Optional[str], automate: bool = False) -> Game:
     """Return a game in the trump selection status"""
     new_game = __get_bidding_game(seed, automate)
     bid(new_game)
     return new_game
 
 
-def __get_discard_game(seed: Optional[str], automate: Optional[bool] = False) -> Game:
+def __get_discard_game(seed: Optional[str], automate: bool = False) -> Game:
     """Return a game in the discard status"""
     new_game = __get_trump_selection_game(seed, automate)
     select_trump(new_game)
     return new_game
 
 
-def __get_tricks_game(seed: Optional[str], automate: Optional[bool] = False) -> Game:
+def __get_tricks_game(seed: Optional[str], automate: bool = False) -> Game:
     """Return a game in the tricks status"""
     new_game = __get_discard_game(seed, automate)
     discard(new_game)
@@ -153,7 +153,7 @@ def __get_tricks_game(seed: Optional[str], automate: Optional[bool] = False) -> 
     return new_game
 
 
-def __get_won_game(seed: Optional[str], automate: Optional[bool] = False) -> Game:
+def __get_won_game(seed: Optional[str], automate: bool = False) -> Game:
     """Return a game in the won status"""
     new_game = __get_bidding_game(seed, automate)
     while new_game.status != GameStatus.WON:
