@@ -1,4 +1,5 @@
-'''Test to ensure game events are returned properly'''
+"""Test to ensure game events are returned properly"""
+
 from unittest import TestCase
 
 from hundredandten.constants import GameStatus, RoundStatus
@@ -8,14 +9,14 @@ from tests import arrange
 # tests in this file run off of seeded games to avoid setting up everything necessary for the tests
 # seeds and their expected values in different situations are recorded here
 
-PLAYER_3_WIN_SEED = 'ba297348-77d7-42bb-9164-03712b05ba21'
+PLAYER_3_WIN_SEED = "ba297348-77d7-42bb-9164-03712b05ba21"
 
 
 class TestGameEvents(TestCase):
-    '''Unit tests for returning events in a game'''
+    """Unit tests for returning events in a game"""
 
     def test_new_game(self):
-        '''Before any plays, just the game start event exists'''
+        """Before any plays, just the game start event exists"""
         game = arrange.game(RoundStatus.BIDDING)
         events = game.events
 
@@ -24,7 +25,7 @@ class TestGameEvents(TestCase):
         self.assertIsInstance(events[1], RoundStart)
 
     def test_partial_trick(self):
-        '''While round isn't over, no RoundEnd event exists'''
+        """While round isn't over, no RoundEnd event exists"""
 
         game = arrange.game(RoundStatus.TRICKS)
         init_events = game.events
@@ -35,12 +36,14 @@ class TestGameEvents(TestCase):
         self.assertTrue(any(isinstance(e, TrickEnd) for e in game.events))
 
     def test_partial_round(self):
-        '''While round isn't over, no RoundEnd event exists'''
+        """While round isn't over, no RoundEnd event exists"""
 
-        for status in [RoundStatus.BIDDING,
-                       RoundStatus.TRUMP_SELECTION,
-                       RoundStatus.TRICKS,
-                       RoundStatus.TRUMP_SELECTION]:
+        for status in [
+            RoundStatus.BIDDING,
+            RoundStatus.TRUMP_SELECTION,
+            RoundStatus.TRICKS,
+            RoundStatus.TRUMP_SELECTION,
+        ]:
             game = arrange.game(status)
             events = game.events
 
@@ -48,7 +51,7 @@ class TestGameEvents(TestCase):
             self.assertFalse(any(isinstance(e, RoundEnd) for e in events))
 
     def test_completed_round(self):
-        '''Once the round is over, it will have a RoundEnd event'''
+        """Once the round is over, it will have a RoundEnd event"""
 
         game = arrange.game(RoundStatus.TRICKS, arrange.play_round)
         events = game.events
@@ -57,7 +60,7 @@ class TestGameEvents(TestCase):
         self.assertTrue(any(isinstance(e, RoundEnd) for e in events))
 
     def test_completed_game(self):
-        '''Once the game is over, it will have a GameEnd event'''
+        """Once the game is over, it will have a GameEnd event"""
 
         game = arrange.game(GameStatus.WON, seed=PLAYER_3_WIN_SEED)
         events = game.events

@@ -1,4 +1,5 @@
-'''Unit test common upserting into a list of players'''
+"""Unit test common upserting into a list of players"""
+
 from unittest import TestCase
 
 from hundredandten.constants import RoundRole
@@ -6,12 +7,12 @@ from hundredandten.group import Group, Player
 
 
 class TestUpsertPlayers(TestCase):
-    '''Upsert Players unit tests'''
+    """Upsert Players unit tests"""
 
     def test_upsert_player_not_in_list(self):
-        '''Upsert a player that is not in the list'''
+        """Upsert a player that is not in the list"""
 
-        player = Player('1')
+        player = Player("1")
         players = Group()
 
         pre_len = len(players)
@@ -22,9 +23,9 @@ class TestUpsertPlayers(TestCase):
         self.assertIn(player, players)
 
     def test_upsert_player_in_list(self):
-        '''Upsert a player that is in the list'''
+        """Upsert a player that is in the list"""
 
-        player = Player('1')
+        player = Player("1")
         players = Group([player])
 
         pre_len = len(players)
@@ -35,9 +36,9 @@ class TestUpsertPlayers(TestCase):
         self.assertIn(player, players)
 
     def test_upsert_player_in_list_with_no_roles(self):
-        '''Upsert a player that is in the list but has no roles'''
+        """Upsert a player that is in the list but has no roles"""
 
-        identifier = '1'
+        identifier = "1"
         player = Player(identifier)
         player_with_roles = Player(identifier, {RoundRole.DEALER})
         players = Group([player])
@@ -51,9 +52,9 @@ class TestUpsertPlayers(TestCase):
         self.assertEqual({RoundRole.DEALER}, players[0].roles)
 
     def test_upsert_player_in_list_with_different_roles(self):
-        '''Upsert a player that is in the list but has different roles'''
+        """Upsert a player that is in the list but has different roles"""
 
-        identifier = '1'
+        identifier = "1"
         player_player = Player(identifier, {RoundRole.DEALER})
         player_prepassed = Player(identifier, {RoundRole.PRE_PASSED})
         players = Group([player_player])
@@ -67,12 +68,12 @@ class TestUpsertPlayers(TestCase):
         self.assertEqual({RoundRole.PRE_PASSED}, players[0].roles)
 
     def test_upsert_player_maintains_position(self):
-        '''Upsert a player that is not in the list'''
+        """Upsert a player that is not in the list"""
 
-        identifier = 'p'
+        identifier = "p"
         player = Player(identifier)
         new_player = Player(identifier, {RoundRole.PRE_PASSED})
-        players = Group([Player('1'), player, Player('2')])
+        players = Group([Player("1"), player, Player("2")])
         pre_len = len(players)
         pre_index = players.index(player)
 

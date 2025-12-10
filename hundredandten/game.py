@@ -1,4 +1,5 @@
-'''Represent a game of Hundred and Ten'''
+"""Represent a game of Hundred and Ten"""
+
 from dataclasses import dataclass, field
 from functools import reduce
 from random import Random
@@ -24,7 +25,7 @@ from hundredandten.trick import Score
 
 @dataclass
 class Game:
-    '''A game of Hundred and Ten'''
+    """A game of Hundred and Ten"""
 
     players: Group = field(default_factory=Group)
     rounds: list[Round] = field(default_factory=list)
@@ -41,96 +42,100 @@ class Game:
 
     @property
     def status(self) -> AnyStatus:
-        '''The status property.'''
+        """The status property."""
         if self.winner:
             return GameStatus.WON
         return self.active_round.status
 
     @property
     def active_round(self) -> Round:
-        '''The active round'''
+        """The active round"""
         if not self.rounds:
             raise HundredAndTenError("No active round found.")
         return self.rounds[-1]
 
     @property
     def winner(self) -> Optional[Player]:
-        '''
+        """
         The winner of the game
-        '''
+        """
         # if a round is in progress, don't attempt the computation
         if not self.rounds or self.active_round.status != RoundStatus.COMPLETED:
             return None
 
         winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
-        ordered_winning_players = list(map(
-            lambda score: self.active_round.players.by_identifier(score.identifier),
-            winning_scores))
+        ordered_winning_players = list(
+            map(
+                lambda score: self.active_round.players.by_identifier(score.identifier),
+                winning_scores,
+            )
+        )
 
         winner = (
             self.active_round.active_bidder
-            if (self.active_round.active_bidder in ordered_winning_players) else
-            next(iter(ordered_winning_players),
-                 None))
+            if (self.active_round.active_bidder in ordered_winning_players)
+            else next(iter(ordered_winning_players), None)
+        )
 
         return winner
 
     @property
     def events(self) -> list[Event]:
-        '''The events that occurred in the game.'''
+        """The events that occurred in the game."""
 
         round_events: list[list[Event]] = [
             [
                 RoundStart(
                     round.dealer.identifier,
-                    {p.identifier: round.original_hand(p.identifier) for p in round.players}),
+                    {p.identifier: round.original_hand(p.identifier) for p in round.players},
+                ),
                 *round.events,
                 # don't include the round end event if it hasn't ended
-                *([RoundEnd(scores=self.__scores(index + 1))] if round.completed else [])
+                *([RoundEnd(scores=self.__scores(index + 1))] if round.completed else []),
             ]
-            for index, round in enumerate(self.rounds)]
+            for index, round in enumerate(self.rounds)
+        ]
 
         return [
             GameStart(),
-            *[round_event
-              for event_list in round_events for round_event in event_list],
+            *[round_event for event_list in round_events for round_event in event_list],
             # don't include the game end event if it hasn't ended
-            *([GameEnd(self.winner.identifier)] if self.winner else [])
+            *([GameEnd(self.winner.identifier)] if self.winner else []),
         ]
 
     @property
     def score_history(self) -> list[Score]:
-        '''A list of all players' scores over time'''
+        """A list of all players' scores over time"""
 
         return self.__score_history(len(self.rounds))
 
     @property
     def scores_by_round(self) -> list[dict[str, int]]:
-        '''
+        """
         The scores each player earned for this game
         A dictionary in the form
         key: player identifier
         value: the player's score
-        '''
+        """
         return [self.__scores(round_num) for round_num in range(len(self.rounds) + 1)]
 
     @property
     def scores(self) -> dict[str, int]:
-        '''
+        """
         The scores each player earned for this game
         A dictionary in the form
         key: player identifier
         value: the player's score
-        '''
+        """
         return self.__scores(len(self.rounds))
 
     def act(self, action: Action) -> None:
-        '''Perform an action as a player of the game'''
+        """Perform an action as a player of the game"""
         self.__act(action)
         self.__automated_act()
 
     def suggestion(self) -> Action:
-        '''Return the suggested action given the state of the game'''
+        """Return the suggested action given the state of the game"""
         return self.active_round.suggestion()
 
     def __automated_act(self):
@@ -141,7 +146,7 @@ class Game:
         return self.suggestion()
 
     def __act(self, action: Action) -> None:
-        '''Perform an action as a player of the game'''
+        """Perform an action as a player of the game"""
         self.active_round.act(action)
         # handle creation of new round if appropriate
         if isinstance(action, Bid):
@@ -155,9 +160,13 @@ class Game:
             # dealer doesn't rotate on a round with no bidders
             # unless the current dealer has been dealer 3x in a row
             keep_same_dealer = len(self.rounds) < 3 or any(
-                r.dealer.identifier != current_dealer for r in self.rounds[-3:])
-            next_dealer = current_dealer if keep_same_dealer else self.players.after(
-                current_dealer).identifier
+                r.dealer.identifier != current_dealer for r in self.rounds[-3:]
+            )
+            next_dealer = (
+                current_dealer
+                if keep_same_dealer
+                else self.players.after(current_dealer).identifier
+            )
             self.__new_round(next_dealer)
 
     def __end_play(self):
@@ -169,21 +178,28 @@ class Game:
 
         deck = Deck(seed=str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4)))
 
-        round_players = Group(map(lambda p: Player(
-            p.identifier, hand=deck.draw(HAND_SIZE), automate=p.automate), self.players))
+        round_players = Group(
+            map(
+                lambda p: Player(p.identifier, hand=deck.draw(HAND_SIZE), automate=p.automate),
+                self.players,
+            )
+        )
         round_players.add_role(dealer, RoundRole.DEALER)
 
         self.rounds.append(Round(players=round_players, deck=deck))
 
     def __score_history(self, to_round: int) -> list[Score]:
-        '''A list of all players' scores up to the provided round'''
+        """A list of all players' scores up to the provided round"""
 
         scores = {}
         score_history = []
 
         all_final_scores = [
-            score for round in self.rounds[:to_round] for score in round.scores
-            if round.status == RoundStatus.COMPLETED]
+            score
+            for round in self.rounds[:to_round]
+            for score in round.scores
+            if round.status == RoundStatus.COMPLETED
+        ]
 
         for score in all_final_scores:
             new_score = scores.get(score.identifier, 0) + score.value
@@ -193,24 +209,32 @@ class Game:
         return score_history
 
     def __scores(self, to_round) -> dict[str, int]:
-        '''
+        """
         The scores each player earned for this game up to the provided round
         A dictionary in the form
         key: player identifier
         value: the player's score
-        '''
+        """
 
-        return reduce(lambda acc,
-                      player: {
-                          **acc,
-                          player.identifier: self.__score_at_round(player.identifier, to_round)
-                      },
-                      self.players, {player.identifier: 0 for player in self.players})
+        return reduce(
+            lambda acc, player: {
+                **acc,
+                player.identifier: self.__score_at_round(player.identifier, to_round),
+            },
+            self.players,
+            {player.identifier: 0 for player in self.players},
+        )
 
     def __score_at_round(self, identifier: str, to_round: int) -> int:
-        '''Return the most recent score for the provided player at the provided round'''
+        """Return the most recent score for the provided player at the provided round"""
 
-        most_recent_score = next((score for score in reversed(
-            self.__score_history(to_round)) if score.identifier == identifier), None)
+        most_recent_score = next(
+            (
+                score
+                for score in reversed(self.__score_history(to_round))
+                if score.identifier == identifier
+            ),
+            None,
+        )
 
         return most_recent_score.value if most_recent_score else 0

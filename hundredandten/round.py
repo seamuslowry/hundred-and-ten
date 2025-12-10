@@ -1,4 +1,5 @@
-'''Represent one round of a game of Hundred and Ten'''
+"""Represent one round of a game of Hundred and Ten"""
+
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -22,7 +23,8 @@ from hundredandten.trick import Score, Trick
 
 @dataclass
 class Round:
-    '''A round in the game of Hundred and Ten'''
+    """A round in the game of Hundred and Ten"""
+
     players: Group[Player] = field(default_factory=Group)
     bids: list[Bid] = field(default_factory=list)
     selection: Optional[SelectTrump] = None
@@ -32,7 +34,7 @@ class Round:
 
     @property
     def dealer(self) -> Player:
-        '''The dealer this round.'''
+        """The dealer this round."""
         dlr = next(iter(self.players.by_role(RoundRole.DEALER)), None)
         if not dlr:
             raise HundredAndTenError("No dealer found.")
@@ -40,13 +42,14 @@ class Round:
 
     @property
     def active_player(self) -> Player:
-        '''The current active player.'''
+        """The current active player."""
         # while bidding, the active player is the one after the last bidder that can place a bid
         if self.status == RoundStatus.BIDDING:
             # before anyone has bid, treat the dealer as the last bidder
             last_bidder = self.dealer.identifier if not self.bids else self.bids[-1].identifier
             active_and_last_bidders = Group(
-                [p for p in self.players if p in self.bidders or p.identifier == last_bidder])
+                [p for p in self.players if p in self.bidders or p.identifier == last_bidder]
+            )
             return active_and_last_bidders.after(last_bidder)
         # when in trump selection, the active bidder is the active player
         if self.status == RoundStatus.TRUMP_SELECTION:
@@ -54,8 +57,9 @@ class Round:
             return self.active_bidder
         if self.status == RoundStatus.DISCARD:
             assert self.active_bidder
-            last_discarder = (self.dealer.identifier
-                              if not self.discards else self.discards[-1].identifier)
+            last_discarder = (
+                self.dealer.identifier if not self.discards else self.discards[-1].identifier
+            )
             return self.players.after(last_discarder)
         # while playing tricks, active player needs to consider
         # trick number, trick status, and winner of last trick
@@ -76,28 +80,28 @@ class Round:
                 return winner
             # in an ongoing trick, active player is next around the table
             return self.players.after(self.active_trick.plays[-1].identifier)
-        raise HundredAndTenError(f'Cannot determine active player in {self.status} status')
+        raise HundredAndTenError(f"Cannot determine active player in {self.status} status")
 
     @property
     def inactive_players(self) -> Group[Player]:
-        '''The players that are not active.'''
+        """The players that are not active."""
         return Group([p for p in self.players if p != self.active_player])
 
     @property
     def active_bid(self) -> Optional[BidAmount]:
-        '''The maximum bid submitted this round'''
+        """The maximum bid submitted this round"""
         return max(self.bids).amount if self.bids else None
 
     @property
     def bidders(self) -> Group[Player]:
-        '''Anyone in this round that can still submit a bid.'''
+        """Anyone in this round that can still submit a bid."""
         return Group(
-            [p for p in self.players
-             if self.__current_bid(p.identifier) != Bid('', BidAmount.PASS)])
+            [p for p in self.players if self.__current_bid(p.identifier) != Bid("", BidAmount.PASS)]
+        )
 
     @property
     def active_bidder(self) -> Optional[Player]:
-        '''The active bidder this round.'''
+        """The active bidder this round."""
 
         if not self.active_bid or len(self.bidders) != 1:
             return None
@@ -105,26 +109,26 @@ class Round:
 
     @property
     def active_trick(self) -> Trick:
-        '''The current active trick'''
+        """The current active trick"""
         if not self.tricks:
             raise HundredAndTenError("No active trick found.")
         return self.tricks[-1]
 
     @property
     def trump(self) -> Optional[SelectableSuit]:
-        '''The selected trump'''
+        """The selected trump"""
         if not self.selection:
             return None
         return self.selection.suit
 
     @property
     def completed(self) -> bool:
-        '''True if the round is complete, False otherwise'''
+        """True if the round is complete, False otherwise"""
         return self.status in [RoundStatus.COMPLETED, RoundStatus.COMPLETED_NO_BIDDERS]
 
     @property
     def status(self) -> RoundStatus:
-        '''The status property.'''
+        """The status property."""
         if self.tricks and all(not player.hand for player in self.players):
             return RoundStatus.COMPLETED
         if len(self.discards) == len(self.players):
@@ -139,28 +143,31 @@ class Round:
 
     @property
     def events(self) -> list[Event]:
-        '''The events that occurred in the round.'''
+        """The events that occurred in the round."""
         trick_events: list[list[Event]] = [
             [
                 TrickStart(),
                 *trick.plays,
                 # don't include the trick end event if it hasn't ended
-                *([TrickEnd(trick.winning_play.identifier)]
-                  if (trick.winning_play and len(trick.plays) == len(self.players))
-                  else [])
+                *(
+                    [TrickEnd(trick.winning_play.identifier)]
+                    if (trick.winning_play and len(trick.plays) == len(self.players))
+                    else []
+                ),
             ]
-            for trick in self.tricks]
+            for trick in self.tricks
+        ]
 
         return [
             *self.bids,
             *([self.selection] if self.selection else []),
             *self.discards,
-            *[trick_event for event_list in trick_events for trick_event in event_list]
+            *[trick_event for event_list in trick_events for trick_event in event_list],
         ]
 
     @property
     def scores(self) -> list[Score]:
-        '''
+        """
         The scores each player earned for this round
         A list of tuples in the form
         left: player identifier
@@ -168,20 +175,30 @@ class Round:
 
         The list will come in the order the points were earned.
         This is to determine a disputed winner
-        '''
-        winning_plays = [winning_play
-                         for winning_play in map(lambda trick: trick.winning_play, self.tricks)
-                         if winning_play is not None]
+        """
+        winning_plays = [
+            winning_play
+            for winning_play in map(lambda trick: trick.winning_play, self.tricks)
+            if winning_play is not None
+        ]
 
-        trump_wins = [play for play in winning_plays
-                      if play.card.suit == self.trump or play.card.always_trump]
-        highest_play = max(
-            trump_wins, key=lambda play: play.card.trump_value, default=None)
+        trump_wins = [
+            play for play in winning_plays if play.card.suit == self.trump or play.card.always_trump
+        ]
+        highest_play = max(trump_wins, key=lambda play: play.card.trump_value, default=None)
 
-        base_scores = list(map(lambda play: Score(play.identifier, TRICK_VALUE +
-                                                  # treat the highest value play as two tricks
-                                                  (TRICK_VALUE if play == highest_play else 0)),
-                               winning_plays))
+        base_scores = list(
+            map(
+                lambda play: Score(
+                    play.identifier,
+                    TRICK_VALUE
+                    +
+                    # treat the highest value play as two tricks
+                    (TRICK_VALUE if play == highest_play else 0),
+                ),
+                winning_plays,
+            )
+        )
 
         # use default values here so scores can be calculated before tricks are played
         # should return all zeros
@@ -190,15 +207,14 @@ class Round:
 
         bidder_identifier = acting_bidder.identifier
         bidder_base_scores = list(
-            filter(
-                lambda score: score.identifier == bidder_identifier,
-                base_scores))
-        non_bidder_base_scores = [score for score in base_scores
-                                  if score not in bidder_base_scores]
+            filter(lambda score: score.identifier == bidder_identifier, base_scores)
+        )
+        non_bidder_base_scores = [score for score in base_scores if score not in bidder_base_scores]
         bidder_base_score = sum(map(lambda score: score.value, bidder_base_scores))
 
         shot_the_moon = self.active_bid == BidAmount.SHOOT_THE_MOON and all(
-            score.identifier == bidder_identifier for score in base_scores)
+            score.identifier == bidder_identifier for score in base_scores
+        )
         met_bid = bidder_base_score >= acting_bid
 
         if shot_the_moon:
@@ -209,7 +225,7 @@ class Round:
         return base_scores
 
     def act(self, action: Action) -> None:
-        '''Perform an action as a player of the game'''
+        """Perform an action as a player of the game"""
         if isinstance(action, Bid):
             self.__bid(action)
         if isinstance(action, Unpass):
@@ -222,11 +238,12 @@ class Round:
             self.__play(action)
 
     def __bid(self, bid: Bid) -> None:
-        '''Record a bid from a player'''
+        """Record a bid from a player"""
         identifier = bid.identifier
         amount = bid.amount
         if self.status == RoundStatus.BIDDING and self.active_player == self.players.by_identifier(
-                identifier):
+            identifier
+        ):
             self.__handle_bid(identifier, amount)
         elif amount == BidAmount.PASS:
             self.players.add_role(identifier, RoundRole.PRE_PASSED)
@@ -234,11 +251,11 @@ class Round:
             raise HundredAndTenError("Cannot bid out of order")
 
     def __unpass(self, unpass: Unpass) -> None:
-        '''Discount a prepass bid from the identified player'''
+        """Discount a prepass bid from the identified player"""
         self.players.remove_role(unpass.identifier, RoundRole.PRE_PASSED)
 
     def __select_trump(self, select_trump: SelectTrump) -> None:
-        '''Select the passed suit as trump'''
+        """Select the passed suit as trump"""
         if self.status != RoundStatus.TRUMP_SELECTION:
             raise HundredAndTenError("Cannot select trump outside of the trump selection phase.")
         if not self.active_bidder or select_trump.identifier != self.active_bidder.identifier:
@@ -247,9 +264,9 @@ class Round:
         self.selection = select_trump
 
     def __discard(self, discard: Discard) -> None:
-        '''
+        """
         Discard the selected cards from the identified player's hand and replace them
-        '''
+        """
         if self.status != RoundStatus.DISCARD:
             raise HundredAndTenError("Cannot discard outside of the discard phase.")
         if discard.identifier != self.active_player.identifier:
@@ -257,8 +274,7 @@ class Round:
         if any(card not in self.active_player.hand for card in discard.cards):
             raise HundredAndTenError("You may only discard cards that are in your hand.")
 
-        remaining = list(
-            filter(lambda c: c not in discard.cards, self.active_player.hand))
+        remaining = list(filter(lambda c: c not in discard.cards, self.active_player.hand))
 
         self.active_player.hand = [*remaining]
         self.active_player.hand.extend(self.deck.draw(len(discard.cards)))
@@ -266,7 +282,7 @@ class Round:
         self.__end_discard()
 
     def __play(self, play: Play) -> None:
-        '''Play the specified card from the identified player's hand'''
+        """Play the specified card from the identified player's hand"""
 
         active_player_trump_cards = trumps(self.active_player.hand, self.trump)
 
@@ -274,9 +290,11 @@ class Round:
             raise HundredAndTenError("Cannot play a card out of turn.")
         if play.card not in self.active_player.hand:
             raise HundredAndTenError("Cannot play a card you do not have.")
-        if (self.active_trick.bleeding and
-                active_player_trump_cards and
-                play.card not in active_player_trump_cards):
+        if (
+            self.active_trick.bleeding
+            and active_player_trump_cards
+            and play.card not in active_player_trump_cards
+        ):
             raise HundredAndTenError("You must play a trump card when the trick is bleeding.")
 
         self.active_player.hand.remove(play.card)
@@ -284,7 +302,7 @@ class Round:
         self.__end_play()
 
     def automate(self, player: str) -> None:
-        '''Automate a player in the round'''
+        """Automate a player in the round"""
 
         person = self.players.find_or_use(Player(player))
         person.automate = True
@@ -293,21 +311,22 @@ class Round:
             self.players.update(person)
 
     def available_bids(self, identifier: str) -> list[BidAmount]:
-        '''Compute the bid amounts available to the identified player'''
+        """Compute the bid amounts available to the identified player"""
         return [
-            bid_amount for bid_amount in BidAmount
+            bid_amount
+            for bid_amount in BidAmount
             if self.__is_available_bid(identifier, bid_amount)
         ]
 
     def original_hand(self, identifier: str) -> list[Card]:
-        '''Return the identified player's original hand'''
+        """Return the identified player's original hand"""
         player = self.players.find_or_use(Player(identifier))
         discard = next((d for d in self.discards if d.identifier == identifier), None)
 
         return discard.cards + discard.kept if discard else player.hand
 
     def suggestion(self) -> Action:
-        '''Return the suggested action given the game state'''
+        """Return the suggested action given the game state"""
         if self.status == RoundStatus.BIDDING:
             return self.__suggested_bid()
         if self.status == RoundStatus.TRUMP_SELECTION:
@@ -316,10 +335,10 @@ class Round:
             return self.__suggested_discard()
         if self.status == RoundStatus.TRICKS:
             return self.__suggested_play()
-        raise HundredAndTenError(f'Cannot automate the action in status {self.status}')
+        raise HundredAndTenError(f"Cannot automate the action in status {self.status}")
 
     def __suggested_bid(self) -> Bid:
-        '''Return the suggested bid for the current player'''
+        """Return the suggested bid for the current player"""
 
         maximum_bid = max_bid(self.active_player.hand)
         available_bids = self.available_bids(self.active_player.identifier)
@@ -328,18 +347,19 @@ class Round:
         return Bid(self.active_player.identifier, next(iter(willing_bids), BidAmount.PASS))
 
     def __suggested_trump_selection(self) -> SelectTrump:
-        '''Return the suggested trump selection for the current player'''
+        """Return the suggested trump selection for the current player"""
 
         return SelectTrump(self.active_player.identifier, desired_trump(self.active_player.hand))
 
     def __suggested_discard(self) -> Discard:
-        '''Return the suggested dicard action for the current player'''
+        """Return the suggested dicard action for the current player"""
 
-        return Discard(self.active_player.identifier,
-                       non_trumps(self.active_player.hand, self.trump))
+        return Discard(
+            self.active_player.identifier, non_trumps(self.active_player.hand, self.trump)
+        )
 
     def __suggested_play(self) -> Play:
-        '''Return the suggested play action for the current player'''
+        """Return the suggested play action for the current player"""
 
         playable_cards = self.active_player.hand
         if self.active_trick.bleeding:
@@ -355,8 +375,7 @@ class Round:
             else:
                 card = worst_card(playable_cards, self.trump)
         else:
-            worst_winning_card = worst_card_beating(
-                playable_cards, winning_play.card, self.trump)
+            worst_winning_card = worst_card_beating(playable_cards, winning_play.card, self.trump)
             # if you can beat the current winning card, do it with the lowest card that will do it
             # otherwise, play nothing
             card = worst_winning_card or worst_card(playable_cards, self.trump)
@@ -368,7 +387,7 @@ class Round:
             self.bids.append(Bid(identifier, amount))
             self.__handle_prepass()
         else:
-            raise HundredAndTenError(f'Player {identifier} cannot place a bid for {amount.value}')
+            raise HundredAndTenError(f"Player {identifier} cannot place a bid for {amount.value}")
 
     def __handle_prepass(self) -> None:
         if self.status == RoundStatus.BIDDING and RoundRole.PRE_PASSED in self.active_player.roles:
@@ -376,26 +395,31 @@ class Round:
             self.__handle_bid(self.active_player.identifier, BidAmount.PASS)
 
     def __is_available_bid(self, identifier: str, amount: BidAmount) -> bool:
-        '''Determine if the listed bid amount is available to the listed player'''
+        """Determine if the listed bid amount is available to the listed player"""
         player = self.players.find_or_use(Player(identifier))
         return (
             # the identified player must be able to submit a bid
-            (player in self.bidders and RoundRole.PRE_PASSED not in player.roles) and
+            (player in self.bidders and RoundRole.PRE_PASSED not in player.roles)
+            and
             # pass is always available as a bid
-            (amount == BidAmount.PASS or
-             # no active bid means every bid is available
-             not self.active_bid
-             # if there is an active bid, the specified bid must be larger
-             or amount > self.active_bid
-             # unless the player is the dealer, in which case it can be the same as the active bid
-             or (self.dealer.identifier == identifier and amount == self.active_bid))
+            (
+                amount == BidAmount.PASS
+                or
+                # no active bid means every bid is available
+                not self.active_bid
+                # if there is an active bid, the specified bid must be larger
+                or amount > self.active_bid
+                # unless the player is the dealer,
+                # in which case it can be the same as the active bid
+                or (self.dealer.identifier == identifier and amount == self.active_bid)
+            )
         )
 
     def __current_bid(self, identifier: str) -> Optional[Bid]:
-        '''Return the most recent bid for the provided player'''
+        """Return the most recent bid for the provided player"""
         loc_index = max(
-            (loc for loc, val in enumerate(self.bids) if val.identifier == identifier),
-            default=None)
+            (loc for loc, val in enumerate(self.bids) if val.identifier == identifier), default=None
+        )
         return self.bids[loc_index] if loc_index is not None else None
 
     def __end_discard(self) -> None:

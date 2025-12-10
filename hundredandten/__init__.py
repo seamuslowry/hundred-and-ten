@@ -1,4 +1,4 @@
-'''Init the hundredandten module'''
+"""Init the hundredandten module"""
 
 from .actions import Bid, Discard, Play, SelectTrump, Unpass
 from .constants import BidAmount, GameStatus, RoundStatus, SelectableSuit

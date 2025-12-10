@@ -1,4 +1,5 @@
-'''Constant values for Hundred and Ten games'''
+"""Constant values for Hundred and Ten games"""
+
 from enum import Enum, IntEnum
 from typing import Union
 
@@ -8,12 +9,14 @@ WINNING_SCORE = 110
 
 
 class GameStatus(Enum):
-    '''The statuses the game can be in'''
+    """The statuses the game can be in"""
+
     WON = 1
 
 
 class RoundStatus(Enum):
-    '''The statuses the round can be in'''
+    """The statuses the round can be in"""
+
     BIDDING = 1
     TRUMP_SELECTION = 2
     COMPLETED_NO_BIDDERS = 3
@@ -24,8 +27,10 @@ class RoundStatus(Enum):
 
 AnyStatus = Union[GameStatus, RoundStatus]
 
+
 class RoundRole(Enum):
-    '''The roles a person can have in a round'''
+    """The roles a person can have in a round"""
+
     DEALER = 1
     PRE_PASSED = 2
 
@@ -34,7 +39,8 @@ AnyRole = Union[RoundRole]
 
 
 class BidAmount(IntEnum):
-    '''The valid bid amounts'''
+    """The valid bid amounts"""
+
     PASS = 0
     FIFTEEN = 15
     TWENTY = 20
@@ -44,7 +50,8 @@ class BidAmount(IntEnum):
 
 
 class SelectableSuit(Enum):
-    '''The card suits that can be selected as trump for a round'''
+    """The card suits that can be selected as trump for a round"""
+
     HEARTS = 0
     CLUBS = 1
     SPADES = 2
@@ -52,7 +59,8 @@ class SelectableSuit(Enum):
 
 
 class UnselectableSuit(Enum):
-    '''The card suits that cannot be selected as trump for a round'''
+    """The card suits that cannot be selected as trump for a round"""
+
     JOKER = 1
 
 
@@ -60,7 +68,8 @@ CardSuit = Union[SelectableSuit, UnselectableSuit]
 
 
 class CardNumber(Enum):
-    '''The valid card values'''
+    """The valid card values"""
+
     JOKER = 1
     TWO = 2
     THREE = 3
