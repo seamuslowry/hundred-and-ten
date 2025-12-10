@@ -83,7 +83,7 @@ class Round:
         raise HundredAndTenError(f"Cannot determine active player in {self.status} status")
 
     @property
-    def inactive_players(self) -> Group[Player]:
+    def inactive_players(self) -> Group:
         """The players that are not active."""
         return Group([p for p in self.players if p != self.active_player])
 
@@ -93,7 +93,7 @@ class Round:
         return max(self.bids).amount if self.bids else None
 
     @property
-    def bidders(self) -> Group[Player]:
+    def bidders(self) -> Group:
         """Anyone in this round that can still submit a bid."""
         return Group(
             [p for p in self.players if self.__current_bid(p.identifier) != Bid("", BidAmount.PASS)]
