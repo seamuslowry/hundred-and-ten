@@ -174,6 +174,7 @@ class Game:
             self.__new_round(self.players.after(self.active_round.dealer.identifier).identifier)
 
     def __new_round(self, dealer: str) -> None:
+        # TODO: need to figure out how to make sure this is stable without persisting each round
         r_deck_seed = self.seed if not self.rounds else self.active_round.deck.seed
 
         deck = Deck(seed=str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4)))
