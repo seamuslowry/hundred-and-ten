@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from functools import reduce
 from random import Random
-from typing import Optional
+from typing import Optional, Sequence
 from uuid import UUID, uuid4
 
 from hundredandten.actions import Action, Bid, Play
@@ -28,16 +28,24 @@ class Game:
     """A game of Hundred and Ten"""
 
     players: Group = field(default_factory=Group)
-    rounds: list[Round] = field(default_factory=list)
+    moves: list[Action] = field(default_factory=list)
     seed: str = field(default_factory=lambda: str(uuid4()))
+
+    _rounds: list[Round] = field(default_factory=list, init=False, repr=False)
 
     def __post_init__(self):
         if len(self.players) < 2:
             raise HundredAndTenError("Cannot have a game with less than 2 players")
         if len(self.players) > 4:
             raise HundredAndTenError("Cannot have a game with more than 4 players")
-        if not self.rounds:
-            self.__new_round(self.players[0].identifier)
+
+        # manually create the first round
+        self.__new_round(self.players[0].identifier)
+
+        for move in self.moves:
+            self.act(move)
+
+
         self.__automated_act()
 
     @property
@@ -48,11 +56,14 @@ class Game:
         return self.active_round.status
 
     @property
+    def rounds(self) -> Sequence[Round]:
+        return tuple(self._rounds)
+
+    @property
     def active_round(self) -> Round:
         """The active round"""
-        if not self.rounds:
-            raise HundredAndTenError("No active round found.")
-        return self.rounds[-1]
+        assert self._rounds
+        return self._rounds[-1]
 
     @property
     def winner(self) -> Optional[Player]:
@@ -60,7 +71,7 @@ class Game:
         The winner of the game
         """
         # if a round is in progress, don't attempt the computation
-        if not self.rounds or self.active_round.status != RoundStatus.COMPLETED:
+        if not self._rounds or self.active_round.status != RoundStatus.COMPLETED:
             return None
 
         winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
@@ -86,14 +97,17 @@ class Game:
         round_events: list[list[Event]] = [
             [
                 RoundStart(
-                    round.dealer.identifier,
-                    {p.identifier: round.original_hand(p.identifier) for p in round.players},
+                    game_round.dealer.identifier,
+                    {
+                        p.identifier: game_round.original_hand(p.identifier)
+                        for p in game_round.players
+                    },
                 ),
-                *round.events,
+                *game_round.events,
                 # don't include the round end event if it hasn't ended
-                *([RoundEnd(scores=self.__scores(index + 1))] if round.completed else []),
+                *([RoundEnd(scores=self.__scores(index + 1))] if game_round.completed else []),
             ]
-            for index, round in enumerate(self.rounds)
+            for index, game_round in enumerate(self._rounds)
         ]
 
         return [
@@ -107,7 +121,7 @@ class Game:
     def score_history(self) -> list[Score]:
         """A list of all players' scores over time"""
 
-        return self.__score_history(len(self.rounds))
+        return self.__score_history(len(self._rounds))
 
     @property
     def scores_by_round(self) -> list[dict[str, int]]:
@@ -117,7 +131,7 @@ class Game:
         key: player identifier
         value: the player's score
         """
-        return [self.__scores(round_num) for round_num in range(len(self.rounds) + 1)]
+        return [self.__scores(round_num) for round_num in range(len(self._rounds) + 1)]
 
     @property
     def scores(self) -> dict[str, int]:
@@ -127,7 +141,7 @@ class Game:
         key: player identifier
         value: the player's score
         """
-        return self.__scores(len(self.rounds))
+        return self.__scores(len(self._rounds))
 
     def act(self, action: Action) -> None:
         """Perform an action as a player of the game"""
@@ -159,8 +173,8 @@ class Game:
             current_dealer = self.active_round.dealer.identifier
             # dealer doesn't rotate on a round with no bidders
             # unless the current dealer has been dealer 3x in a row
-            keep_same_dealer = len(self.rounds) < 3 or any(
-                r.dealer.identifier != current_dealer for r in self.rounds[-3:]
+            keep_same_dealer = len(self._rounds) < 3 or any(
+                r.dealer.identifier != current_dealer for r in self._rounds[-3:]
             )
             next_dealer = (
                 current_dealer
@@ -175,7 +189,7 @@ class Game:
 
     def __new_round(self, dealer: str) -> None:
         # TODO: need to figure out how to make sure this is stable without persisting each round
-        r_deck_seed = self.seed if not self.rounds else self.active_round.deck.seed
+        r_deck_seed = self.seed if not self._rounds else self.active_round.deck.seed
 
         deck = Deck(seed=str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4)))
 
@@ -187,7 +201,7 @@ class Game:
         )
         round_players.add_role(dealer, RoundRole.DEALER)
 
-        self.rounds.append(Round(players=round_players, deck=deck))
+        self._rounds.append(Round(players=round_players, deck=deck))
 
     def __score_history(self, to_round: int) -> list[Score]:
         """A list of all players' scores up to the provided round"""
@@ -197,9 +211,9 @@ class Game:
 
         all_final_scores = [
             score
-            for round in self.rounds[:to_round]
-            for score in round.scores
-            if round.status == RoundStatus.COMPLETED
+            for game_round in self._rounds[:to_round]
+            for score in game_round.scores
+            if game_round.status == RoundStatus.COMPLETED
         ]
 
         for score in all_final_scores:
