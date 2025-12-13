@@ -50,6 +50,7 @@ def __game(
     Will automate players based on the automated flag.
     """
 
+    # TODO: initialize these games by _passing_ moves rather than acting them here
     new_game = {
         RoundStatus.BIDDING: __get_bidding_game,
         RoundStatus.COMPLETED_NO_BIDDERS: __get_completed_no_bidders_game,
