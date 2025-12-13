@@ -71,7 +71,7 @@ def pass_round(game_to_pass: Game) -> None:
 def pass_to_dealer(game_to_pass: Game) -> None:
     """Pass the current round until reaching the dealer"""
     for player in filter(
-        lambda player: player != game_to_pass.active_round.dealer, game_to_pass.active_round.bidders
+        lambda p: p != game_to_pass.active_round.dealer, game_to_pass.active_round.bidders
     ):
         game_to_pass.act(Bid(player.identifier, BidAmount.PASS))
 

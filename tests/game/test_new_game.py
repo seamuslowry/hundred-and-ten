@@ -7,7 +7,6 @@ from hundredandten import Bid, BidAmount, RoundStatus
 from hundredandten.game import Game
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.round import Round
 from tests import arrange
 
 
@@ -29,23 +28,19 @@ class TestNewGame(TestCase):
             lambda: Game(Group(list(map(lambda identifier: Player(str(identifier)), range(5))))),
         )
 
-    def test_will_initialize_with_round(self):
+    def test_will_initialize_with_move(self):
         """Game will initialize with a round"""
         players = Group(list(map(lambda identifier: Player(str(identifier)), range(4))))
-        force_round = Round(
-            players=players,
-            bids=[Bid(amount=BidAmount.PASS, identifier="0")],
-        )
-        game = Game(players=players, rounds=[force_round])
+        game = Game(players=players, moves=[Bid(identifier=players[1].identifier, amount=BidAmount.FIFTEEN)])
 
-        self.assertEqual(force_round, game.active_round)
+        self.assertIsNotNone(game.active_round.active_bid)
 
-    def test_errors_if_rounds_cleared(self):
+    def test_will_initialize_with_no_moves(self):
         """Game with throw if round is cleared"""
         game = Game(players=Group(list(map(lambda identifier: Player(str(identifier)), range(4)))))
-        game.rounds = []
 
-        self.assertRaises(HundredAndTenError, lambda: game.active_round)
+        self.assertEqual(1, len(game.rounds))
+        self.assertIsNotNone(game.active_round)
 
     def test_generates_seed_when_none_passed(self):
         """Game defaults a seed if none is passed"""
