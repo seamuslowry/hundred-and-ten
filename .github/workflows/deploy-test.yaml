@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - test/*
+      - feat/v2
 
 jobs:
   get-tag:
