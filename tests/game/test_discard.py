@@ -25,7 +25,9 @@ class TestDiscard(TestCase):
         inactive_player = game.active_round.inactive_players[0]
 
         self.assertRaises(
-            HundredAndTenError, game.act, Discard(inactive_player.identifier, inactive_player.hand)
+            HundredAndTenError,
+            game.act,
+            Discard(inactive_player.identifier, inactive_player.hand),
         )
 
     def test_cant_discard_other_players_cards(self):

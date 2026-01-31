@@ -25,19 +25,28 @@ class TestNewGame(TestCase):
         """Game throws if initialized with five players"""
         self.assertRaises(
             HundredAndTenError,
-            lambda: Game(Group(list(map(lambda identifier: Player(str(identifier)), range(5))))),
+            lambda: Game(
+                Group(list(map(lambda identifier: Player(str(identifier)), range(5))))
+            ),
         )
 
     def test_will_initialize_with_move(self):
         """Game will initialize with a round"""
         players = Group(list(map(lambda identifier: Player(str(identifier)), range(4))))
-        game = Game(players=players, moves=[Bid(identifier=players[1].identifier, amount=BidAmount.FIFTEEN)])
+        game = Game(
+            players=players,
+            moves=[Bid(identifier=players[1].identifier, amount=BidAmount.FIFTEEN)],
+        )
 
         self.assertIsNotNone(game.active_round.active_bid)
 
     def test_will_initialize_with_no_moves(self):
         """Game with throw if round is cleared"""
-        game = Game(players=Group(list(map(lambda identifier: Player(str(identifier)), range(4)))))
+        game = Game(
+            players=Group(
+                list(map(lambda identifier: Player(str(identifier)), range(4)))
+            )
+        )
 
         self.assertEqual(1, len(game.rounds))
         self.assertIsNotNone(game.active_round)

@@ -75,7 +75,9 @@ class Group(list[Player]):
         if player:
             player.roles.discard(role)
 
-    def swap_role(self, source_identifier: str, dest_identifier: str, role: AnyRole) -> None:
+    def swap_role(
+        self, source_identifier: str, dest_identifier: str, role: AnyRole
+    ) -> None:
         """
         Swap a role from the source identifier to the destination identifier
         """
@@ -94,5 +96,7 @@ class Group(list[Player]):
         """
         player = self.by_identifier(identifier)
         if not self or not player:
-            raise HundredAndTenError(f"Unable to find player {offset} away from {identifier}.")
+            raise HundredAndTenError(
+                f"Unable to find player {offset} away from {identifier}."
+            )
         return self[(self.index(player) + offset) % len(self)]

@@ -75,7 +75,9 @@ class Game:
         if not self._rounds or self.active_round.status != RoundStatus.COMPLETED:
             return None
 
-        winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
+        winning_scores = [
+            score for score in self.score_history if score.value >= WINNING_SCORE
+        ]
         ordered_winning_players = list(
             map(
                 lambda score: self.active_round.players.by_identifier(score.identifier),
@@ -106,7 +108,11 @@ class Game:
                 ),
                 *game_round.events,
                 # don't include the round end event if it hasn't ended
-                *([RoundEnd(scores=self.__scores(index + 1))] if game_round.completed else []),
+                *(
+                    [RoundEnd(scores=self.__scores(index + 1))]
+                    if game_round.completed
+                    else []
+                ),
             ]
             for index, game_round in enumerate(self._rounds)
         ]
@@ -161,7 +167,10 @@ class Game:
         return self.active_round.suggestion()
 
     def __automated_act(self):
-        while isinstance(self.status, RoundStatus) and self.active_round.active_player.automate:
+        while (
+            isinstance(self.status, RoundStatus)
+            and self.active_round.active_player.automate
+        ):
             self.__act(self.__automated_action())
 
     def __automated_action(self) -> Action:
@@ -193,7 +202,9 @@ class Game:
 
     def __end_play(self):
         if self.status == RoundStatus.COMPLETED:
-            self.__new_round(self.players.after(self.active_round.dealer.identifier).identifier)
+            self.__new_round(
+                self.players.after(self.active_round.dealer.identifier).identifier
+            )
 
     def __new_round(self, dealer: str) -> None:
         r_deck_seed = hashlib.sha256(
@@ -204,7 +215,9 @@ class Game:
 
         round_players = Group(
             map(
-                lambda p: Player(p.identifier, hand=deck.draw(HAND_SIZE), automate=p.automate),
+                lambda p: Player(
+                    p.identifier, hand=deck.draw(HAND_SIZE), automate=p.automate
+                ),
                 self.players,
             )
         )

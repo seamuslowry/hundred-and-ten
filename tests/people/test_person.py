@@ -16,7 +16,9 @@ class TestPlayer(TestCase):
         self.assertEqual(
             Player(identifier),
             Player(
-                identifier, {RoundRole.DEALER}, hand=[Card(CardNumber.ACE, SelectableSuit.CLUBS)]
+                identifier,
+                {RoundRole.DEALER},
+                hand=[Card(CardNumber.ACE, SelectableSuit.CLUBS)],
             ),
         )
         self.assertNotEqual(Player("one"), Player("two"))

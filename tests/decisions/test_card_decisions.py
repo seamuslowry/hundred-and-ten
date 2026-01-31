@@ -17,7 +17,11 @@ class TestCardDecisions(TestCase):
         self.assertEqual(
             card,
             best_card(
-                [Card(CardNumber.FIVE, SelectableSuit.DIAMONDS), card, Card(CardNumber.ACE, suit)],
+                [
+                    Card(CardNumber.FIVE, SelectableSuit.DIAMONDS),
+                    card,
+                    Card(CardNumber.ACE, suit),
+                ],
                 suit,
             ),
         )
@@ -73,7 +77,9 @@ class TestCardDecisions(TestCase):
         self.assertEqual(
             card,
             worst_card_beating(
-                [Card(CardNumber.FIVE, suit), Card(CardNumber.JACK, suit), card], card_to_beat, suit
+                [Card(CardNumber.FIVE, suit), Card(CardNumber.JACK, suit), card],
+                card_to_beat,
+                suit,
             ),
         )
 

@@ -21,7 +21,9 @@ class TestNextPlay(TestCase):
 
         players = Group([Player("1")])
 
-        self.assertRaises(HundredAndTenError, players.after, players[0].identifier + "bad")
+        self.assertRaises(
+            HundredAndTenError, players.after, players[0].identifier + "bad"
+        )
 
     def test_after_with_one_player(self):
         """Determines the next player in a list of 1"""

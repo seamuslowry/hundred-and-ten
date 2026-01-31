@@ -24,7 +24,9 @@ class TestEndBidding(TestCase):
         game = arrange.game(RoundStatus.TRUMP_SELECTION)
 
         self.assertEqual(game.status, RoundStatus.TRUMP_SELECTION)
-        self.assertEqual(game.active_round.active_player, game.active_round.active_bidder)
+        self.assertEqual(
+            game.active_round.active_player, game.active_round.active_bidder
+        )
 
     def test_cannot_bid_after_bidding_stage(self):
         """Bidding can only occur in the bidding stage"""
@@ -54,7 +56,9 @@ class TestEndBidding(TestCase):
 
         self.assertEqual(0, len(game.active_round.bids))
 
-        for player in list(filter(lambda p: p != game.active_round.active_player, game.players)):
+        for player in list(
+            filter(lambda p: p != game.active_round.active_player, game.players)
+        ):
             game.act(Bid(player.identifier, BidAmount.PASS))
 
         self.assertEqual(0, len(game.active_round.bids))

@@ -33,7 +33,8 @@ class Trick:
         )
 
         weak_trump_winner = self.__winning_play(
-            lambda play: play.card.suit == self.weak_trump, lambda play: play.card.weak_trump_value
+            lambda play: play.card.suit == self.weak_trump,
+            lambda play: play.card.weak_trump_value,
         )
 
         return strong_trump_winner or weak_trump_winner

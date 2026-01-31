@@ -17,7 +17,9 @@ class TestBidding(TestCase):
         game = arrange.game(RoundStatus.BIDDING)
 
         # remove dealer role to put game in invalid state to verify error
-        game.active_round.players.remove_role(game.active_round.dealer.identifier, RoundRole.DEALER)
+        game.active_round.players.remove_role(
+            game.active_round.dealer.identifier, RoundRole.DEALER
+        )
 
         self.assertRaises(HundredAndTenError, lambda: game.active_round.dealer)
 
@@ -94,7 +96,9 @@ class TestBidding(TestCase):
         once_active_player = game.active_round.active_player.identifier
         game.act(Bid(once_active_player, BidAmount.PASS))
 
-        self.assertRaises(HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN))
+        self.assertRaises(
+            HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN)
+        )
 
     def test_bid_from_inactive_player(self):
         """Inactive player cannot place a bid"""
@@ -129,13 +133,17 @@ class TestBidding(TestCase):
         game.act(Unpass(game.active_round.inactive_players[0].identifier))
 
         self.assertEqual(0, len(game.active_round.bids))
-        self.assertNotIn(RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles)
+        self.assertNotIn(
+            RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles
+        )
 
     def test_prepass(self):
         """When the next player has prepassed, auto pass for them"""
         game = arrange.game(RoundStatus.BIDDING)
 
-        next_player = game.active_round.players.after(game.active_round.active_player.identifier)
+        next_player = game.active_round.players.after(
+            game.active_round.active_player.identifier
+        )
 
         game.act(Bid(next_player.identifier, BidAmount.PASS))
 
@@ -145,7 +153,9 @@ class TestBidding(TestCase):
 
         self.assertEqual(2, len(game.active_round.bids))
         self.assertEqual(RoundStatus.BIDDING, game.status)
-        self.assertEqual(0, len(game.active_round.players.by_role(RoundRole.PRE_PASSED)))
+        self.assertEqual(
+            0, len(game.active_round.players.by_role(RoundRole.PRE_PASSED))
+        )
         self.assertIn(game.active_round.active_player, game.active_round.bidders)
         # play will have passed the previously "next" player since they pre-passed
         self.assertNotEqual(game.active_round.active_player, next_player)

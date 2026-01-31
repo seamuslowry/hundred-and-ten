@@ -92,7 +92,8 @@ class TestPlayCard(TestCase):
             HundredAndTenError,
             game.act,
             Play(
-                game.active_round.active_player.identifier, game.active_round.active_player.hand[0]
+                game.active_round.active_player.identifier,
+                game.active_round.active_player.hand[0],
             ),
         )
 
@@ -120,7 +121,8 @@ class TestPlayCard(TestCase):
 
         game.act(
             Play(
-                game.active_round.active_player.identifier, game.active_round.active_player.hand[0]
+                game.active_round.active_player.identifier,
+                game.active_round.active_player.hand[0],
             )
         )
 
@@ -136,7 +138,9 @@ class TestPlayCard(TestCase):
         assert winning_play
 
         self.assertEqual(2, len(game.active_round.tricks))
-        self.assertEqual(winning_play.identifier, game.active_round.active_player.identifier)
+        self.assertEqual(
+            winning_play.identifier, game.active_round.active_player.identifier
+        )
 
     def test_play_through_round(self):
         """A new round is created after all tricks are played"""

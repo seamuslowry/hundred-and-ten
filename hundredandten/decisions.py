@@ -38,8 +38,12 @@ def best_card(cards: list[Card], trump: Optional[SelectableSuit]) -> Card:
 
 def worst_card(cards: list[Card], trump: Optional[SelectableSuit]) -> Card:
     """Return the worst card in the list of cards"""
-    worst_non_trump = min(non_trumps(cards, trump), key=lambda c: c.weak_trump_value, default=None)
-    worst_trump = min(trumps(cards, trump), key=lambda c: c.trump_value, default=cards[0])
+    worst_non_trump = min(
+        non_trumps(cards, trump), key=lambda c: c.weak_trump_value, default=None
+    )
+    worst_trump = min(
+        trumps(cards, trump), key=lambda c: c.trump_value, default=cards[0]
+    )
 
     return worst_non_trump or worst_trump
 
@@ -86,7 +90,9 @@ def non_trumps(cards: list[Card], trump: Optional[SelectableSuit]) -> list[Card]
 
 def __bid_value(cards: list[Card]) -> int:
     """Returns the bid value for a list of cards, assuming they are all trump"""
-    discouragement = -10 if CardNumber.FIVE not in list(map(lambda c: c.number, cards)) else 0
+    discouragement = (
+        -10 if CardNumber.FIVE not in list(map(lambda c: c.number, cards)) else 0
+    )
 
     return sum(map(lambda card: card.trump_value, cards)) + discouragement
 
@@ -99,7 +105,8 @@ def __most_valuable_suit(cards: list[Card]) -> tuple[SelectableSuit, int]:
 def __suits_by_value(cards: list[Card]) -> dict[SelectableSuit, int]:
     """Return a list of each suit with a numeric value of how much trump it has"""
     return {
-        suit: __bid_value(grouped_cards) for suit, grouped_cards in __cards_by_suit(cards).items()
+        suit: __bid_value(grouped_cards)
+        for suit, grouped_cards in __cards_by_suit(cards).items()
     }
 
 

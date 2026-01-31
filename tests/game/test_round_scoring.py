@@ -108,7 +108,10 @@ class TestRoundScoring(TestCase):
         assert game.active_round.active_bidder
 
         game.active_round.bids.append(
-            Bid(identifier=game.active_round.active_bidder.identifier, amount=BidAmount.TWENTY)
+            Bid(
+                identifier=game.active_round.active_bidder.identifier,
+                amount=BidAmount.TWENTY,
+            )
         )
 
         arrange.play_round(game)
