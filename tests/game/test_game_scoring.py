@@ -9,15 +9,15 @@ from tests import arrange
 # tests in this file run off of seeded games to avoid setting up everything necessary for the tests
 # seeds and their expected values in different situations are recorded here
 
-PLAYER_3_WIN_SEED = "ba297348-77d7-42bb-9164-03712b05ba21"
-BIDDER_WINS_IN_DISPUTE_SEED = "c3f48eea-3f7e-42f5-bd54-8504d759e3d5"
-FIRST_TO_SCORE_WINS_IN_DISPUTE_SEED = "ae1f037b-6b39-474e-99f3-6468be19bfd5"
+PLAYER_0_WIN_SEED = "ba297348-77d7-42bb-9164-03712b05ba21"
+BIDDER_WINS_IN_DISPUTE_SEED = "cc710b75-f7f5-4c6f-ba6d-4406c3735087"
+FIRST_TO_SCORE_WINS_IN_DISPUTE_SEED = "2eb541a3-3160-4b02-a113-efea10a2c2c6"
 
 
 SEEDS_TO_SCORES = {
-    PLAYER_3_WIN_SEED: {"0": 10, "1": -5, "2": 15, "3": 115},
-    BIDDER_WINS_IN_DISPUTE_SEED: {"0": 120, "1": 0, "2": 115, "3": 80},
-    FIRST_TO_SCORE_WINS_IN_DISPUTE_SEED: {"0": 55, "1": 110, "2": 50, "3": 110},
+    PLAYER_0_WIN_SEED: {"0": 110, "1": 60, "2": 35, "3": 30},
+    BIDDER_WINS_IN_DISPUTE_SEED: {"0": 60, "1": 115, "2": 110, "3": 50},
+    FIRST_TO_SCORE_WINS_IN_DISPUTE_SEED: {"0": 115, "1": 115, "2": 70, "3": 50},
 }
 
 
@@ -33,7 +33,7 @@ class TestGameScoring(TestCase):
 
     def test_win_at_winning_score(self):
         """At the end of the game, the winner has 110"""
-        seed = PLAYER_3_WIN_SEED
+        seed = PLAYER_0_WIN_SEED
         game = arrange.game(GameStatus.WON, seed=seed)
 
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores)

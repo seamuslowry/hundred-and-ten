@@ -65,5 +65,5 @@ class TestGameEvents(TestCase):
         game = arrange.game(GameStatus.WON, seed=PLAYER_3_WIN_SEED)
         events = game.events
 
-        self.assertEqual(len(events), 330)  # known from seed
+        self.assertEqual(len(events), 781)  # known from seed
         self.assertTrue(isinstance(events[-1], GameEnd))

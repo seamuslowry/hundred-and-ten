@@ -11,33 +11,43 @@ from tests import arrange
 # seeds and their expected values in different situations are recorded here
 BIDDER_GOES_BACK_SEED = "57eaf68e-1c52-4a34-a1e1-1a12905c5069"
 TWO_FIFTEENS_SEED = "5b46ca51-5967-4a9e-b894-c9886ba1794b"
-SHOOT_THE_MOON_SEED = "ba2acf5d-3dbf-48d6-9cf3-b0cf353384d5"
+SHOOT_THE_MOON_SEED = "c60b633d-af6e-4715-be71-02c285bfea07"
 
 SEEDS_TO_SCORES = {
     BIDDER_GOES_BACK_SEED: {
         BidAmount.FIFTEEN: [
             Score("1", -15),
-            Score("2", 10),
             Score("0", 5),
+            Score("3", 5),
             Score("3", 5),
             Score("3", 5),
         ]
     },
     TWO_FIFTEENS_SEED: {
         BidAmount.FIFTEEN: [
-            Score("0", 10),
+            Score("1", 10),
+            Score("3", 5),
             Score("1", 5),
-            Score("1", 5),
-            Score("1", 5),
-            Score("0", 5),
+            Score("3", 5),
+            Score("3", 5),
         ],
-        BidAmount.TWENTY: [Score("1", -20), Score("0", 10), Score("0", 5)],
-        BidAmount.SHOOT_THE_MOON: [Score("1", -60), Score("0", 10), Score("0", 5)],
+        BidAmount.TWENTY: [
+            Score("1", -20),
+            Score("3", 5),
+            Score("3", 5),
+            Score("3", 5),
+        ],
+        BidAmount.SHOOT_THE_MOON: [
+            Score("1", -60),
+            Score("3", 5),
+            Score("3", 5),
+            Score("3", 5),
+        ],
     },
     SHOOT_THE_MOON_SEED: {
         BidAmount.FIFTEEN: [
-            Score("1", 5),
             Score("1", 10),
+            Score("1", 5),
             Score("1", 5),
             Score("1", 5),
             Score("1", 5),
@@ -80,8 +90,7 @@ class TestRoundScoring(TestCase):
         assert old_round.active_bid
         self.assertEqual(
             [
-                Score(old_round.active_bidder.identifier, 5),
-                Score(old_round.active_bidder.identifier, 5),
+                Score(old_round.active_bidder.identifier, 10),
                 Score(old_round.active_bidder.identifier, 5),
             ],
             [
@@ -156,20 +165,7 @@ class TestRoundScoring(TestCase):
 
         assert old_round.active_bidder
         assert old_round.active_bid
-        self.assertEqual(
-            [
-                Score(old_round.active_bidder.identifier, 5),
-                Score(old_round.active_bidder.identifier, 10),
-                Score(old_round.active_bidder.identifier, 5),
-                Score(old_round.active_bidder.identifier, 5),
-                Score(old_round.active_bidder.identifier, 5),
-            ],
-            [
-                score
-                for score in old_round.scores
-                if score.identifier == old_round.active_bidder.identifier
-            ],
-        )
+        self.assertEqual(30, game.scores[old_round.active_bidder.identifier])
         self.assertEqual(SEEDS_TO_SCORES[seed][old_round.active_bid], old_round.scores)
 
     def test_lose_shoot_the_moon(self):

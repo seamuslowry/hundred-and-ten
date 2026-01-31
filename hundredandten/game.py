@@ -1,5 +1,6 @@
 """Represent a game of Hundred and Ten"""
 
+import hashlib
 from dataclasses import dataclass, field
 from functools import reduce
 from random import Random
@@ -45,7 +46,6 @@ class Game:
         for move in self.moves:
             self.act(move)
 
-
         self.__automated_act()
 
     @property
@@ -57,6 +57,7 @@ class Game:
 
     @property
     def rounds(self) -> Sequence[Round]:
+        """All the rounds in the game, ordered"""
         return tuple(self._rounds)
 
     @property
@@ -131,7 +132,14 @@ class Game:
         key: player identifier
         value: the player's score
         """
-        return [self.__scores(round_num) for round_num in range(len(self._rounds) + 1)]
+        return [
+            self.__scores(round_num)
+            for round_num in range(
+                len(self._rounds)
+                # get the score "after" the round if it is completed
+                + (self.active_round.status == RoundStatus.COMPLETED)
+            )
+        ]
 
     @property
     def scores(self) -> dict[str, int]:
@@ -188,8 +196,9 @@ class Game:
             self.__new_round(self.players.after(self.active_round.dealer.identifier).identifier)
 
     def __new_round(self, dealer: str) -> None:
-        # TODO: need to figure out how to make sure this is stable without persisting each round
-        r_deck_seed = self.seed if not self._rounds else self.active_round.deck.seed
+        r_deck_seed = hashlib.sha256(
+            f"deck-seed|{self.seed}|round:{len(self._rounds)}".encode()
+        ).hexdigest()
 
         deck = Deck(seed=str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4)))
 
