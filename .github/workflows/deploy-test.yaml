@@ -24,6 +24,6 @@ jobs:
     uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
     with:
       repo: testpypi
-      release-version: "${{ needs.get-tag.outputs.tag }}-${{ github.run_number }}"
+      release-version: "${{ needs.get-tag.outputs.tag }}.dev${{ github.run_number }}"
     secrets:
       py_pi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
