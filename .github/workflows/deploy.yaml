@@ -6,15 +6,79 @@ on:
       - main
 
 jobs:
+  check-release-type:
+    runs-on: ubuntu-latest
+    outputs:
+      is_post: ${{ steps.check.outputs.is_post }}
+    steps:
+      - name: Check if post release
+        id: check
+        run: |
+          if [[ "${{ github.event.head_commit.message }}" == \#post* ]]; then
+            echo "is_post=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_post=false" >> $GITHUB_OUTPUT
+          fi
+
   tag-new-version:
+    needs: check-release-type
+    if: needs.check-release-type.outputs.is_post == 'false'
     uses: seamuslowry/workflows/.github/workflows/tag.yml@main
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
 
+  tag-post-version:
+    needs: check-release-type
+    if: needs.check-release-type.outputs.is_post == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.create-tag.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest base tag and create post release
+        id: create-tag
+        run: |
+          # Get the latest tag that is NOT a post release
+          LATEST_BASE_TAG=$(git tag --list --sort=-v:refname | grep -v '\.post' | head -n 1)
+
+          if [ -z "$LATEST_BASE_TAG" ]; then
+            echo "No base tag found, cannot create post release"
+            exit 1
+          fi
+
+          echo "Latest base tag: $LATEST_BASE_TAG"
+
+          # Find existing post releases for this base tag
+          LATEST_POST=$(git tag --list "${LATEST_BASE_TAG}.post*" --sort=-v:refname | head -n 1)
+
+          if [ -z "$LATEST_POST" ]; then
+            # No post releases yet, create .post1
+            NEW_TAG="${LATEST_BASE_TAG}.post1"
+          else
+            # Extract the post number and increment
+            POST_NUM=$(echo "$LATEST_POST" | sed "s/${LATEST_BASE_TAG}\.post//")
+            NEW_POST_NUM=$((POST_NUM + 1))
+            NEW_TAG="${LATEST_BASE_TAG}.post${NEW_POST_NUM}"
+          fi
+
+          echo "Creating new tag: $NEW_TAG"
+          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+
+          # Create and push the tag
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$NEW_TAG"
+          git push origin "$NEW_TAG"
+
   publish:
-    needs: tag-new-version
+    needs: [check-release-type, tag-new-version, tag-post-version]
+    if: always() && (needs.tag-new-version.result == 'success' || needs.tag-post-version.result == 'success')
     uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
     with:
-      release-version: ${{ needs.tag-new-version.outputs.tag }}
+      release-version: ${{ needs.tag-new-version.outputs.tag || needs.tag-post-version.outputs.tag }}
     secrets:
       py_pi_token: ${{ secrets.PYPI_API_TOKEN }}
