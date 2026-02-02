@@ -44,7 +44,7 @@ class Game:
         self.__new_round(self.players[0].identifier)
 
         for move in self.moves:
-            self.act(move)
+            self.__act(move)  # don't trigger automation for already made moves
 
         self.__automated_act()
 
