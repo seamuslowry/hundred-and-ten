@@ -361,7 +361,7 @@ All players in the game must have a unique string identifier. They may also have
 - `GameRole.ORGANIZER`: This person is organizing the game. They have no more inherent permissions than any other player within the engine, but they can be tracked if consumers want to give them additional permissions.
 - `GameRole.PLAYER`: This person is attached to the game and will be playing if or once the game begins.
 - `GameRole.INVITEE`: This person is attached to the game as an invitee and will be able to join the game even if the accessibility is set to private.
-- `RoundRole.DEALER`: This player is acting as the dealer for the current round. This role is only attached to persons/players at the round level, not the game level. This role describes the invividual as the dealer and does offer inherent play differences as described in the [rules](#how-to-play).
+- `RoundRole.DEALER`: This player is acting as the dealer for the current round. This role is only attached to persons/players at the round level, not the game level. This role describes the individual as the dealer and does offer inherent play differences as described in the [rules](#how-to-play).
 - `RoundRole.PRE_PASSED`: This player has elected to pass before their bidding turn. When play reaches them, they will perform a pass action automatically.
 
 ## Inviting, Joining, and Leaving
