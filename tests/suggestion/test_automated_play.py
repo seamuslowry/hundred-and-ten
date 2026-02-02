@@ -23,3 +23,5 @@ class TestAutomatedPlay(TestCase):
         game = arrange.game(GameStatus.WON, seed=AUTOMATED_SEED)
 
         self.assertRaises(HundredAndTenError, game.suggestion)
+
+    # TODO: add a test for a game with all automated players and a list of moves _that weren't from suggestions_ (real -> automated players)
