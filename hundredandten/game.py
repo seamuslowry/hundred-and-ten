@@ -29,7 +29,7 @@ class Game:
     """A game of Hundred and Ten"""
 
     players: Group = field(default_factory=Group)
-    moves: list[Action] = field(default_factory=list)
+    moves: list[Action] = field(default_factory=list)  # TODO: initvar
     seed: str = field(default_factory=lambda: str(uuid4()))
 
     _rounds: list[Round] = field(default_factory=list, init=False, repr=False)
