@@ -9,7 +9,7 @@ updates:
       time: "14:00"
       timezone: "America/New_York"
     commit-message:
-      prefix: '#post'
+      prefix: '#none'
     groups:
       dev-dependencies:
         dependency-type: "development"
