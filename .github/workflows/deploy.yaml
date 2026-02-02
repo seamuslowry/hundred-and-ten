@@ -23,7 +23,7 @@ jobs:
 
   publish:
     needs: tag-new-version
-    if: needs.tag-new-version.outputs.old_tag
+    if: needs.tag-new-version.outputs.old_tag != needs.tag-new-version.outputs.new_tag
     uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
     with:
       release-version: ${{ needs.tag-new-version.outputs.tag }}
