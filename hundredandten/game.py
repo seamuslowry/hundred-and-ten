@@ -1,7 +1,7 @@
 """Represent a game of Hundred and Ten"""
 
 import hashlib
-from dataclasses import dataclass, field
+from dataclasses import InitVar, dataclass, field
 from functools import reduce
 from random import Random
 from typing import Optional, Sequence
@@ -29,12 +29,12 @@ class Game:
     """A game of Hundred and Ten"""
 
     players: Group = field(default_factory=Group)
-    moves: list[Action] = field(default_factory=list)  # TODO: initvar
     seed: str = field(default_factory=lambda: str(uuid4()))
+    moves: InitVar[Optional[list[Action]]] = field(default=None)
 
     _rounds: list[Round] = field(default_factory=list, init=False, repr=False)
 
-    def __post_init__(self):
+    def __post_init__(self, moves: Optional[list[Action]]):
         if len(self.players) < 2:
             raise HundredAndTenError("Cannot have a game with less than 2 players")
         if len(self.players) > 4:
@@ -43,7 +43,7 @@ class Game:
         # manually create the first round
         self.__new_round(self.players[0].identifier)
 
-        for move in self.moves:
+        for move in moves or []:
             self.__act(move)  # don't trigger automation for already made moves
 
         self.__automated_act()
