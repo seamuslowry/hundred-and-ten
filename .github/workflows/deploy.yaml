@@ -2,14 +2,24 @@ name: Tag and Publish
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
 
 jobs:
   tag-new-version:
     uses: seamuslowry/workflows/.github/workflows/tag.yml@main
     secrets:
       gh_token: ${{ secrets.GITHUB_TOKEN }}
+
+  debug-outputs:
+    needs: tag-new-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo tag outputs
+        run: |
+          echo "tag='${{ needs.tag-new-version.outputs.tag }}'"
+          echo "old_tag='${{ needs.tag-new-version.outputs.old_tag }}'"
+          echo "new_tag='${{ needs.tag-new-version.outputs.new_tag }}'"
 
   publish:
     needs: tag-new-version
