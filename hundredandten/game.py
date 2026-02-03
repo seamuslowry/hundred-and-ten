@@ -30,11 +30,11 @@ class Game:
 
     players: Group = field(default_factory=Group)
     seed: str = field(default_factory=lambda: str(uuid4()))
-    moves: InitVar[Optional[list[Action]]] = field(default=None)
+    initial_moves: InitVar[Optional[list[Action]]] = field(default=None)
 
     _rounds: list[Round] = field(default_factory=list, init=False, repr=False)
 
-    def __post_init__(self, moves: Optional[list[Action]]):
+    def __post_init__(self, initial_moves: Optional[list[Action]]):
         if len(self.players) < 2:
             raise HundredAndTenError("Cannot have a game with less than 2 players")
         if len(self.players) > 4:
@@ -43,7 +43,7 @@ class Game:
         # manually create the first round
         self.__new_round(self.players[0].identifier)
 
-        for move in moves or []:
+        for move in initial_moves or []:
             self.__act(move)  # don't trigger automation for already made moves
 
         self.__automated_act()
@@ -92,6 +92,11 @@ class Game:
         )
 
         return winner
+
+    @property
+    def moves(self) -> list[Action]:
+        """All moves that have been played in the game."""
+        return [move for move in self.events if isinstance(move, Action)]
 
     @property
     def events(self) -> list[Event]:
