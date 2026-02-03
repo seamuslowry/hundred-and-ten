@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.constants import RoundRole
-from hundredandten.group import Group, Player
+from hundredandten.group import RoundGroup, RoundPlayer
 
 
 class TestPeopleRoles(TestCase):
@@ -12,7 +12,7 @@ class TestPeopleRoles(TestCase):
     def test_add_role_with_no_players(self):
         """Does nothing when adding a role to a player an in empty list"""
 
-        players = Group([])
+        players = RoundGroup([])
         players.add_role("any", RoundRole.DEALER)
 
         self.assertEqual(0, len(players))
@@ -20,9 +20,9 @@ class TestPeopleRoles(TestCase):
     def test_add_role_to_player_with_no_roles(self):
         """Adds a role to a player with no roles"""
 
-        player = Player("id")
+        player = RoundPlayer("id")
         role = RoundRole.DEALER
-        players = Group([player])
+        players = RoundGroup([player])
         players.add_role(player.identifier, role)
 
         self.assertEqual(1, len(players))
@@ -31,9 +31,9 @@ class TestPeopleRoles(TestCase):
     def test_add_role_to_player_with_existing_roles(self):
         """Adds a role to a player with existing roles"""
 
-        player = Player("id", {RoundRole.DEALER})
+        player = RoundPlayer("id", roles={RoundRole.DEALER})
         role = RoundRole.PRE_PASSED
-        players = Group([player])
+        players = RoundGroup([player])
         players.add_role(player.identifier, role)
 
         self.assertEqual(1, len(players))
@@ -43,7 +43,7 @@ class TestPeopleRoles(TestCase):
     def test_remove_role_with_no_players(self):
         """Does nothing when removing a role from a player an in empty list"""
 
-        players = Group([])
+        players = RoundGroup([])
         players.remove_role("any", RoundRole.DEALER)
 
         self.assertEqual(0, len(players))
@@ -51,9 +51,9 @@ class TestPeopleRoles(TestCase):
     def test_remove_role_from_player_with_no_roles(self):
         """Removes a role from a player with no roles"""
 
-        player = Player("id")
+        player = RoundPlayer("id")
         role = RoundRole.DEALER
-        players = Group([player])
+        players = RoundGroup([player])
         players.remove_role(player.identifier, role)
 
         self.assertEqual(1, len(players))
@@ -65,8 +65,8 @@ class TestPeopleRoles(TestCase):
         initial_roles = {RoundRole.PRE_PASSED, RoundRole.DEALER}
         initial_len = len(initial_roles)
         remove_role = next(iter(initial_roles))
-        player = Player("id", initial_roles)
-        players = Group([player])
+        player = RoundPlayer("id", roles=initial_roles)
+        players = RoundGroup([player])
         players.remove_role(player.identifier, remove_role)
 
         self.assertEqual(1, len(players))
@@ -77,9 +77,9 @@ class TestPeopleRoles(TestCase):
         """Swaps a role between players"""
 
         role = RoundRole.DEALER
-        player_one = Player("one", {role})
-        player_two = Player("two")
-        players = Group([player_one, player_two])
+        player_one = RoundPlayer("one", roles={role})
+        player_two = RoundPlayer("two")
+        players = RoundGroup([player_one, player_two])
 
         self.assertIn(role, players[0].roles)
         self.assertNotIn(role, players[1].roles)

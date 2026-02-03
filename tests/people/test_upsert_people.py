@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.constants import RoundRole
-from hundredandten.group import Group, Player
+from hundredandten.group import Group, Player, RoundPlayer
 
 
 class TestUpsertPlayers(TestCase):
@@ -39,8 +39,8 @@ class TestUpsertPlayers(TestCase):
         """Upsert a player that is in the list but has no roles"""
 
         identifier = "1"
-        player = Player(identifier)
-        player_with_roles = Player(identifier, {RoundRole.DEALER})
+        player = RoundPlayer(identifier)
+        player_with_roles = RoundPlayer(identifier, roles={RoundRole.DEALER})
         players = Group([player])
 
         pre_len = len(players)
@@ -55,8 +55,8 @@ class TestUpsertPlayers(TestCase):
         """Upsert a player that is in the list but has different roles"""
 
         identifier = "1"
-        player_player = Player(identifier, {RoundRole.DEALER})
-        player_prepassed = Player(identifier, {RoundRole.PRE_PASSED})
+        player_player = RoundPlayer(identifier, roles={RoundRole.DEALER})
+        player_prepassed = RoundPlayer(identifier, roles={RoundRole.PRE_PASSED})
         players = Group([player_player])
 
         pre_len = len(players)
@@ -71,8 +71,8 @@ class TestUpsertPlayers(TestCase):
         """Upsert a player that is not in the list"""
 
         identifier = "p"
-        player = Player(identifier)
-        new_player = Player(identifier, {RoundRole.PRE_PASSED})
+        player = RoundPlayer(identifier)
+        new_player = RoundPlayer(identifier, roles={RoundRole.PRE_PASSED})
         players = Group([Player("1"), player, Player("2")])
         pre_len = len(players)
         pre_index = players.index(player)

@@ -18,7 +18,7 @@ from hundredandten.constants import (
 )
 from hundredandten.deck import Deck
 from hundredandten.events import Event, GameEnd, GameStart, RoundEnd, RoundStart
-from hundredandten.group import Group, Player
+from hundredandten.group import Group, Player, RoundGroup, RoundPlayer
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
 from hundredandten.trick import Score
@@ -218,9 +218,9 @@ class Game:
 
         deck = Deck(seed=str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4)))
 
-        round_players = Group(
+        round_players = RoundGroup(
             map(
-                lambda p: Player(
+                lambda p: RoundPlayer(
                     p.identifier, hand=deck.draw(HAND_SIZE), automate=p.automate
                 ),
                 self.players,

@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from hundredandten.constants import CardNumber, RoundRole, SelectableSuit
 from hundredandten.deck import Card
-from hundredandten.group import Player
+from hundredandten.group import Player, RoundPlayer
 
 
 class TestPlayer(TestCase):
@@ -15,9 +15,19 @@ class TestPlayer(TestCase):
         identifier = "1"
         self.assertEqual(
             Player(identifier),
-            Player(
+            Player(identifier, automate=True),
+        )
+        self.assertNotEqual(Player("one"), Player("two"))
+
+    def test_round_players_equal_by_identifier_only(self):
+        """When checking ifround  players are equal, only the identifier matters"""
+        identifier = "1"
+        self.assertEqual(
+            RoundPlayer(identifier),
+            RoundPlayer(
                 identifier,
-                {RoundRole.DEALER},
+                automate=True,
+                roles={RoundRole.DEALER},
                 hand=[Card(CardNumber.ACE, SelectableSuit.CLUBS)],
             ),
         )

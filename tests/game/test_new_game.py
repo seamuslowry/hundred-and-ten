@@ -35,7 +35,9 @@ class TestNewGame(TestCase):
         players = Group(list(map(lambda identifier: Player(str(identifier)), range(4))))
         game = Game(
             players=players,
-            initial_moves=[Bid(identifier=players[1].identifier, amount=BidAmount.FIFTEEN)],
+            initial_moves=[
+                Bid(identifier=players[1].identifier, amount=BidAmount.FIFTEEN)
+            ],
         )
 
         self.assertIsNotNone(game.active_round.active_bid)

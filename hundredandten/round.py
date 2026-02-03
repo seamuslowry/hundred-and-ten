@@ -30,7 +30,7 @@ from hundredandten.decisions import (
 )
 from hundredandten.deck import Card, Deck
 from hundredandten.events import Event, TrickEnd, TrickStart
-from hundredandten.group import Group, Player
+from hundredandten.group import RoundGroup, RoundPlayer
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.trick import Score, Trick
 
@@ -39,7 +39,7 @@ from hundredandten.trick import Score, Trick
 class Round:
     """A round in the game of Hundred and Ten"""
 
-    players: Group = field(default_factory=Group)
+    players: RoundGroup = field(default_factory=RoundGroup)
     bids: list[Bid] = field(default_factory=list)
     selection: Optional[SelectTrump] = None
     discards: list[DetailedDiscard] = field(default_factory=list)
@@ -47,7 +47,7 @@ class Round:
     deck: Deck = field(default_factory=Deck)
 
     @property
-    def dealer(self) -> Player:
+    def dealer(self) -> RoundPlayer:
         """The dealer this round."""
         dlr = next(iter(self.players.by_role(RoundRole.DEALER)), None)
         if not dlr:
@@ -55,7 +55,7 @@ class Round:
         return dlr
 
     @property
-    def active_player(self) -> Player:
+    def active_player(self) -> RoundPlayer:
         """The current active player."""
         # while bidding, the active player is the one after the last bidder that can place a bid
         if self.status == RoundStatus.BIDDING:
@@ -63,7 +63,7 @@ class Round:
             last_bidder = (
                 self.dealer.identifier if not self.bids else self.bids[-1].identifier
             )
-            active_and_last_bidders = Group(
+            active_and_last_bidders = RoundGroup(
                 [
                     p
                     for p in self.players
@@ -107,9 +107,9 @@ class Round:
         )
 
     @property
-    def inactive_players(self) -> Group:
+    def inactive_players(self) -> RoundGroup:
         """The players that are not active."""
-        return Group([p for p in self.players if p != self.active_player])
+        return RoundGroup([p for p in self.players if p != self.active_player])
 
     @property
     def active_bid(self) -> Optional[BidAmount]:
@@ -117,9 +117,9 @@ class Round:
         return max(self.bids).amount if self.bids else None
 
     @property
-    def bidders(self) -> Group:
+    def bidders(self) -> RoundGroup:
         """Anyone in this round that can still submit a bid."""
-        return Group(
+        return RoundGroup(
             [
                 p
                 for p in self.players
@@ -128,7 +128,7 @@ class Round:
         )
 
     @property
-    def active_bidder(self) -> Optional[Player]:
+    def active_bidder(self) -> Optional[RoundPlayer]:
         """The active bidder this round."""
 
         if not self.active_bid or len(self.bidders) != 1:
@@ -358,7 +358,7 @@ class Round:
 
     def original_hand(self, identifier: str) -> list[Card]:
         """Return the identified player's original hand"""
-        player = self.players.find_or_use(Player(identifier))
+        player = self.players.find_or_use(RoundPlayer(identifier))
         discard = next((d for d in self.discards if d.identifier == identifier), None)
 
         return discard.cards + discard.kept if discard else player.hand
@@ -450,7 +450,7 @@ class Round:
 
     def __is_available_bid(self, identifier: str, amount: BidAmount) -> bool:
         """Determine if the listed bid amount is available to the listed player"""
-        player = self.players.find_or_use(Player(identifier))
+        player = self.players.find_or_use(RoundPlayer(identifier))
         return (
             # the identified player must be able to submit a bid
             (player in self.bidders and RoundRole.PRE_PASSED not in player.roles)
