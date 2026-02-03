@@ -2,7 +2,10 @@
 
 from unittest import TestCase
 
-from hundredandten.constants import GameStatus
+from hundredandten.actions import Action, Bid
+from hundredandten.constants import BidAmount, GameStatus
+from hundredandten.game import Game
+from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from tests import arrange
 
@@ -24,4 +27,44 @@ class TestAutomatedPlay(TestCase):
 
         self.assertRaises(HundredAndTenError, game.suggestion)
 
-    # TODO: add a test for a game with all automated players and a list of moves _that weren't from suggestions_ (real -> automated players)
+    def test_initial_moves_dont_automate(self):
+        """When starting a game with automated players, initial moves do not trigger automation"""
+        automated_game_from_start = Game(
+            seed=AUTOMATED_SEED,
+            players=Group(
+                [
+                    Player(identifier="unautomated", automate=True),
+                    Player(identifier="automated1", automate=True),
+                    Player(identifier="automated2", automate=True),
+                    Player(identifier="automated3", automate=True),
+                ]
+            ),
+        )
+
+        initial_moves: list[Action] = [
+            Bid(identifier="automated1", amount=BidAmount.FIFTEEN),
+            Bid(identifier="automated2", amount=BidAmount.TWENTY),
+            Bid(identifier="automated3", amount=BidAmount.TWENTY_FIVE),
+            Bid(identifier="unautomated", amount=BidAmount.PASS),
+            Bid(identifier="automated1", amount=BidAmount.SHOOT_THE_MOON),
+        ]
+
+        automated_game_after_start = Game(
+            seed=AUTOMATED_SEED,
+            players=Group(
+                [
+                    Player(identifier="unautomated", automate=True),
+                    Player(identifier="automated1", automate=True),
+                    Player(identifier="automated2", automate=True),
+                    Player(identifier="automated3", automate=True),
+                ]
+            ),
+            initial_moves=initial_moves,
+        )
+
+        self.assertEqual(
+            initial_moves, automated_game_after_start.moves[: len(initial_moves)]
+        )
+        self.assertNotEqual(
+            initial_moves, automated_game_from_start.moves[: len(initial_moves)]
+        )
