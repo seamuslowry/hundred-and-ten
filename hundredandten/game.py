@@ -14,11 +14,10 @@ from hundredandten.constants import (
     GameStatus,
     RoundStatus,
 )
-from hundredandten.events import Event, GameEnd, GameStart, RoundEnd, RoundStart
+from hundredandten.events import Event, GameEnd, GameStart, Score
 from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
-from hundredandten.trick import Score
 
 
 @dataclass
@@ -101,22 +100,9 @@ class Game:
 
         round_events: list[list[Event]] = [
             [
-                RoundStart(
-                    game_round.dealer.identifier,
-                    {
-                        p.identifier: game_round.original_hand(p.identifier)
-                        for p in game_round.players
-                    },
-                ),
                 *game_round.events,
-                # don't include the round end event if it hasn't ended
-                *(
-                    [RoundEnd(scores=self.__scores(index + 1))]
-                    if game_round.completed
-                    else []
-                ),
             ]
-            for index, game_round in enumerate(self._rounds)
+            for game_round in self._rounds
         ]
 
         return [

@@ -30,10 +30,17 @@ from hundredandten.decisions import (
     worst_card_beating,
 )
 from hundredandten.deck import Card, Deck
-from hundredandten.events import Event, TrickEnd, TrickStart
+from hundredandten.events import (
+    Event,
+    RoundEnd,
+    RoundStart,
+    Score,
+    TrickEnd,
+    TrickStart,
+)
 from hundredandten.group import Group, RoundGroup, RoundPlayer
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.trick import Score, Trick
+from hundredandten.trick import Trick
 
 
 @dataclass
@@ -237,8 +244,14 @@ class Round:
         ]
 
         return [
+            RoundStart(
+                self.dealer.identifier,
+                {p.identifier: self._original_hand(p.identifier) for p in self.players},
+            ),
             *self._non_trick_actions,
             *[trick_event for event_list in trick_events for trick_event in event_list],
+            # don't include the round end event if it hasn't ended
+            *([RoundEnd(scores=self.scores)] if self.completed else []),
         ]
 
     @property
@@ -396,7 +409,7 @@ class Round:
         self.active_trick.plays.append(play)
         self.__end_play()
 
-    def available_bids(self, identifier: str) -> list[BidAmount]:
+    def _available_bids(self, identifier: str) -> list[BidAmount]:
         """Compute the bid amounts available to the identified player"""
         return [
             bid_amount
@@ -404,7 +417,7 @@ class Round:
             if self.__is_available_bid(identifier, bid_amount)
         ]
 
-    def original_hand(self, identifier: str) -> list[Card]:
+    def _original_hand(self, identifier: str) -> list[Card]:
         """Return the identified player's original hand"""
         player = self.players.find_or_use(RoundPlayer(identifier))
         discard = next((d for d in self.discards if d.identifier == identifier), None)
@@ -427,7 +440,7 @@ class Round:
         """Return the suggested bid for the current player"""
 
         maximum_bid = max_bid(self.active_player.hand)
-        available_bids = self.available_bids(self.active_player.identifier)
+        available_bids = self._available_bids(self.active_player.identifier)
         willing_bids = list(filter(lambda b: b and b <= maximum_bid, available_bids))
 
         return Bid(
@@ -478,7 +491,7 @@ class Round:
         return Play(self.active_player.identifier, card)
 
     def __handle_bid(self, identifier: str, amount: BidAmount) -> None:
-        if amount in self.available_bids(identifier):
+        if amount in self._available_bids(identifier):
             self._non_trick_actions.append(Bid(identifier, amount))
             self.__handle_prepass()
         else:

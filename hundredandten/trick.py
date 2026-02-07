@@ -9,14 +9,6 @@ from hundredandten.deck import Card
 
 
 @dataclass
-class Score:
-    """A class to keep track of a player's score in either a trick or a game"""
-
-    identifier: str
-    value: int
-
-
-@dataclass
 class Trick:
     """A class to keep track of one trick"""
 

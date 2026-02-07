@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from hundredandten.actions import Bid
 from hundredandten.constants import BidAmount, RoundStatus
-from hundredandten.trick import Score
+from hundredandten.events import Score
 from tests import arrange
 
 # tests in this file run off of seeded games to avoid setting up everything necessary for the tests

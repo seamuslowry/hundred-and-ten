@@ -6,6 +6,14 @@ from hundredandten.deck import Card
 
 
 @dataclass
+class Score:
+    """A class to keep track of a player's score in either a trick or a game"""
+
+    identifier: str
+    value: int
+
+
+@dataclass
 class Event:
     """A superclass for events in the game"""
 
@@ -32,7 +40,7 @@ class TrickStart(Event):
 class RoundEnd(Event):
     """A class to represent the end of round event"""
 
-    scores: dict[str, int]
+    scores: list[Score]
 
 
 @dataclass
