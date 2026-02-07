@@ -121,7 +121,7 @@ def play_trick(game_to_play: Game) -> None:
 
 
 def play_round(game_to_play: Game) -> None:
-    """Play through the current trick of the provided game"""
+    """Play through the current round of tricks of the provided game"""
     while game_to_play.status == RoundStatus.TRICKS:
         play_trick(game_to_play)
 
