@@ -3,6 +3,7 @@
 import hashlib
 from dataclasses import InitVar, dataclass, field
 from functools import reduce
+from itertools import chain
 from random import Random
 from typing import Optional, Sequence
 from uuid import UUID, uuid4
@@ -98,18 +99,10 @@ class Game:
     def events(self) -> list[Event]:
         """The events that occurred in the game."""
 
-        round_events: list[list[Event]] = [
-            [
-                *game_round.events,
-            ]
-            for game_round in self._rounds
-        ]
-
         return [
             GameStart(),
-            *[round_event for event_list in round_events for round_event in event_list],
-            # don't include the game end event if it hasn't ended
-            *([GameEnd(self.winner.identifier)] if self.winner else []),
+            *chain.from_iterable(r.events for r in self._rounds),
+            *([] if not self.winner else [GameEnd(self.winner.identifier)]),
         ]
 
     @property
