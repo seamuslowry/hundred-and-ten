@@ -196,7 +196,7 @@ class Game:
 
         self._rounds.append(
             Round(
-                player_info=self.players,
+                game_players=self.players,
                 dealer_identifier=dealer,
                 seed=deck_seed,
             )

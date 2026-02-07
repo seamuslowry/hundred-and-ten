@@ -47,11 +47,10 @@ from hundredandten.trick import Trick
 class Round:
     """A round in the game of Hundred and Ten"""
 
-    player_info: InitVar[Group]  # Game-level players (identifier + automate)
-    dealer_identifier: InitVar[str]  # Dealer identifier
-    seed: InitVar[str]  # Deck seed
+    game_players: InitVar[Group]
+    dealer_identifier: InitVar[str]
+    seed: InitVar[str]
 
-    # Internal state (not init params)
     players: RoundGroup = field(init=False)
     _deck: Deck = field(init=False, repr=False)
     _non_trick_actions: list[Action] = field(
