@@ -2,8 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten import RoundStatus
-from hundredandten.constants import WINNING_SCORE, GameStatus
+from hundredandten.constants import WINNING_SCORE, GameStatus, RoundStatus
 from tests import arrange
 
 # tests in this file run off of seeded games to avoid setting up everything necessary for the tests
