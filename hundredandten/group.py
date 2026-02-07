@@ -78,10 +78,3 @@ class RoundGroup(Group[RoundPlayer]):
         player = self.by_identifier(identifier)
         if player:
             player.roles.discard(role)
-
-    def swap_role(
-        self, source_identifier: str, dest_identifier: str, role: RoundRole
-    ) -> None:
-        """Swap a role from the source identifier to the destination identifier."""
-        self.remove_role(source_identifier, role)
-        self.add_role(dest_identifier, role)

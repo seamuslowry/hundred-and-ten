@@ -72,20 +72,3 @@ class TestPeopleRoles(TestCase):
         self.assertEqual(1, len(players))
         self.assertEqual(initial_len - 1, len(players[0].roles))
         self.assertNotIn(remove_role, players[0].roles)
-
-    def test_swap_role(self):
-        """Swaps a role between players"""
-
-        role = RoundRole.DEALER
-        player_one = RoundPlayer("one", roles={role})
-        player_two = RoundPlayer("two")
-        players = RoundGroup([player_one, player_two])
-
-        self.assertIn(role, players[0].roles)
-        self.assertNotIn(role, players[1].roles)
-
-        players.swap_role(player_one.identifier, player_two.identifier, role)
-
-        self.assertEqual(2, len(players))
-        self.assertNotIn(role, players[0].roles)
-        self.assertIn(role, players[1].roles)
