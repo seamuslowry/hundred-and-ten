@@ -53,7 +53,13 @@ class Round:
 
     players: RoundGroup = field(init=False)
     _deck: Deck = field(init=False, repr=False)
-    _non_trick_actions: list[Action] = field(
+    _bids: list[Bid] = field(
+        default_factory=list, init=False, repr=False
+    )
+    _select_trump: Optional[SelectTrump] = field(
+        default=None, init=False, repr=False
+    )
+    _discards: list[DetailedDiscard] = field(
         default_factory=list, init=False, repr=False
     )
     _tricks: list[Trick] = field(default_factory=list, init=False, repr=False)
