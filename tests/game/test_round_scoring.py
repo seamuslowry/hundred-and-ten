@@ -104,16 +104,21 @@ class TestRoundScoring(TestCase):
     def test_lose_twenty(self):
         """Score a round where the bidder bids twenty and loses"""
         seed = TWO_FIFTEENS_SEED
-        game = arrange.game(RoundStatus.TRICKS, seed=seed)
-        assert game.active_round.active_bidder
+        game = arrange.game(RoundStatus.BIDDING, seed=seed)
 
-        game.active_round.bids.append(
+        game.act(
             Bid(
-                identifier=game.active_round.active_bidder.identifier,
+                identifier=game.active_round.active_player.identifier,
                 amount=BidAmount.TWENTY,
             )
         )
 
+        # remaining players pass
+        for _ in range(len(game.players) - 1):
+            game.act(Bid(game.active_round.active_player.identifier, BidAmount.PASS))
+
+        arrange.select_trump(game)
+        arrange.discard(game)
         arrange.play_round(game)
 
         old_round = game.rounds[-2]
@@ -133,16 +138,21 @@ class TestRoundScoring(TestCase):
     def test_shoot_the_moon(self):
         """Score a round where the bidder shoots the moon and wins"""
         seed = SHOOT_THE_MOON_SEED
-        game = arrange.game(RoundStatus.TRICKS, seed=seed)
-        assert game.active_round.active_bidder
+        game = arrange.game(RoundStatus.BIDDING, seed=seed)
 
-        game.active_round.bids.append(
+        game.act(
             Bid(
-                identifier=game.active_round.active_bidder.identifier,
+                identifier=game.active_round.active_player.identifier,
                 amount=BidAmount.SHOOT_THE_MOON,
             )
         )
 
+        # remaining players pass
+        for _ in range(len(game.players) - 1):
+            game.act(Bid(game.active_round.active_player.identifier, BidAmount.PASS))
+
+        arrange.select_trump(game)
+        arrange.discard(game)
         arrange.play_round(game)
 
         old_round = game.rounds[-2]
@@ -174,16 +184,21 @@ class TestRoundScoring(TestCase):
     def test_lose_shoot_the_moon(self):
         """Score a round where the bidder shoots the moon and loses"""
         seed = TWO_FIFTEENS_SEED
-        game = arrange.game(RoundStatus.TRICKS, seed=seed)
-        assert game.active_round.active_bidder
+        game = arrange.game(RoundStatus.BIDDING, seed=seed)
 
-        game.active_round.bids.append(
+        game.act(
             Bid(
-                identifier=game.active_round.active_bidder.identifier,
+                identifier=game.active_round.active_player.identifier,
                 amount=BidAmount.SHOOT_THE_MOON,
             )
         )
 
+        # remaining players pass
+        for _ in range(len(game.players) - 1):
+            game.act(Bid(game.active_round.active_player.identifier, BidAmount.PASS))
+
+        arrange.select_trump(game)
+        arrange.discard(game)
         arrange.play_round(game)
 
         old_round = game.rounds[-2]

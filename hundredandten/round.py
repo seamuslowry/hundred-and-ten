@@ -1,6 +1,6 @@
 """Represent one round of a game of Hundred and Ten"""
 
-from dataclasses import dataclass, field
+from dataclasses import InitVar, dataclass, field
 from typing import Optional
 
 from hundredandten.actions import (
@@ -13,6 +13,7 @@ from hundredandten.actions import (
     Unpass,
 )
 from hundredandten.constants import (
+    HAND_SIZE,
     TRICK_VALUE,
     BidAmount,
     RoundRole,
@@ -30,7 +31,7 @@ from hundredandten.decisions import (
 )
 from hundredandten.deck import Card, Deck
 from hundredandten.events import Event, TrickEnd, TrickStart
-from hundredandten.group import RoundGroup, RoundPlayer
+from hundredandten.group import Group, RoundGroup, RoundPlayer
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.trick import Score, Trick
 
@@ -39,12 +40,61 @@ from hundredandten.trick import Score, Trick
 class Round:
     """A round in the game of Hundred and Ten"""
 
-    players: RoundGroup = field(default_factory=RoundGroup)
-    bids: list[Bid] = field(default_factory=list)
-    selection: Optional[SelectTrump] = None
-    discards: list[DetailedDiscard] = field(default_factory=list)
-    tricks: list[Trick] = field(default_factory=list)
-    deck: Deck = field(default_factory=Deck)
+    player_info: InitVar[Group]  # Game-level players (identifier + automate)
+    dealer_identifier: InitVar[str]  # Dealer identifier
+    seed: InitVar[str]  # Deck seed
+
+    # Internal state (not init params)
+    players: RoundGroup = field(init=False)
+    _deck: Deck = field(init=False, repr=False)
+    _non_trick_actions: list[Action] = field(
+        default_factory=list, init=False, repr=False
+    )
+    _tricks: list[Trick] = field(default_factory=list, init=False, repr=False)
+
+    def __post_init__(
+        self, player_info: Group, dealer_identifier: str, seed: str
+    ) -> None:
+        # Create deck from seed
+        self._deck = Deck(seed=seed)
+
+        # Create players RoundGroup by dealing hands from deck
+        self.players = RoundGroup(
+            RoundPlayer(
+                p.identifier, hand=self._deck.draw(HAND_SIZE), automate=p.automate
+            )
+            for p in player_info
+        )
+
+        # Add DEALER role to dealer
+        self.players.add_role(dealer_identifier, RoundRole.DEALER)
+
+    @property
+    def bids(self) -> list[Bid]:
+        """All bids placed in this round."""
+        return [a for a in self._non_trick_actions if isinstance(a, Bid)]
+
+    @property
+    def selection(self) -> Optional[SelectTrump]:
+        """The trump selection, if any."""
+        return next(
+            (a for a in self._non_trick_actions if isinstance(a, SelectTrump)), None
+        )
+
+    @property
+    def discards(self) -> list[DetailedDiscard]:
+        """All discards in this round."""
+        return [a for a in self._non_trick_actions if isinstance(a, DetailedDiscard)]
+
+    @property
+    def tricks(self) -> list[Trick]:
+        """All tricks in this round."""
+        return self._tricks
+
+    @property
+    def deck(self) -> Deck:
+        """The deck for this round."""
+        return self._deck
 
     @property
     def dealer(self) -> RoundPlayer:
@@ -187,9 +237,7 @@ class Round:
         ]
 
         return [
-            *self.bids,
-            *([self.selection] if self.selection else []),
-            *self.discards,
+            *self._non_trick_actions,
             *[trick_event for event_list in trick_events for trick_event in event_list],
         ]
 
@@ -300,7 +348,7 @@ class Round:
         ):
             raise HundredAndTenError("Only the bidder can select trump.")
 
-        self.selection = select_trump
+        self._non_trick_actions.append(select_trump)
 
     def __discard(self, discard: Discard) -> None:
         """
@@ -321,7 +369,7 @@ class Round:
 
         self.active_player.hand = [*remaining]
         self.active_player.hand.extend(self.deck.draw(len(discard.cards)))
-        self.discards.append(
+        self._non_trick_actions.append(
             DetailedDiscard(discard.identifier, discard.cards, remaining)
         )
         self.__end_discard()
@@ -431,7 +479,7 @@ class Round:
 
     def __handle_bid(self, identifier: str, amount: BidAmount) -> None:
         if amount in self.available_bids(identifier):
-            self.bids.append(Bid(identifier, amount))
+            self._non_trick_actions.append(Bid(identifier, amount))
             self.__handle_prepass()
         else:
             raise HundredAndTenError(

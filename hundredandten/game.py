@@ -9,16 +9,13 @@ from uuid import UUID, uuid4
 
 from hundredandten.actions import Action, Bid, Play
 from hundredandten.constants import (
-    HAND_SIZE,
     WINNING_SCORE,
     AnyStatus,
     GameStatus,
-    RoundRole,
     RoundStatus,
 )
-from hundredandten.deck import Deck
 from hundredandten.events import Event, GameEnd, GameStart, RoundEnd, RoundStart
-from hundredandten.group import Group, Player, RoundGroup, RoundPlayer
+from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.round import Round
 from hundredandten.trick import Score
@@ -216,19 +213,15 @@ class Game:
             f"deck-seed|{self.seed}|round:{len(self._rounds)}".encode()
         ).hexdigest()
 
-        deck = Deck(seed=str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4)))
+        deck_seed = str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4))
 
-        round_players = RoundGroup(
-            map(
-                lambda p: RoundPlayer(
-                    p.identifier, hand=deck.draw(HAND_SIZE), automate=p.automate
-                ),
-                self.players,
+        self._rounds.append(
+            Round(
+                player_info=self.players,
+                dealer_identifier=dealer,
+                seed=deck_seed,
             )
         )
-        round_players.add_role(dealer, RoundRole.DEALER)
-
-        self._rounds.append(Round(players=round_players, deck=deck))
 
     def __score_history(self, to_round: int) -> list[Score]:
         """A list of all players' scores up to the provided round"""
