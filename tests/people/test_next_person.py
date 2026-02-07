@@ -1,69 +1,72 @@
-'''Unit test determining the next person within a list of persons'''
+"""Unit test determining the next person within a list of players"""
+
 from unittest import TestCase
 
-from hundredandten.group import Group, Person
+from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
-class TestNextPerson(TestCase):
-    '''Next Person of People unit tests'''
+class TestNextPlay(TestCase):
+    """Next Player unit tests"""
 
     def test_after_with_no_players(self):
-        '''Finds no player in empty list'''
+        """Finds no player in empty list"""
 
-        persons = Group([])
+        players = Group([])
 
-        self.assertRaises(HundredAndTenError, persons.after, 'any')
+        self.assertRaises(HundredAndTenError, players.after, "any")
 
     def test_after_with_unknown_player(self):
-        '''Finds no player when not in list'''
+        """Finds no player when not in list"""
 
-        persons = Group([Person('1')])
+        players = Group([Player("1")])
 
-        self.assertRaises(HundredAndTenError, persons.after, persons[0].identifier + 'bad')
+        self.assertRaises(
+            HundredAndTenError, players.after, players[0].identifier + "bad"
+        )
 
     def test_after_with_one_player(self):
-        '''Determines the next player in a list of 1'''
+        """Determines the next player in a list of 1"""
 
-        person_one = Person('1')
-        persons = Group([person_one])
+        person_one = Player("1")
+        players = Group([person_one])
 
-        self.assertEqual(person_one, persons.after(person_one.identifier))
+        self.assertEqual(person_one, players.after(person_one.identifier))
 
     def test_after_with_two_players(self):
-        '''Determines the next player in a list of 2'''
+        """Determines the next player in a list of 2"""
 
-        person_one = Person('1')
-        person_two = Person('2')
-        persons = Group([person_one, person_two])
+        person_one = Player("1")
+        person_two = Player("2")
+        players = Group([person_one, person_two])
 
-        self.assertEqual(person_two, persons.after(person_one.identifier))
-        self.assertEqual(person_one, persons.after(person_two.identifier))
+        self.assertEqual(person_two, players.after(person_one.identifier))
+        self.assertEqual(person_one, players.after(person_two.identifier))
 
     def test_after_with_three_players(self):
-        '''Determines the next player in a list of 3'''
+        """Determines the next player in a list of 3"""
 
-        person_one = Person('1')
-        person_two = Person('2')
-        person_three = Person('3')
+        person_one = Player("1")
+        person_two = Player("2")
+        person_three = Player("3")
 
-        persons = Group([person_one, person_two, person_three])
+        players = Group([person_one, person_two, person_three])
 
-        self.assertEqual(person_two, persons.after(person_one.identifier))
-        self.assertEqual(person_three, persons.after(person_two.identifier))
-        self.assertEqual(person_one, persons.after(person_three.identifier))
+        self.assertEqual(person_two, players.after(person_one.identifier))
+        self.assertEqual(person_three, players.after(person_two.identifier))
+        self.assertEqual(person_one, players.after(person_three.identifier))
 
     def test_after_with_four_players(self):
-        '''Determines the next player in a list of 4'''
+        """Determines the next player in a list of 4"""
 
-        person_one = Person('1')
-        person_two = Person('2')
-        person_three = Person('3')
-        person_four = Person('4')
+        person_one = Player("1")
+        person_two = Player("2")
+        person_three = Player("3")
+        person_four = Player("4")
 
-        persons = Group([person_one, person_two, person_three, person_four])
+        players = Group([person_one, person_two, person_three, person_four])
 
-        self.assertEqual(person_two, persons.after(person_one.identifier))
-        self.assertEqual(person_three, persons.after(person_two.identifier))
-        self.assertEqual(person_four, persons.after(person_three.identifier))
-        self.assertEqual(person_one, persons.after(person_four.identifier))
+        self.assertEqual(person_two, players.after(person_one.identifier))
+        self.assertEqual(person_three, players.after(person_two.identifier))
+        self.assertEqual(person_four, players.after(person_three.identifier))
+        self.assertEqual(person_one, players.after(person_four.identifier))
