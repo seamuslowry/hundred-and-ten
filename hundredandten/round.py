@@ -84,19 +84,17 @@ class Round:
     @property
     def bids(self) -> list[Bid]:
         """All bids placed in this round."""
-        return [a for a in self._non_trick_actions if isinstance(a, Bid)]
+        return self._bids
 
     @property
     def selection(self) -> Optional[SelectTrump]:
         """The trump selection, if any."""
-        return next(
-            (a for a in self._non_trick_actions if isinstance(a, SelectTrump)), None
-        )
+        return self._select_trump
 
     @property
     def discards(self) -> list[DetailedDiscard]:
         """All discards in this round."""
-        return [a for a in self._non_trick_actions if isinstance(a, DetailedDiscard)]
+        return self._discards
 
     @property
     def tricks(self) -> list[Trick]:
@@ -253,7 +251,9 @@ class Round:
                 self.dealer.identifier,
                 {p.identifier: self._original_hand(p.identifier) for p in self.players},
             ),
-            *self._non_trick_actions,
+            *self._bids,
+            *([self._select_trump] if self._select_trump else []),
+            *self._discards,
             *[trick_event for event_list in trick_events for trick_event in event_list],
             # don't include the round end event if it hasn't ended
             *([RoundEnd(scores=self.scores)] if self.completed else []),
@@ -366,7 +366,7 @@ class Round:
         ):
             raise HundredAndTenError("Only the bidder can select trump.")
 
-        self._non_trick_actions.append(select_trump)
+        self._select_trump = select_trump
 
     def __discard(self, discard: Discard) -> None:
         """
@@ -387,7 +387,7 @@ class Round:
 
         self.active_player.hand = [*remaining]
         self.active_player.hand.extend(self.deck.draw(len(discard.cards)))
-        self._non_trick_actions.append(
+        self._discards.append(
             DetailedDiscard(discard.identifier, discard.cards, remaining)
         )
         self.__end_discard()
@@ -497,7 +497,7 @@ class Round:
 
     def __handle_bid(self, identifier: str, amount: BidAmount) -> None:
         if amount in self._available_bids(identifier):
-            self._non_trick_actions.append(Bid(identifier, amount))
+            self._bids.append(Bid(identifier, amount))
             self.__handle_prepass()
         else:
             raise HundredAndTenError(
