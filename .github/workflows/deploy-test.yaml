@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - test/*
-      - feat/v2
 
 jobs:
   get-tag:
@@ -24,6 +23,6 @@ jobs:
     uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
     with:
       repo: testpypi
-      release-version: "2.0.0.dev${{ github.run_number }}"
+      release-version: "${{ needs.get-tag.outputs.tag }}.dev${{ github.run_number }}"
     secrets:
       py_pi_token: ${{ secrets.TEST_PYPI_API_TOKEN }}
