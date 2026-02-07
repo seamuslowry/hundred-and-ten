@@ -22,6 +22,8 @@ dependencies = []
 lint = [
     "pylint==4.0.4",
     "pyright==1.1.408",
+    "ruff==0.6.9",
+    "black==24.10.0",
 ]
 publish = [
     "build==1.4.0",
@@ -39,3 +41,8 @@ omit = [
     "tests/*",
     "setup.py",
 ]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+lint.extend-select = ["I"]
