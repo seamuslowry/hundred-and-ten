@@ -30,21 +30,6 @@ P = TypeVar("P", bound=Player)
 class Group(list[P], Generic[P]):
     """A list of players"""
 
-    def update(self, person: P) -> None:
-        """
-        Update the provided player within the group.
-        Will raise an error if the player is not in the group already.
-        """
-        index = self.index(person)
-        self[index] = person
-
-    def upsert(self, person: P) -> None:
-        """Upsert the provided player into the group."""
-        if person in self:
-            self.update(person)
-        else:
-            self.append(person)
-
     def by_identifier(self, identifier: str) -> Optional[P]:
         """Find a player with the given identifier."""
         return next((p for p in self if p.identifier == identifier), None)
