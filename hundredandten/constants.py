@@ -35,9 +35,6 @@ class RoundRole(Enum):
     PRE_PASSED = 2
 
 
-AnyRole = Union[RoundRole]
-
-
 class BidAmount(IntEnum):
     """The valid bid amounts"""
 

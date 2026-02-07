@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from typing import Generic, Optional, TypeVar
 
-from hundredandten.constants import AnyRole
+from hundredandten.constants import RoundRole
 from hundredandten.deck import Card
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 
@@ -20,7 +20,7 @@ class Player:
 class RoundPlayer(Player):
     """A class to keep track of player information within a round"""
 
-    roles: set[AnyRole] = field(default_factory=set, compare=False)
+    roles: set[RoundRole] = field(default_factory=set, compare=False)
     hand: list[Card] = field(default_factory=list, compare=False)
 
 
@@ -69,7 +69,7 @@ class Group(list[P], Generic[P]):
 class RoundGroup(Group[RoundPlayer]):
     """A group of round players, with role-based operations."""
 
-    def by_role(self, role: AnyRole) -> "RoundGroup":
+    def by_role(self, role: RoundRole) -> "RoundGroup":
         """Find all players carrying the given role."""
         return RoundGroup(p for p in self if role in p.roles)
 
@@ -82,20 +82,20 @@ class RoundGroup(Group[RoundPlayer]):
         player.roles = player.roles.union(example.roles)
         return player
 
-    def add_role(self, identifier: str, role: AnyRole) -> None:
+    def add_role(self, identifier: str, role: RoundRole) -> None:
         """Add the provided role to the player with the given identifier."""
         player = self.by_identifier(identifier)
         if player:
             player.roles.add(role)
 
-    def remove_role(self, identifier: str, role: AnyRole) -> None:
+    def remove_role(self, identifier: str, role: RoundRole) -> None:
         """Remove the provided role from the player with the given identifier."""
         player = self.by_identifier(identifier)
         if player:
             player.roles.discard(role)
 
     def swap_role(
-        self, source_identifier: str, dest_identifier: str, role: AnyRole
+        self, source_identifier: str, dest_identifier: str, role: RoundRole
     ) -> None:
         """Swap a role from the source identifier to the destination identifier."""
         self.remove_role(source_identifier, role)
