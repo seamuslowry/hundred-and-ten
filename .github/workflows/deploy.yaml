@@ -13,6 +13,8 @@ jobs:
       version: ${{ steps.version.outputs.value }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
       - name: Read version from pyproject.toml
         id: version
         uses: SebRollen/toml-action@v1.2.0
