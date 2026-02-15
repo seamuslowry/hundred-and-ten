@@ -7,15 +7,30 @@ on:
 
 jobs:
   tag-new-version:
-    uses: seamuslowry/workflows/.github/workflows/tag.yml@main
-    secrets:
-      gh_token: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    outputs:
+      tag_exists: ${{ steps.create_tag.outputs.tag_exists }}
+      version: ${{ steps.version.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read version from pyproject.toml
+        id: version
+        uses: SebRollen/toml-action@v1.2.0
+        with:
+          file: pyproject.toml
+          field: project.version
+      - name: Create tag if it doesn't exist
+        id: create_tag
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ steps.version.outputs.value }}
+          tag_exists_error: "false"
 
   publish:
     needs: tag-new-version
-    if: needs.tag-new-version.outputs.old_tag != needs.tag-new-version.outputs.new_tag
+    if: needs.tag-new-version.outputs.tag_exists == 'false'
     uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
     with:
-      release-version: ${{ needs.tag-new-version.outputs.tag }}
+      release-version: ${{ needs.tag-new-version.outputs.version }}
     secrets:
       py_pi_token: ${{ secrets.PYPI_API_TOKEN }}
