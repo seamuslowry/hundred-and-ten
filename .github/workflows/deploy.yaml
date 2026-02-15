@@ -12,7 +12,7 @@ jobs:
       tag_already_exists: ${{ steps.check_tag.outputs.exists }}
       version: ${{ steps.version.outputs.value }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Read version from pyproject.toml
         id: version
         uses: SebRollen/toml-action@v1.2.0
