@@ -9,7 +9,7 @@ jobs:
   tag-new-version:
     runs-on: ubuntu-latest
     outputs:
-      tag_exists: ${{ steps.check_tag.outputs.exists }}
+      tag_already_exists: ${{ steps.check_tag.outputs.exists }}
       version: ${{ steps.version.outputs.value }}
     steps:
       - uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
 
   publish:
     needs: tag-new-version
-    if: needs.tag-new-version.outputs.tag_exists == 'false'
+    if: needs.tag-new-version.outputs.tag_already_exists == 'false'
     uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
     with:
       release-version: ${{ needs.tag-new-version.outputs.version }}
