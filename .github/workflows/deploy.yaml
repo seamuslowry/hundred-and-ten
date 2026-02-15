@@ -24,7 +24,7 @@ jobs:
         uses: rickstaa/action-create-tag@v1
         with:
           tag: ${{ steps.version.outputs.value }}
-          tag_exists_error: "false"
+          tag_exists_error: false
 
   publish:
     needs: tag-new-version
