@@ -6,7 +6,7 @@ from hundredandten.actions import Action, Bid
 from hundredandten.constants import BidAmount, GameStatus
 from hundredandten.game import Game
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.player import Player
+from hundredandten.player import NaiveAutomatedPlayer
 from tests import arrange
 
 AUTOMATED_SEED = "a92475b9-3df3-458d-b0df-486f9a305015"
@@ -17,7 +17,15 @@ class TestAutomatedPlay(TestCase):
 
     def test_game_will_complete_from_start(self):
         """When playing with all automated players, the game will complete"""
-        game = arrange.automated_game(seed=AUTOMATED_SEED)
+        game = Game(
+            seed=AUTOMATED_SEED,
+            players=list(
+                map(
+                    lambda identifier: NaiveAutomatedPlayer(str(identifier)),
+                    range(4),
+                )
+            ),
+        )
 
         self.assertIsNotNone(game.winner)
 
@@ -32,10 +40,10 @@ class TestAutomatedPlay(TestCase):
         automated_game_from_start = Game(
             seed=AUTOMATED_SEED,
             players=[
-                Player(identifier="unautomated", automate=True),
-                Player(identifier="automated1", automate=True),
-                Player(identifier="automated2", automate=True),
-                Player(identifier="automated3", automate=True),
+                NaiveAutomatedPlayer(identifier="automated0"),
+                NaiveAutomatedPlayer(identifier="automated1"),
+                NaiveAutomatedPlayer(identifier="automated2"),
+                NaiveAutomatedPlayer(identifier="automated3"),
             ],
         )
 
@@ -43,17 +51,17 @@ class TestAutomatedPlay(TestCase):
             Bid(identifier="automated1", amount=BidAmount.FIFTEEN),
             Bid(identifier="automated2", amount=BidAmount.TWENTY),
             Bid(identifier="automated3", amount=BidAmount.TWENTY_FIVE),
-            Bid(identifier="unautomated", amount=BidAmount.PASS),
+            Bid(identifier="automated0", amount=BidAmount.PASS),
             Bid(identifier="automated1", amount=BidAmount.SHOOT_THE_MOON),
         ]
 
         automated_game_after_start = Game(
             seed=AUTOMATED_SEED,
             players=[
-                Player(identifier="unautomated", automate=True),
-                Player(identifier="automated1", automate=True),
-                Player(identifier="automated2", automate=True),
-                Player(identifier="automated3", automate=True),
+                NaiveAutomatedPlayer(identifier="automated0"),
+                NaiveAutomatedPlayer(identifier="automated1"),
+                NaiveAutomatedPlayer(identifier="automated2"),
+                NaiveAutomatedPlayer(identifier="automated3"),
             ],
             initial_moves=initial_moves,
         )

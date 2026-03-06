@@ -5,7 +5,7 @@ from unittest import TestCase
 from hundredandten.constants import HAND_SIZE, RoundStatus
 from hundredandten.game import Game
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.player import Player
+from hundredandten.player import HumanPlayer
 from tests import arrange
 
 
@@ -46,5 +46,5 @@ class TestStartOfGame(TestCase):
     def test_game_with_five_players(self):
         """Will not allow creating a game with five players"""
         self.assertRaises(
-            HundredAndTenError, Game, [Player(identifier=str(i)) for i in range(5)]
+            HundredAndTenError, Game, [HumanPlayer(identifier=str(i)) for i in range(5)]
         )

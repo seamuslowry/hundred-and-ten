@@ -76,9 +76,7 @@ class Round:
 
         # Create players RoundGroup by dealing hands from deck
         self.players = [
-            RoundPlayer(
-                p.identifier, hand=self._deck.draw(HAND_SIZE)
-            )
+            RoundPlayer(p.identifier, hand=self._deck.draw(HAND_SIZE))
             for p in player_info
         ]
 

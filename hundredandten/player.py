@@ -1,5 +1,6 @@
 """Interact with a list of people"""
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
 from hundredandten.constants import RoundRole
@@ -8,11 +9,31 @@ from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 
 @dataclass
-class Player:
+class Player(ABC):
     """A class to represent a player at the game level"""
 
     identifier: str
-    automate: bool = field(default=False, compare=False)
+
+    @abstractmethod
+    def automate(self) -> bool:
+        """Return true if this player is automated, false otherwise"""
+        # TODO: should eventually be act and return the action given a game state
+
+
+@dataclass
+class HumanPlayer(Player):
+    """Represent a human player. Actions must be taken independently."""
+
+    def automate(self) -> bool:
+        return False
+
+
+@dataclass
+class NaiveAutomatedPlayer(Player):
+    """Represent an automated player. Actions will be taken autonomously."""
+
+    def automate(self) -> bool:
+        return True
 
 
 @dataclass

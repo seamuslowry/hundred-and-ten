@@ -66,8 +66,11 @@ class Game:
     @property
     def active_player(self) -> Player:
         """The active player"""
-        return next(p for p in self.players
-                    if p.identifier == self.active_round.active_player.identifier)
+        return next(
+            p
+            for p in self.players
+            if p.identifier == self.active_round.active_player.identifier
+        )
 
     @property
     def winner(self) -> Optional[Player]:
@@ -159,10 +162,7 @@ class Game:
         return self.active_round.suggestion()
 
     def __automated_act(self):
-        while (
-            isinstance(self.status, RoundStatus)
-            and self.active_player.automate
-        ):
+        while isinstance(self.status, RoundStatus) and self.active_player.automate():
             self.__act(self.__automated_action())
 
     def __automated_action(self) -> Action:
