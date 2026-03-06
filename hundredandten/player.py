@@ -9,7 +9,7 @@ from hundredandten.hundred_and_ten_error import HundredAndTenError
 
 @dataclass
 class Player:
-    """A class to keep track of player information at the game level"""
+    """A class to represent a player at the game level"""
 
     identifier: str
     automate: bool = field(default=False, compare=False)
