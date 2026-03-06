@@ -5,8 +5,8 @@ from unittest import TestCase
 from hundredandten.actions import Action, Bid
 from hundredandten.constants import BidAmount, GameStatus
 from hundredandten.game import Game
-from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.player import Player
 from tests import arrange
 
 AUTOMATED_SEED = "a92475b9-3df3-458d-b0df-486f9a305015"
@@ -31,14 +31,12 @@ class TestAutomatedPlay(TestCase):
         """When starting a game with automated players, initial moves do not trigger automation"""
         automated_game_from_start = Game(
             seed=AUTOMATED_SEED,
-            players=Group(
-                [
-                    Player(identifier="unautomated", automate=True),
-                    Player(identifier="automated1", automate=True),
-                    Player(identifier="automated2", automate=True),
-                    Player(identifier="automated3", automate=True),
-                ]
-            ),
+            players=[
+                Player(identifier="unautomated", automate=True),
+                Player(identifier="automated1", automate=True),
+                Player(identifier="automated2", automate=True),
+                Player(identifier="automated3", automate=True),
+            ],
         )
 
         initial_moves: list[Action] = [
@@ -51,14 +49,12 @@ class TestAutomatedPlay(TestCase):
 
         automated_game_after_start = Game(
             seed=AUTOMATED_SEED,
-            players=Group(
-                [
-                    Player(identifier="unautomated", automate=True),
-                    Player(identifier="automated1", automate=True),
-                    Player(identifier="automated2", automate=True),
-                    Player(identifier="automated3", automate=True),
-                ]
-            ),
+            players=[
+                Player(identifier="unautomated", automate=True),
+                Player(identifier="automated1", automate=True),
+                Player(identifier="automated2", automate=True),
+                Player(identifier="automated3", automate=True),
+            ],
             initial_moves=initial_moves,
         )
 

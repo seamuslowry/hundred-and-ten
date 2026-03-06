@@ -6,6 +6,7 @@ from hundredandten.actions import Play
 from hundredandten.constants import HAND_SIZE, CardNumber, RoundStatus, SelectableSuit
 from hundredandten.deck import Card
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.player import player_after
 from tests import arrange
 
 
@@ -27,7 +28,9 @@ class TestPlayCard(TestCase):
         assert game.active_round.active_bidder
         self.assertEqual(
             game.active_round.active_player,
-            game.active_round.players.after(game.active_round.active_bidder.identifier),
+            player_after(
+                game.active_round.players, game.active_round.active_bidder.identifier
+            ),
         )
 
         original_active_player = game.active_round.active_player
@@ -73,7 +76,7 @@ class TestPlayCard(TestCase):
         non_trump = next(iter(SelectableSuit))
 
         active_player = game.active_round.active_player
-        next_player = game.active_round.players.after(active_player.identifier)
+        next_player = player_after(game.active_round.players, active_player.identifier)
 
         # overwrite to ensure this trick will bleed
         active_player.hand[0] = Card(CardNumber.TEN, game.active_round.trump)
@@ -106,7 +109,7 @@ class TestPlayCard(TestCase):
         non_trump = next(iter(SelectableSuit))
 
         active_player = game.active_round.active_player
-        next_player = game.active_round.players.after(active_player.identifier)
+        next_player = player_after(game.active_round.players, active_player.identifier)
 
         # overwrite to ensure this trick will bleed
         active_player.hand[0] = Card(CardNumber.TEN, game.active_round.trump)

@@ -13,7 +13,7 @@ from hundredandten.constants import (
 )
 from hundredandten.decisions import trumps
 from hundredandten.game import Game
-from hundredandten.group import Group, Player
+from hundredandten.player import Player
 
 
 def automated_game(
@@ -129,12 +129,10 @@ def play_round(game_to_play: Game) -> None:
 def __get_bidding_game(seed: Optional[str], automate: bool = False) -> Game:
     """Returns a game with no moves"""
     new_game = Game(
-        players=Group(
-            list(
-                map(
-                    lambda identifier: Player(str(identifier), automate=automate),
-                    range(4),
-                )
+        players=list(
+            map(
+                lambda identifier: Player(str(identifier), automate=automate),
+                range(4),
             )
         ),
         seed=seed or str(uuid4()),

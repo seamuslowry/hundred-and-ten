@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from hundredandten.constants import CardNumber, RoundRole, SelectableSuit
 from hundredandten.deck import Card
-from hundredandten.group import Player, RoundPlayer
+from hundredandten.player import Player, RoundPlayer
 
 
 class TestPlayer(TestCase):
@@ -26,7 +26,6 @@ class TestPlayer(TestCase):
             RoundPlayer(identifier),
             RoundPlayer(
                 identifier,
-                automate=True,
                 roles={RoundRole.DEALER},
                 hand=[Card(CardNumber.ACE, SelectableSuit.CLUBS)],
             ),

@@ -5,6 +5,7 @@ from unittest import TestCase
 from hundredandten.actions import Bid, Unpass
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.player import player_after, players_by_role, remove_player_role
 from tests import arrange
 
 
@@ -17,8 +18,10 @@ class TestBidding(TestCase):
         game = arrange.game(RoundStatus.BIDDING)
 
         # remove dealer role to put game in invalid state to verify error
-        game.active_round.players.remove_role(
-            game.active_round.dealer.identifier, RoundRole.DEALER
+        remove_player_role(
+            game.active_round.players,
+            game.active_round.dealer.identifier,
+            RoundRole.DEALER,
         )
 
         self.assertRaises(HundredAndTenError, lambda: game.active_round.dealer)
@@ -141,8 +144,8 @@ class TestBidding(TestCase):
         """When the next player has prepassed, auto pass for them"""
         game = arrange.game(RoundStatus.BIDDING)
 
-        next_player = game.active_round.players.after(
-            game.active_round.active_player.identifier
+        next_player = player_after(
+            game.active_round.players, game.active_round.active_player.identifier
         )
 
         game.act(Bid(next_player.identifier, BidAmount.PASS))
@@ -154,7 +157,7 @@ class TestBidding(TestCase):
         self.assertEqual(2, len(game.active_round.bids))
         self.assertEqual(RoundStatus.BIDDING, game.status)
         self.assertEqual(
-            0, len(game.active_round.players.by_role(RoundRole.PRE_PASSED))
+            0, len(players_by_role(game.active_round.players, RoundRole.PRE_PASSED))
         )
         self.assertIn(game.active_round.active_player, game.active_round.bidders)
         # play will have passed the previously "next" player since they pre-passed

@@ -4,8 +4,8 @@ from unittest import TestCase
 
 from hundredandten.constants import HAND_SIZE, RoundStatus
 from hundredandten.game import Game
-from hundredandten.group import Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.player import Player
 from tests import arrange
 
 

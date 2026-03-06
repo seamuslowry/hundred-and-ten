@@ -38,8 +38,16 @@ from hundredandten.events import (
     TrickEnd,
     TrickStart,
 )
-from hundredandten.group import Group, RoundGroup, RoundPlayer
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.player import (
+    Player,
+    RoundPlayer,
+    add_player_role,
+    player_after,
+    player_by_identifier,
+    players_by_role,
+    remove_player_role,
+)
 from hundredandten.trick import Trick
 
 
@@ -47,39 +55,35 @@ from hundredandten.trick import Trick
 class Round:
     """A round in the game of Hundred and Ten"""
 
-    game_players: InitVar[Group]
+    game_players: InitVar[list[Player]]
     dealer_identifier: InitVar[str]
     seed: InitVar[str]
 
-    players: RoundGroup = field(init=False)
+    players: list[RoundPlayer] = field(init=False)
     _deck: Deck = field(init=False, repr=False)
-    _bids: list[Bid] = field(
-        default_factory=list, init=False, repr=False
-    )
-    _select_trump: Optional[SelectTrump] = field(
-        default=None, init=False, repr=False
-    )
+    _bids: list[Bid] = field(default_factory=list, init=False, repr=False)
+    _select_trump: Optional[SelectTrump] = field(default=None, init=False, repr=False)
     _discards: list[DetailedDiscard] = field(
         default_factory=list, init=False, repr=False
     )
     _tricks: list[Trick] = field(default_factory=list, init=False, repr=False)
 
     def __post_init__(
-        self, player_info: Group, dealer_identifier: str, seed: str
+        self, player_info: list[Player], dealer_identifier: str, seed: str
     ) -> None:
         # Create deck from seed
         self._deck = Deck(seed=seed)
 
         # Create players RoundGroup by dealing hands from deck
-        self.players = RoundGroup(
+        self.players = [
             RoundPlayer(
-                p.identifier, hand=self._deck.draw(HAND_SIZE), automate=p.automate
+                p.identifier, hand=self._deck.draw(HAND_SIZE)
             )
             for p in player_info
-        )
+        ]
 
         # Add DEALER role to dealer
-        self.players.add_role(dealer_identifier, RoundRole.DEALER)
+        add_player_role(self.players, dealer_identifier, RoundRole.DEALER)
 
     @property
     def bids(self) -> list[Bid]:
@@ -109,7 +113,7 @@ class Round:
     @property
     def dealer(self) -> RoundPlayer:
         """The dealer this round."""
-        dlr = next(iter(self.players.by_role(RoundRole.DEALER)), None)
+        dlr = next(iter(players_by_role(self.players, RoundRole.DEALER)), None)
         if not dlr:
             raise HundredAndTenError("No dealer found.")
         return dlr
@@ -123,14 +127,13 @@ class Round:
             last_bidder = (
                 self.dealer.identifier if not self.bids else self.bids[-1].identifier
             )
-            active_and_last_bidders = RoundGroup(
-                [
-                    p
-                    for p in self.players
-                    if p in self.bidders or p.identifier == last_bidder
-                ]
-            )
-            return active_and_last_bidders.after(last_bidder)
+            active_and_last_bidders = [
+                p
+                for p in self.players
+                if p in self.bidders or p.identifier == last_bidder
+            ]
+
+            return player_after(active_and_last_bidders, last_bidder)
         # when in trump selection, the active bidder is the active player
         if self.status == RoundStatus.TRUMP_SELECTION:
             assert self.active_bidder
@@ -142,7 +145,7 @@ class Round:
                 if not self.discards
                 else self.discards[-1].identifier
             )
-            return self.players.after(last_discarder)
+            return player_after(self.players, last_discarder)
         # while playing tricks, active player needs to consider
         # trick number, trick status, and winner of last trick
         if self.status == RoundStatus.TRICKS:
@@ -151,25 +154,25 @@ class Round:
             if not self.active_trick.plays:
                 # the player after the bidder goes first on the first trick
                 if len(self.tricks) == 1:
-                    return self.players.after(self.active_bidder.identifier)
+                    return player_after(self.players, self.active_bidder.identifier)
                 # otherwise, its the winner of the last trick
                 winning_play = self.tricks[-2].winning_play
                 # when we have more than one trick, any previous trick will have a winning play
                 assert winning_play
-                winner = self.players.by_identifier(winning_play.identifier)
+                winner = player_by_identifier(self.players, winning_play.identifier)
                 # when the trick has a winning play, there will be a valid player associated to it
                 assert winner
                 return winner
             # in an ongoing trick, active player is next around the table
-            return self.players.after(self.active_trick.plays[-1].identifier)
+            return player_after(self.players, self.active_trick.plays[-1].identifier)
         raise HundredAndTenError(
             f"Cannot determine active player in {self.status} status"
         )
 
     @property
-    def inactive_players(self) -> RoundGroup:
+    def inactive_players(self) -> list[RoundPlayer]:
         """The players that are not active."""
-        return RoundGroup([p for p in self.players if p != self.active_player])
+        return [p for p in self.players if p != self.active_player]
 
     @property
     def active_bid(self) -> Optional[BidAmount]:
@@ -177,15 +180,13 @@ class Round:
         return max(self.bids).amount if self.bids else None
 
     @property
-    def bidders(self) -> RoundGroup:
+    def bidders(self) -> list[RoundPlayer]:
         """Anyone in this round that can still submit a bid."""
-        return RoundGroup(
-            [
-                p
-                for p in self.players
-                if self.__current_bid(p.identifier) != Bid("", BidAmount.PASS)
-            ]
-        )
+        return [
+            p
+            for p in self.players
+            if self.__current_bid(p.identifier) != Bid("", BidAmount.PASS)
+        ]
 
     @property
     def active_bidder(self) -> Optional[RoundPlayer]:
@@ -210,7 +211,7 @@ class Round:
         return self.selection.suit
 
     @property
-    def completed(self) -> bool:
+    def __completed(self) -> bool:
         """True if the round is complete, False otherwise"""
         return self.status in [RoundStatus.COMPLETED, RoundStatus.COMPLETED_NO_BIDDERS]
 
@@ -256,7 +257,7 @@ class Round:
             *self._discards,
             *[trick_event for event_list in trick_events for trick_event in event_list],
             # don't include the round end event if it hasn't ended
-            *([RoundEnd(scores=self.scores)] if self.completed else []),
+            *([RoundEnd(scores=self.scores)] if self.__completed else []),
         ]
 
     @property
@@ -342,17 +343,17 @@ class Round:
         amount = bid.amount
         if (
             self.status == RoundStatus.BIDDING
-            and self.active_player == self.players.by_identifier(identifier)
+            and self.active_player == player_by_identifier(self.players, identifier)
         ):
             self.__handle_bid(identifier, amount)
         elif amount == BidAmount.PASS:
-            self.players.add_role(identifier, RoundRole.PRE_PASSED)
+            add_player_role(self.players, identifier, RoundRole.PRE_PASSED)
         else:
             raise HundredAndTenError("Cannot bid out of order")
 
     def __unpass(self, unpass: Unpass) -> None:
         """Discount a prepass bid from the identified player"""
-        self.players.remove_role(unpass.identifier, RoundRole.PRE_PASSED)
+        remove_player_role(self.players, unpass.identifier, RoundRole.PRE_PASSED)
 
     def __select_trump(self, select_trump: SelectTrump) -> None:
         """Select the passed suit as trump"""
@@ -424,7 +425,7 @@ class Round:
 
     def _original_hand(self, identifier: str) -> list[Card]:
         """Return the identified player's original hand"""
-        player = self.players.find_or_use(RoundPlayer(identifier))
+        player = player_by_identifier(self.players, identifier)
         discard = next((d for d in self.discards if d.identifier == identifier), None)
 
         return discard.cards + discard.kept if discard else player.hand
@@ -509,14 +510,14 @@ class Round:
             self.status == RoundStatus.BIDDING
             and RoundRole.PRE_PASSED in self.active_player.roles
         ):
-            self.players.remove_role(
-                self.active_player.identifier, RoundRole.PRE_PASSED
+            remove_player_role(
+                self.players, self.active_player.identifier, RoundRole.PRE_PASSED
             )
             self.__handle_bid(self.active_player.identifier, BidAmount.PASS)
 
     def __is_available_bid(self, identifier: str, amount: BidAmount) -> bool:
         """Determine if the listed bid amount is available to the listed player"""
-        player = self.players.find_or_use(RoundPlayer(identifier))
+        player = player_by_identifier(self.players, identifier)
         return (
             # the identified player must be able to submit a bid
             (player in self.bidders and RoundRole.PRE_PASSED not in player.roles)

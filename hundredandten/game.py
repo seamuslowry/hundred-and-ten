@@ -16,8 +16,8 @@ from hundredandten.constants import (
     RoundStatus,
 )
 from hundredandten.events import Event, GameEnd, GameStart, Score
-from hundredandten.group import Group, Player
 from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.player import Player, player_after, player_by_identifier
 from hundredandten.round import Round
 
 
@@ -25,7 +25,7 @@ from hundredandten.round import Round
 class Game:
     """A game of Hundred and Ten"""
 
-    players: Group = field(default_factory=Group)
+    players: list[Player] = field(default_factory=list)
     seed: str = field(default_factory=lambda: str(uuid4()))
     initial_moves: InitVar[Optional[list[Action]]] = field(default=None)
 
@@ -64,6 +64,12 @@ class Game:
         return self._rounds[-1]
 
     @property
+    def active_player(self) -> Player:
+        """The active player"""
+        return next(p for p in self.players
+                    if p.identifier == self.active_round.active_player.identifier)
+
+    @property
     def winner(self) -> Optional[Player]:
         """
         The winner of the game
@@ -77,7 +83,9 @@ class Game:
         ]
         ordered_winning_players = list(
             map(
-                lambda score: self.active_round.players.by_identifier(score.identifier),
+                lambda score: player_by_identifier(
+                    self.active_round.players, score.identifier
+                ),
                 winning_scores,
             )
         )
@@ -88,7 +96,10 @@ class Game:
             else next(iter(ordered_winning_players), None)
         )
 
-        return winner
+        return next(
+            (p for p in self.players if winner and p.identifier == winner.identifier),
+            None,
+        )
 
     @property
     def moves(self) -> list[Action]:
@@ -150,7 +161,7 @@ class Game:
     def __automated_act(self):
         while (
             isinstance(self.status, RoundStatus)
-            and self.active_round.active_player.automate
+            and self.active_player.automate
         ):
             self.__act(self.__automated_action())
 
@@ -177,14 +188,16 @@ class Game:
             next_dealer = (
                 current_dealer
                 if keep_same_dealer
-                else self.players.after(current_dealer).identifier
+                else player_after(self.active_round.players, current_dealer).identifier
             )
             self.__new_round(next_dealer)
 
     def __end_play(self):
         if self.status == RoundStatus.COMPLETED:
             self.__new_round(
-                self.players.after(self.active_round.dealer.identifier).identifier
+                player_after(
+                    self.active_round.players, self.active_round.dealer.identifier
+                ).identifier
             )
 
     def __new_round(self, dealer: str) -> None:
