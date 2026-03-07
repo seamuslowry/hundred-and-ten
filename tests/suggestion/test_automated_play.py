@@ -29,11 +29,10 @@ class TestAutomatedPlay(TestCase):
 
         self.assertIsNotNone(game.winner)
 
-    def test_no_suggestions_after_completion(self):
+    def test_no_actions_after_completion(self):
         """When playing with all automated players, the game will complete"""
         game = arrange.game(GameStatus.WON, seed=AUTOMATED_SEED)
 
-        self.assertRaises(HundredAndTenError, game.suggestion)
         self.assertRaises(
             HundredAndTenError,
             NaiveAutomatedPlayer(game.players[0].identifier).act,

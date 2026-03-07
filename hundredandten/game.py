@@ -20,7 +20,6 @@ from hundredandten.deck import Card, defined_cards
 from hundredandten.events import Event, GameEnd, GameStart, Score
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.player import (
-    NaiveAutomatedPlayer,
     Player,
     RoundPlayer,
     player_after,
@@ -178,12 +177,6 @@ class Game:
         """Perform an action as a player of the game"""
         self.__act(action)
         self.__automated_act()
-
-    def suggestion(self) -> Action:
-        """Return the suggested action given the state of the game"""
-        return NaiveAutomatedPlayer(identifier=self.active_player.identifier).act(
-            self.game_state_for(self.active_player.identifier)
-        )
 
     def game_state_for(self, identifier: str) -> GameState:
         """Build a GameState observation for the identified player.

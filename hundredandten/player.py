@@ -35,7 +35,7 @@ class Player(ABC):
 class HumanPlayer(Player):
     """Represent a human player. Actions must be taken independently."""
 
-    def act(self, _: GameState) -> None:
+    def act(self, _: GameState) -> Optional[Action]:
         return None
 
 
@@ -43,7 +43,7 @@ class HumanPlayer(Player):
 class NaiveAutomatedPlayer(Player):
     """Represent an automated player. Actions will be taken autonomously."""
 
-    def act(self, game_state: GameState) -> Action:
+    def act(self, game_state: GameState) -> Optional[Action]:
         """Return the suggested action given the game state"""
         if game_state.status == RoundStatus.BIDDING:
             return self.__suggested_bid(game_state)
