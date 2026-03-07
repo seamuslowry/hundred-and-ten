@@ -332,9 +332,6 @@ class Game:
         return TrickState(
             completed_tricks=tuple(completed_tricks),
             current_trick_plays=current_trick_plays,
-            bleeding=(
-                game_round.active_trick.bleeding if len(game_round.tricks) else False
-            ),
         )
 
     def __build_available_actions(

@@ -96,7 +96,6 @@ class TrickState:
 
     completed_tricks: tuple[CompletedTrick, ...]
     current_trick_plays: tuple[TrickPlay, ...]
-    bleeding: bool
 
 
 @dataclass(frozen=True)

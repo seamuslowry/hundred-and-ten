@@ -7,6 +7,7 @@ from hundredandten.actions import Action, Bid, Discard, Play, SelectTrump
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.decisions import (
     best_card,
+    bleeds,
     desired_trump,
     max_bid,
     non_trumps,
@@ -84,12 +85,16 @@ class NaiveAutomatedPlayer(AutomatedPlayer):
         """Return the suggested play action for the current player"""
 
         playable_cards = game_state.hand
-        if game_state.tricks.bleeding:
+        if (
+            len(game_state.tricks.current_trick_plays) > 0
+            and game_state.trump
+            and bleeds(game_state.current_trick_plays[0].card, game_state.trump)
+        ):
             playable_cards = trumps(game_state.hand, game_state.trump) or playable_cards
 
         best_played_card = next(
             map(lambda p: p.card, game_state.tricks.current_trick_plays), None
-        )  # self.active_trick.winning_play
+        )
 
         if not best_played_card:
             # if you are the bidder and you can bleed, do so

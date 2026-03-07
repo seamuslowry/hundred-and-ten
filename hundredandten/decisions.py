@@ -122,3 +122,11 @@ def __cards_by_suit(cards: Sequence[Card]) -> dict[SelectableSuit, list[Card]]:
         suit: [card for card in cards if card.suit == suit or card.always_trump]
         for suit in list(SelectableSuit)
     }
+
+
+def bleeds(card: Card, trump: SelectableSuit) -> bool:
+    """
+    Return true if the card played causes a trick to bleed
+    if played under the provided trump
+    """
+    return card.suit == trump or card.always_trump
