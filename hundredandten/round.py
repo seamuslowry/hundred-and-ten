@@ -393,7 +393,6 @@ class Round:
         self._discards.append(
             DetailedDiscard(discard.identifier, discard.cards, remaining)
         )
-        # self.__end_discard()
 
     def __play(self, play: Play) -> None:
         """Play the specified card from the identified player's hand"""
@@ -415,7 +414,6 @@ class Round:
 
         self.active_player.hand.remove(play.card)
         self.active_trick.plays.append(play)
-        # self.__end_play()
 
     def available_bids(self, identifier: str) -> list[BidAmount]:
         """Compute the bid amounts available to the identified player"""
