@@ -21,6 +21,7 @@ from hundredandten.deck import defined_cards
 from hundredandten.events import Event, GameEnd, GameStart, Score
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.player import (
+    NaiveAutomatedPlayer,
     Player,
     RoundPlayer,
     player_after,
@@ -182,7 +183,9 @@ class Game:
 
     def suggestion(self) -> Action:
         """Return the suggested action given the state of the game"""
-        return self.active_round.suggestion()
+        return NaiveAutomatedPlayer(identifier=self.active_player.identifier).act(
+            self.game_state_for(self.active_player.identifier)
+        )
 
     def game_state_for(self, identifier: str) -> GameState:
         """Build a GameState observation for the identified player.
@@ -301,6 +304,9 @@ class Game:
         return TrickState(
             completed_tricks=tuple(completed_tricks),
             current_trick_plays=current_trick_plays,
+            bleeding=(
+                game_round.active_trick.bleeding if len(game_round.tricks) else False
+            ),
         )
 
     def __build_available_actions(
@@ -308,7 +314,10 @@ class Game:
         game_round: Round,
         player: RoundPlayer,
     ) -> tuple[Action, ...]:
-        if game_round.active_player.identifier != player.identifier:
+        if (
+            self.status == GameStatus.WON
+            or game_round.active_player.identifier != player.identifier
+        ):
             return ()
 
         if game_round.status == RoundStatus.BIDDING:
@@ -339,11 +348,16 @@ class Game:
         return tuple(Play(player.identifier, card) for card in playable)
 
     def __automated_act(self):
-        while isinstance(self.status, RoundStatus) and self.active_player.automate():
-            self.__act(self.__automated_action())
-
-    def __automated_action(self) -> Action:
-        return self.suggestion()
+        while (
+            isinstance(self.status, RoundStatus)
+            and (
+                action := self.active_player.act(
+                    self.game_state_for(self.active_player.identifier)
+                )
+            )
+            is not None
+        ):
+            self.__act(action)
 
     def __act(self, action: Action) -> None:
         """Perform an action as a player of the game"""

@@ -11,7 +11,7 @@ class TestPlayer(TestCase):
     """Player unit tests"""
 
     def test_round_players_equal_by_identifier_only(self):
-        """When checking ifround  players are equal, only the identifier matters"""
+        """When checking if round players are equal, only the identifier matters"""
         identifier = "1"
         self.assertEqual(
             RoundPlayer(identifier),

@@ -21,13 +21,7 @@ from hundredandten.constants import (
     SelectableSuit,
 )
 from hundredandten.decisions import (
-    best_card,
-    desired_trump,
-    max_bid,
-    non_trumps,
     trumps,
-    worst_card,
-    worst_card_beating,
 )
 from hundredandten.deck import Card, Deck
 from hundredandten.events import (
@@ -427,72 +421,6 @@ class Round:
         discard = next((d for d in self.discards if d.identifier == identifier), None)
 
         return discard.cards + discard.kept if discard else player.hand
-
-    def suggestion(self) -> Action:
-        """Return the suggested action given the game state"""
-        if self.status == RoundStatus.BIDDING:
-            return self.__suggested_bid()
-        if self.status == RoundStatus.TRUMP_SELECTION:
-            return self.__suggested_trump_selection()
-        if self.status == RoundStatus.DISCARD:
-            return self.__suggested_discard()
-        if self.status == RoundStatus.TRICKS:
-            return self.__suggested_play()
-        raise HundredAndTenError(f"Cannot automate the action in status {self.status}")
-
-    def __suggested_bid(self) -> Bid:
-        """Return the suggested bid for the current player"""
-
-        maximum_bid = max_bid(self.active_player.hand)
-        available_bids = self.available_bids(self.active_player.identifier)
-        willing_bids = list(filter(lambda b: b and b <= maximum_bid, available_bids))
-
-        return Bid(
-            self.active_player.identifier, next(iter(willing_bids), BidAmount.PASS)
-        )
-
-    def __suggested_trump_selection(self) -> SelectTrump:
-        """Return the suggested trump selection for the current player"""
-
-        return SelectTrump(
-            self.active_player.identifier, desired_trump(self.active_player.hand)
-        )
-
-    def __suggested_discard(self) -> Discard:
-        """Return the suggested dicard action for the current player"""
-
-        return Discard(
-            self.active_player.identifier,
-            non_trumps(self.active_player.hand, self.trump),
-        )
-
-    def __suggested_play(self) -> Play:
-        """Return the suggested play action for the current player"""
-
-        playable_cards = self.active_player.hand
-        if self.active_trick.bleeding:
-            playable_cards = (
-                trumps(self.active_player.hand, self.trump) or playable_cards
-            )
-
-        winning_play = self.active_trick.winning_play
-
-        if not winning_play:
-            # if you are the bidder and you can bleed, do so
-            if self.active_player == self.active_bidder:
-                card = best_card(playable_cards, self.trump)
-            # otherwise, don't bleed if you can help it
-            else:
-                card = worst_card(playable_cards, self.trump)
-        else:
-            worst_winning_card = worst_card_beating(
-                playable_cards, winning_play.card, self.trump
-            )
-            # if you can beat the current winning card, do it with the lowest card that will do it
-            # otherwise, play nothing
-            card = worst_winning_card or worst_card(playable_cards, self.trump)
-
-        return Play(self.active_player.identifier, card)
 
     def __handle_bid(self, identifier: str, amount: BidAmount) -> None:
         if amount in self.available_bids(identifier):

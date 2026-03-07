@@ -34,6 +34,8 @@ class TestAutomatedPlay(TestCase):
         game = arrange.game(GameStatus.WON, seed=AUTOMATED_SEED)
 
         self.assertRaises(HundredAndTenError, game.suggestion)
+        self.assertRaises(HundredAndTenError, NaiveAutomatedPlayer(game.players[0].identifier).act,
+                          game.game_state_for(game.players[0].identifier))
 
     def test_initial_moves_dont_automate(self):
         """When starting a game with automated players, initial moves do not trigger automation"""
