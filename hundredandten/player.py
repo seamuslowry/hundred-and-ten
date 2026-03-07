@@ -35,7 +35,7 @@ class Player(ABC):
 class HumanPlayer(Player):
     """Represent a human player. Actions must be taken independently."""
 
-    def act(self, _: GameState) -> Optional[Action]:
+    def act(self, game_state: GameState) -> Optional[Action]:
         return None
 
 
