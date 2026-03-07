@@ -153,11 +153,3 @@ def remove_player_role(
 ) -> None:
     """Remove the provided role from the player with the given identifier."""
     player_by_identifier(players, identifier).roles.discard(role)
-
-
-def relative_distance(players: list[RoundPlayer], self: str, other: str) -> int:
-    """Return the relative distance of the other player to the first player"""
-    self_player = player_by_identifier(players, self)
-    other_player = player_by_identifier(players, other)
-
-    return (players.index(other_player) - players.index(self_player)) % len(players)

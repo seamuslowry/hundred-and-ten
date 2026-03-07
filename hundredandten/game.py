@@ -2,7 +2,6 @@
 
 import hashlib
 from dataclasses import InitVar, dataclass, field
-from functools import reduce
 from itertools import chain, combinations
 from random import Random
 from typing import Optional, Sequence
@@ -17,7 +16,7 @@ from hundredandten.constants import (
     SelectableSuit,
 )
 from hundredandten.decisions import trumps
-from hundredandten.deck import defined_cards
+from hundredandten.deck import Card, defined_cards
 from hundredandten.events import Event, GameEnd, GameStart, Score
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.player import (
@@ -26,7 +25,6 @@ from hundredandten.player import (
     RoundPlayer,
     player_after,
     player_by_identifier,
-    relative_distance,
 )
 from hundredandten.round import Round
 from hundredandten.state import (
@@ -194,26 +192,36 @@ class Game:
         Cards the player cannot see are marked Unknown.
         """
         game_round = self.active_round
-        num_players = len(game_round.players)
-        player = player_by_identifier(game_round.players, identifier)
-        player_index = game_round.players.index(player)
+        players = game_round.players
+        num_players = len(players)
+        non_relative_seat_by_identifier = {
+            round_player.identifier: index for index, round_player in enumerate(players)
+        }
+        player = player_by_identifier(players, identifier)
+        player_index = non_relative_seat_by_identifier[identifier]
 
         current_scores = self.scores
         table = TableInfo(
             num_players=num_players,
-            dealer_seat=relative_distance(
-                game_round.players, identifier, game_round.dealer.identifier
+            dealer_seat=self.__relative_seat(
+                non_relative_seat_by_identifier,
+                player.identifier,
+                game_round.dealer.identifier,
+                num_players,
             ),
             bidder_seat=(
-                relative_distance(
-                    game_round.players, identifier, game_round.active_bidder.identifier
+                self.__relative_seat(
+                    non_relative_seat_by_identifier,
+                    player.identifier,
+                    game_round.active_bidder.identifier,
+                    num_players,
                 )
                 if game_round.active_bidder
                 else None
             ),
             scores=tuple(
                 current_scores.get(
-                    game_round.players[(player_index + i) % num_players].identifier, 0
+                    players[(player_index + i) % num_players].identifier, 0
                 )
                 for i in range(num_players)
             ),
@@ -221,8 +229,11 @@ class Game:
         bidding = BiddingState(
             bid_history=tuple(
                 BidEvent(
-                    seat=relative_distance(
-                        game_round.players, identifier, bid.identifier
+                    seat=self.__relative_seat(
+                        non_relative_seat_by_identifier,
+                        player.identifier,
+                        bid.identifier,
+                        num_players,
                     ),
                     amount=bid.amount,
                 )
@@ -237,49 +248,71 @@ class Game:
             table=table,
             hand=tuple(player.hand),
             bidding=bidding,
-            tricks=self.__build_trick_state(game_round, player),
-            cards=self.__build_card_knowledge(game_round, player),
+            tricks=self.__build_trick_state(
+                game_round, player, non_relative_seat_by_identifier
+            ),
+            cards=self.__build_card_knowledge(
+                game_round, player, non_relative_seat_by_identifier
+            ),
             available_actions=self.__build_available_actions(game_round, player),
         )
 
     def __build_card_knowledge(
-        self, game_round: Round, player: RoundPlayer
+        self,
+        game_round: Round,
+        player: RoundPlayer,
+        non_relative_seat_by_identifier: dict[str, int],
     ) -> tuple[CardKnowledge, ...]:
-        card_status_list: list[InHand | Played | Discarded | Unknown] = [
-            Unknown() for _ in defined_cards
-        ]
+        card_status_by_card: dict[Card, InHand | Played | Discarded] = {}
+        num_players = len(game_round.players)
 
         for card in player.hand:
-            card_status_list[defined_cards.index(card)] = InHand()
+            card_status_by_card[card] = InHand()
 
         for trick_index, trick in enumerate(game_round.tricks):
             for play in trick.plays:
-                card_status_list[defined_cards.index(play.card)] = Played(
+                card_status_by_card[play.card] = Played(
                     trick_index=trick_index,
-                    seat=relative_distance(
-                        game_round.players, player.identifier, play.identifier
+                    seat=self.__relative_seat(
+                        non_relative_seat_by_identifier,
+                        player.identifier,
+                        play.identifier,
+                        num_players,
                     ),
                 )
 
         for discard in game_round.discards:
             if discard.identifier == player.identifier:
                 for card in discard.cards:
-                    card_status_list[defined_cards.index(card)] = Discarded(seat=0)
+                    card_status_by_card[card] = Discarded(seat=0)
 
+        unknown = Unknown()
         return tuple(
-            CardKnowledge(card=defined_cards[index], status=card_status_list[index])
-            for index in range(len(defined_cards))
+            CardKnowledge(
+                card=card,
+                status=card_status_by_card.get(card, unknown),
+            )
+            for card in defined_cards
         )
 
-    def __build_trick_state(self, game_round: Round, player: RoundPlayer) -> TrickState:
+    def __build_trick_state(
+        self,
+        game_round: Round,
+        player: RoundPlayer,
+        non_relative_seat_by_identifier: dict[str, int],
+    ) -> TrickState:
         completed_tricks: list[CompletedTrick] = []
         current_trick_plays: tuple[TrickPlay, ...] = ()
+        num_players = len(game_round.players)
 
         for trick in game_round.tricks:
             trick_plays = tuple(
                 TrickPlay(
-                    seat=relative_distance(
-                        game_round.players, player.identifier, play.identifier
+                    seat=self.__relative_seat(
+                        non_relative_seat_by_identifier,
+                        player.identifier,
+                        play.identifier,
+                        num_players,
                     ),
                     card=play.card,
                 )
@@ -291,10 +324,11 @@ class Game:
                 completed_tricks.append(
                     CompletedTrick(
                         plays=trick_plays,
-                        winner_seat=relative_distance(
-                            game_round.players,
+                        winner_seat=self.__relative_seat(
+                            non_relative_seat_by_identifier,
                             player.identifier,
                             winner_play.identifier,
+                            num_players,
                         ),
                     )
                 )
@@ -434,25 +468,25 @@ class Game:
         value: the player's score
         """
 
-        return reduce(
-            lambda acc, player: {
-                **acc,
-                player.identifier: self.__score_at_round(player.identifier, to_round),
-            },
-            self.players,
-            {player.identifier: 0 for player in self.players},
-        )
+        scores = {player.identifier: 0 for player in self.players}
 
-    def __score_at_round(self, identifier: str, to_round: int) -> int:
-        """Return the most recent score for the provided player at the provided round"""
+        for game_round in self._rounds[:to_round]:
+            if game_round.status != RoundStatus.COMPLETED:
+                continue
 
-        most_recent_score = next(
-            (
-                score
-                for score in reversed(self.__score_history(to_round))
-                if score.identifier == identifier
-            ),
-            None,
-        )
+            for score in game_round.scores:
+                scores[score.identifier] = scores.get(score.identifier, 0) + score.value
 
-        return most_recent_score.value if most_recent_score else 0
+        return scores
+
+    def __relative_seat(
+        self,
+        non_relative_seat_by_identifier: dict[str, int],
+        player_identifier: str,
+        other_identifier: str,
+        num_players: int,
+    ) -> int:
+        return (
+            non_relative_seat_by_identifier[other_identifier]
+            - non_relative_seat_by_identifier[player_identifier]
+        ) % num_players
