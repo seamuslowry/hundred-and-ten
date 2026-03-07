@@ -1,6 +1,7 @@
 """Represent one round of a game of Hundred and Ten"""
 
 from dataclasses import InitVar, dataclass, field
+from functools import cached_property
 from typing import Optional
 
 from hundredandten.actions import (
@@ -110,7 +111,7 @@ class Round:
             raise HundredAndTenError("No dealer found.")
         return dlr
 
-    @property
+    @cached_property
     def active_player(self) -> RoundPlayer:
         """The current active player."""
         # while bidding, the active player is the one after the last bidder that can place a bid
@@ -328,6 +329,9 @@ class Round:
             self.__discard(action)
         if isinstance(action, Play):
             self.__play(action)
+        self.__invalidate_cached_properties()
+
+        self.__handle_prepass()
 
     def __bid(self, bid: Bid) -> None:
         """Record a bid from a player"""
@@ -425,7 +429,6 @@ class Round:
     def __handle_bid(self, identifier: str, amount: BidAmount) -> None:
         if amount in self.available_bids(identifier):
             self._bids.append(Bid(identifier, amount))
-            self.__handle_prepass()
         else:
             raise HundredAndTenError(
                 f"Player {identifier} cannot place a bid for {amount.value}"
@@ -439,7 +442,7 @@ class Round:
             remove_player_role(
                 self.players, self.active_player.identifier, RoundRole.PRE_PASSED
             )
-            self.__handle_bid(self.active_player.identifier, BidAmount.PASS)
+            self.act(Bid(self.active_player.identifier, BidAmount.PASS))
 
     def __is_available_bid(self, identifier: str, amount: BidAmount) -> bool:
         """Determine if the listed bid amount is available to the listed player"""
@@ -483,3 +486,6 @@ class Round:
     def __new_trick(self) -> None:
         assert self.trump
         self.tricks.append(Trick(self.trump))
+
+    def __invalidate_cached_properties(self) -> None:
+        del self.active_player
