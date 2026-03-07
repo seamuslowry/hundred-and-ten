@@ -20,6 +20,7 @@ from hundredandten.deck import Card, defined_cards
 from hundredandten.events import Event, GameEnd, GameStart, Score
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.player import (
+    AutomatedPlayer,
     Player,
     RoundPlayer,
     player_after,
@@ -377,6 +378,7 @@ class Game:
     def __automated_act(self):
         while (
             isinstance(self.status, RoundStatus)
+            and isinstance(self.active_player, AutomatedPlayer)
             and (
                 action := self.active_player.act(
                     self.game_state_for(self.active_player.identifier)

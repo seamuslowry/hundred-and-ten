@@ -26,6 +26,11 @@ class Player(ABC):
 
     identifier: str
 
+
+@dataclass
+class AutomatedPlayer(Player):
+    """A class to represent an automated player at the game level"""
+
     @abstractmethod
     def act(self, game_state: GameState) -> Optional[Action]:
         """Return the action this player should take, or None if no action"""
@@ -35,12 +40,9 @@ class Player(ABC):
 class HumanPlayer(Player):
     """Represent a human player. Actions must be taken independently."""
 
-    def act(self, game_state: GameState) -> Optional[Action]:
-        return None
-
 
 @dataclass
-class NaiveAutomatedPlayer(Player):
+class NaiveAutomatedPlayer(AutomatedPlayer):
     """Represent an automated player. Actions will be taken autonomously."""
 
     def act(self, game_state: GameState) -> Optional[Action]:
