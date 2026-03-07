@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Optional
 
 from hundredandten.actions import Action, Bid, Discard, Play, SelectTrump
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
@@ -32,7 +31,7 @@ class AutomatedPlayer(Player):
     """A class to represent an automated player at the game level"""
 
     @abstractmethod
-    def act(self, game_state: GameState) -> Optional[Action]:
+    def act(self, game_state: GameState) -> Action:
         """Return the action this player should take, or None if no action"""
 
 
@@ -45,7 +44,7 @@ class HumanPlayer(Player):
 class NaiveAutomatedPlayer(AutomatedPlayer):
     """Represent an automated player. Actions will be taken autonomously."""
 
-    def act(self, game_state: GameState) -> Optional[Action]:
+    def act(self, game_state: GameState) -> Action:
         """Return the suggested action given the game state"""
         if game_state.status == RoundStatus.BIDDING:
             return self.__suggested_bid(game_state)
