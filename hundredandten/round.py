@@ -413,7 +413,7 @@ class Round:
         self.active_trick.plays.append(play)
         self.__end_play()
 
-    def _available_bids(self, identifier: str) -> list[BidAmount]:
+    def available_bids(self, identifier: str) -> list[BidAmount]:
         """Compute the bid amounts available to the identified player"""
         return [
             bid_amount
@@ -444,7 +444,7 @@ class Round:
         """Return the suggested bid for the current player"""
 
         maximum_bid = max_bid(self.active_player.hand)
-        available_bids = self._available_bids(self.active_player.identifier)
+        available_bids = self.available_bids(self.active_player.identifier)
         willing_bids = list(filter(lambda b: b and b <= maximum_bid, available_bids))
 
         return Bid(
@@ -495,7 +495,7 @@ class Round:
         return Play(self.active_player.identifier, card)
 
     def __handle_bid(self, identifier: str, amount: BidAmount) -> None:
-        if amount in self._available_bids(identifier):
+        if amount in self.available_bids(identifier):
             self._bids.append(Bid(identifier, amount))
             self.__handle_prepass()
         else:
