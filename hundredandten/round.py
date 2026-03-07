@@ -162,17 +162,17 @@ class Round:
             f"Cannot determine active player in {self.status} status"
         )
 
-    @property
+    @cached_property
     def inactive_players(self) -> list[RoundPlayer]:
         """The players that are not active."""
         return [p for p in self.players if p != self.active_player]
 
-    @property
+    @cached_property
     def active_bid(self) -> Optional[BidAmount]:
         """The maximum bid submitted this round"""
         return max(self.bids).amount if self.bids else None
 
-    @property
+    @cached_property
     def bidders(self) -> list[RoundPlayer]:
         """Anyone in this round that can still submit a bid."""
         return [
@@ -181,7 +181,7 @@ class Round:
             if self.__current_bid(p.identifier) != Bid("", BidAmount.PASS)
         ]
 
-    @property
+    @cached_property
     def active_bidder(self) -> Optional[RoundPlayer]:
         """The active bidder this round."""
 
@@ -196,7 +196,7 @@ class Round:
             raise HundredAndTenError("No active trick found.")
         return self.tricks[-1]
 
-    @property
+    @cached_property
     def trump(self) -> Optional[SelectableSuit]:
         """The selected trump"""
         if not self.selection:
@@ -208,7 +208,7 @@ class Round:
         """True if the round is complete, False otherwise"""
         return self.status in [RoundStatus.COMPLETED, RoundStatus.COMPLETED_NO_BIDDERS]
 
-    @property
+    @cached_property
     def status(self) -> RoundStatus:
         """The status property."""
         if self.tricks and all(not player.hand for player in self.players):
@@ -223,7 +223,7 @@ class Round:
             return RoundStatus.COMPLETED_NO_BIDDERS
         return RoundStatus.BIDDING
 
-    @property
+    @cached_property
     def events(self) -> list[Event]:
         """The events that occurred in the round."""
         trick_events: list[list[Event]] = [
@@ -253,7 +253,7 @@ class Round:
             *([RoundEnd(scores=self.scores)] if self.__completed else []),
         ]
 
-    @property
+    @cached_property
     def scores(self) -> list[Score]:
         """
         The scores each player earned for this round
@@ -321,17 +321,23 @@ class Round:
         """Perform an action as a player of the game"""
         if isinstance(action, Bid):
             self.__bid(action)
+            self.__invalidate_cached_properties()
+            self.__handle_prepass()
         if isinstance(action, Unpass):
             self.__unpass(action)
+            self.__invalidate_cached_properties()
         if isinstance(action, SelectTrump):
             self.__select_trump(action)
+            self.__invalidate_cached_properties()
         if isinstance(action, Discard):
             self.__discard(action)
+            self.__invalidate_cached_properties()
+            self.__end_discard()
         if isinstance(action, Play):
             self.__play(action)
+            self.__invalidate_cached_properties()
+            self.__end_play()
         self.__invalidate_cached_properties()
-
-        self.__handle_prepass()
 
     def __bid(self, bid: Bid) -> None:
         """Record a bid from a player"""
@@ -387,7 +393,7 @@ class Round:
         self._discards.append(
             DetailedDiscard(discard.identifier, discard.cards, remaining)
         )
-        self.__end_discard()
+        # self.__end_discard()
 
     def __play(self, play: Play) -> None:
         """Play the specified card from the identified player's hand"""
@@ -409,7 +415,7 @@ class Round:
 
         self.active_player.hand.remove(play.card)
         self.active_trick.plays.append(play)
-        self.__end_play()
+        # self.__end_play()
 
     def available_bids(self, identifier: str) -> list[BidAmount]:
         """Compute the bid amounts available to the identified player"""
@@ -488,4 +494,6 @@ class Round:
         self.tricks.append(Trick(self.trump))
 
     def __invalidate_cached_properties(self) -> None:
-        del self.active_player
+        for name, value in type(self).__dict__.items():
+            if isinstance(value, cached_property):
+                self.__dict__.pop(name, None)
