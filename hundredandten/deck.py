@@ -96,7 +96,7 @@ card_info = {
 }
 
 
-@dataclass
+@dataclass(frozen=True)
 class Card:
     """A playing card"""
 

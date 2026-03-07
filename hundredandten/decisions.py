@@ -1,12 +1,12 @@
 """A module to make machine decisions about how to act in a game"""
 
-from typing import Optional
+from typing import Optional, Sequence
 
 from hundredandten.constants import BidAmount, CardNumber, SelectableSuit
 from hundredandten.deck import Card
 
 
-def max_bid(cards: list[Card]) -> BidAmount:
+def max_bid(cards: Sequence[Card]) -> BidAmount:
     """Return the maximum amount to bid with the given hand"""
 
     best_value = __most_valuable_suit(cards)[1]
@@ -25,18 +25,18 @@ def max_bid(cards: list[Card]) -> BidAmount:
     return BidAmount.PASS
 
 
-def desired_trump(cards: list[Card]) -> SelectableSuit:
+def desired_trump(cards: Sequence[Card]) -> SelectableSuit:
     """Return the desired trump for the given hand"""
 
     return __most_valuable_suit(cards)[0]
 
 
-def best_card(cards: list[Card], trump: Optional[SelectableSuit]) -> Card:
+def best_card(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Card:
     """Return the best trump card in the list of cards"""
     return max(trumps(cards, trump), key=lambda c: c.trump_value, default=cards[0])
 
 
-def worst_card(cards: list[Card], trump: Optional[SelectableSuit]) -> Card:
+def worst_card(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Card:
     """Return the worst card in the list of cards"""
     worst_non_trump = min(
         non_trumps(cards, trump), key=lambda c: c.weak_trump_value, default=None
@@ -49,7 +49,7 @@ def worst_card(cards: list[Card], trump: Optional[SelectableSuit]) -> Card:
 
 
 def worst_card_beating(
-    cards: list[Card], card_to_beat: Card, trump: Optional[SelectableSuit]
+    cards: Sequence[Card], card_to_beat: Card, trump: Optional[SelectableSuit]
 ) -> Optional[Card]:
     """Return the worst card in the list of cards"""
     beating = __cards_beating(cards, card_to_beat, trump)
@@ -58,8 +58,8 @@ def worst_card_beating(
 
 
 def __cards_beating(
-    cards: list[Card], card_to_beat: Card, trump: Optional[SelectableSuit]
-) -> list[Card]:
+    cards: Sequence[Card], card_to_beat: Card, trump: Optional[SelectableSuit]
+) -> Sequence[Card]:
     """Return all cards in the list that beat the provided card"""
     trump_cards = trumps(cards, trump)
 
@@ -78,17 +78,19 @@ def __cards_beating(
     return list(filter(lambda c: c.trump_value > card_to_beat.trump_value, trump_cards))
 
 
-def trumps(cards: list[Card], trump: Optional[SelectableSuit]) -> list[Card]:
+def trumps(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Sequence[Card]:
     """Return all trump cards in the list"""
     return [card for card in cards if card.suit == trump or card.always_trump]
 
 
-def non_trumps(cards: list[Card], trump: Optional[SelectableSuit]) -> list[Card]:
+def non_trumps(
+    cards: Sequence[Card], trump: Optional[SelectableSuit]
+) -> Sequence[Card]:
     """Return all non trump cards in the list"""
     return [card for card in cards if card.suit != trump and not card.always_trump]
 
 
-def __bid_value(cards: list[Card]) -> int:
+def __bid_value(cards: Sequence[Card]) -> int:
     """Returns the bid value for a list of cards, assuming they are all trump"""
     discouragement = (
         -10 if CardNumber.FIVE not in list(map(lambda c: c.number, cards)) else 0
@@ -97,12 +99,12 @@ def __bid_value(cards: list[Card]) -> int:
     return sum(map(lambda card: card.trump_value, cards)) + discouragement
 
 
-def __most_valuable_suit(cards: list[Card]) -> tuple[SelectableSuit, int]:
+def __most_valuable_suit(cards: Sequence[Card]) -> tuple[SelectableSuit, int]:
     """Return a list of each suit with a numeric value of how much trump it has"""
     return max(__suits_by_value(cards).items(), key=lambda item: item[1])
 
 
-def __suits_by_value(cards: list[Card]) -> dict[SelectableSuit, int]:
+def __suits_by_value(cards: Sequence[Card]) -> dict[SelectableSuit, int]:
     """Return a list of each suit with a numeric value of how much trump it has"""
     return {
         suit: __bid_value(grouped_cards)
@@ -110,7 +112,7 @@ def __suits_by_value(cards: list[Card]) -> dict[SelectableSuit, int]:
     }
 
 
-def __cards_by_suit(cards: list[Card]) -> dict[SelectableSuit, list[Card]]:
+def __cards_by_suit(cards: Sequence[Card]) -> dict[SelectableSuit, list[Card]]:
     """
     Return the list as a dictionary of cards sorted by suit
     if they would be trump for that suit.
@@ -120,3 +122,11 @@ def __cards_by_suit(cards: list[Card]) -> dict[SelectableSuit, list[Card]]:
         suit: [card for card in cards if card.suit == suit or card.always_trump]
         for suit in list(SelectableSuit)
     }
+
+
+def bleeds(card: Card, trump: SelectableSuit) -> bool:
+    """
+    Return true if the card played causes a trick to bleed
+    if played under the provided trump
+    """
+    return card.suit == trump or card.always_trump

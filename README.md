@@ -354,7 +354,28 @@ If multiple players are above 110, the winner is determined as follows:
 
 ## Players
 
-All players in the game must have a unique string identifier. They may also have a list of applicable roles, but, for most use cases, the engine should manage those roles itself.
+All players in the game are represented by a class extending the base `Player` class. Each player must have a unique string identifier.
+
+### Player Types
+
+- `HumanPlayer`: Represents a person making manual decisions. The game will wait for these players to `act`.
+- `AutomatedPlayer`: An abstract base class for AI players. Subclasses must implement the `act(game_state)` method.
+- `NaiveAutomatedPlayer`: A built-in implementation of `AutomatedPlayer` that makes simple, rule-based decisions.
+
+### Custom Automated Players
+
+You can create custom AI by extending `AutomatedPlayer` and implementing the `act` method. This method receives a `GameState` object representing the game from that player's perspective.
+
+```python
+class MySmartPlayer(AutomatedPlayer):
+    def act(self, game_state: GameState) -> Action:
+        # logic to determine the best action based on game_state
+        # for example, always play the first available card during tricks
+        if game_state.available_plays:
+            return game_state.available_plays[0]
+        # return None or another action for other phases
+```
+
 
 ### Roles
 
@@ -365,18 +386,18 @@ All players in the game must have a unique string identifier. They may also have
 
 ### `HundredAndTen.start_game`
 
-Start a game by initializing a `HundredAndTen` instance with a group of players and no rounds.
+Start a game by initializing a `HundredAndTen` instance with a group of players. Use `HumanPlayer` for people and any subclass of `AutomatedPlayer` for machine play.
 
 ```python
-game = HundredAndTen(Group([
-    Player('player_1'),
-    Player('player_2'),
-    Player('player_3'),
-    Player('player_4', automate=True),
-]))
+game = HundredAndTen([
+    HumanPlayer('player_1'),
+    HumanPlayer('player_2'),
+    HumanPlayer('player_3'),
+    NaiveAutomatedPlayer('player_4'),
+])
 ```
 
-If a player is set as `automate=True`, that player will automatically act following the [suggested action](#hundredandtensuggestion).
+Automated players will act automatically as soon as it is their turn. If a human action triggers a sequence of automated turns, they will all be processed before the `act` call returns.
 
 ## Determining the State of a Game
 
@@ -504,16 +525,23 @@ from hundredandten import HundredAndTen, Play
 game.act(Play('active_player', game.active_round.active_player.hand[0]))
 ```
 
-## Machine Play
+## Automated Play
 
-### `HundredAndTen.suggestion`
+Automated players in Hundred and Ten are first-class citizens. Instead of a simple "suggested move" API, the engine uses an observation-based architecture where automated players receive a "slice" of the game state and return an action.
 
-At any state of active play (when the game is not `GameStatus.WON` or `GameStatus.WAITING_FOR_PLAYERS`), the game can provide a suggested action.
+### GameState Observation
 
-```python
-from hundredandten import HundredAndTen
+When an `AutomatedPlayer` is asked to act, it receives a `GameState` object. This object is seat-relative: the player taking the action is always at seat 0, and other seats are numbered clockwise from there.
 
-# set up and start the game
+The `GameState` provides:
+- `hand`: The player's current cards.
+- `status`: The current phase of the round (Bidding, Trump Selection, etc.).
+- `table`: Information about scores, dealer position, and bidder position.
+- `bidding`: History of bids and the selected trump suit.
+- `tricks`: Information about completed tricks and the current in-progress trick.
+- `cards`: Knowledge about all cards in the deck (whether they are in hand, played, discarded, or unknown).
+- `available_actions`: A list of all legal moves the player can make.
 
-print(game.suggestion()) # will be a Bid, SelectTrump, Discard, or Play action
-```
+### Built-in AI
+
+The `NaiveAutomatedPlayer` provides a baseline AI that follows basic game rules (like bleeding) and makes simple bidding decisions based on hand strength. It is useful for testing or filling out a table.

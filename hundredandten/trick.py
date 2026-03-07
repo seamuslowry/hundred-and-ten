@@ -5,6 +5,7 @@ from typing import Callable, Optional
 
 from hundredandten.actions import Play
 from hundredandten.constants import CardSuit, SelectableSuit
+from hundredandten.decisions import bleeds
 from hundredandten.deck import Card
 
 
@@ -34,9 +35,7 @@ class Trick:
     @property
     def bleeding(self) -> bool:
         """True if the trick should force players to play a trump card (if they have one)"""
-        return bool(self.leading_card) and (
-            self.leading_card.suit == self.round_trump or self.leading_card.always_trump
-        )
+        return bool(self.leading_card) and bleeds(self.leading_card, self.round_trump)
 
     @property
     def leading_card(self) -> Optional[Card]:

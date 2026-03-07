@@ -13,22 +13,7 @@ from hundredandten.constants import (
 )
 from hundredandten.decisions import trumps
 from hundredandten.game import Game
-from hundredandten.group import Group, Player
-
-
-def automated_game(
-    seed: Optional[str] = None,
-) -> Game:
-    """
-    Return a game with all automated players in the requested status.
-    If passed, will call the massage function on the game before returning
-    """
-    return __game(
-        # Round status is irrelevant here since the game will automate to the end
-        RoundStatus.BIDDING,
-        seed=seed,
-        automate=True,
-    )
+from hundredandten.player import HumanPlayer
 
 
 def game(
@@ -41,14 +26,13 @@ def game(
     If passed, will call the massage function on the game before returning
     """
 
-    return __game(status, massage, seed, False)
+    return __game(status, massage, seed)
 
 
 def __game(
     status: AnyStatus,
     massage: Callable[[Game], None] = lambda f_game: None,
     seed: Optional[str] = None,
-    automate: bool = False,
 ) -> Game:
     """
     Return a game in the requested status.
@@ -63,7 +47,7 @@ def __game(
         RoundStatus.DISCARD: __get_discard_game,
         RoundStatus.TRICKS: __get_tricks_game,
         GameStatus.WON: __get_won_game,
-    }[status](seed, automate)
+    }[status](seed)
     massage(new_game)
     return new_game
 
@@ -114,7 +98,7 @@ def play_trick(game_to_play: Game) -> None:
     starting_active_trick = game_to_play.active_round.active_trick
     while len(starting_active_trick.plays) < len(game_to_play.players):
         active_player = game_to_play.active_round.active_player
-        trump_cards = trumps(active_player.hand, game_to_play.active_round.trump)
+        trump_cards = list(trumps(active_player.hand, game_to_play.active_round.trump))
         game_to_play.act(
             Play(active_player.identifier, next(iter(trump_cards + active_player.hand)))
         )
@@ -126,15 +110,13 @@ def play_round(game_to_play: Game) -> None:
         play_trick(game_to_play)
 
 
-def __get_bidding_game(seed: Optional[str], automate: bool = False) -> Game:
+def __get_bidding_game(seed: Optional[str]) -> Game:
     """Returns a game with no moves"""
     new_game = Game(
-        players=Group(
-            list(
-                map(
-                    lambda identifier: Player(str(identifier), automate=automate),
-                    range(4),
-                )
+        players=list(
+            map(
+                lambda identifier: HumanPlayer(str(identifier)),
+                range(4),
             )
         ),
         seed=seed or str(uuid4()),
@@ -142,40 +124,38 @@ def __get_bidding_game(seed: Optional[str], automate: bool = False) -> Game:
     return new_game
 
 
-def __get_completed_no_bidders_game(
-    seed: Optional[str], automate: bool = False
-) -> Game:
+def __get_completed_no_bidders_game(seed: Optional[str]) -> Game:
     """Returns a game in the completed no bidders status"""
-    new_game = __get_bidding_game(seed, automate)
+    new_game = __get_bidding_game(seed)
     pass_round(new_game)
     return new_game
 
 
-def __get_trump_selection_game(seed: Optional[str], automate: bool = False) -> Game:
+def __get_trump_selection_game(seed: Optional[str]) -> Game:
     """Return a game in the trump selection status"""
-    new_game = __get_bidding_game(seed, automate)
+    new_game = __get_bidding_game(seed)
     bid(new_game)
     return new_game
 
 
-def __get_discard_game(seed: Optional[str], automate: bool = False) -> Game:
+def __get_discard_game(seed: Optional[str]) -> Game:
     """Return a game in the discard status"""
-    new_game = __get_trump_selection_game(seed, automate)
+    new_game = __get_trump_selection_game(seed)
     select_trump(new_game)
     return new_game
 
 
-def __get_tricks_game(seed: Optional[str], automate: bool = False) -> Game:
+def __get_tricks_game(seed: Optional[str]) -> Game:
     """Return a game in the tricks status"""
-    new_game = __get_discard_game(seed, automate)
+    new_game = __get_discard_game(seed)
     discard(new_game)
 
     return new_game
 
 
-def __get_won_game(seed: Optional[str], automate: bool = False) -> Game:
+def __get_won_game(seed: Optional[str]) -> Game:
     """Return a game in the won status"""
-    new_game = __get_bidding_game(seed, automate)
+    new_game = __get_bidding_game(seed)
     while new_game.status != GameStatus.WON:
         bid(new_game)
         select_trump(new_game)
