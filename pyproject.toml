@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "hundredandten"
 # Note, CI bug means version 4.0.0 is already claimed in PyPi
-version = "3.0.1"
+version = "3.0.2"
 description = "A package to play the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.11"
