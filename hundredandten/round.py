@@ -204,7 +204,7 @@ class Round:
         return self.selection.suit
 
     @property
-    def __completed(self) -> bool:
+    def completed(self) -> bool:
         """True if the round is complete, False otherwise"""
         return self.status in [RoundStatus.COMPLETED, RoundStatus.COMPLETED_NO_BIDDERS]
 
@@ -250,7 +250,7 @@ class Round:
             *self._discards,
             *[trick_event for event_list in trick_events for trick_event in event_list],
             # don't include the round end event if it hasn't ended
-            *([RoundEnd(scores=self.scores)] if self.__completed else []),
+            *([RoundEnd(scores=self.scores)] if self.completed else []),
         ]
 
     @cached_property
