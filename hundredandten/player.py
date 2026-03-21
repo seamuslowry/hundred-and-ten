@@ -2,6 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from typing import Optional
 
 from hundredandten.actions import Action, Bid, Discard, Play, SelectTrump
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
@@ -32,7 +33,7 @@ class AutomatedPlayer(Player):
     """A class to represent an automated player at the game level"""
 
     @abstractmethod
-    def act(self, game_state: GameState) -> Action:
+    def act(self, game_state: GameState) -> Optional[Action]:
         """Return the action this player should take, or None if no action"""
 
 
