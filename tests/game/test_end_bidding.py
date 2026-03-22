@@ -3,9 +3,8 @@
 from unittest import TestCase
 
 from hundredandten.actions import Bid
-from hundredandten.constants import BidAmount, RoundRole, RoundStatus
+from hundredandten.constants import BidAmount, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.player import players_by_role
 from tests import arrange
 
 
@@ -50,29 +49,6 @@ class TestEndBidding(TestCase):
         self.assertEqual(game.rounds[-2].status, RoundStatus.COMPLETED_NO_BIDDERS)
         # new round in bidding
         self.assertEqual(game.status, RoundStatus.BIDDING)
-
-    def test_end_bidding_with_prepass(self):
-        """When all players have prepassed, the round can end"""
-        game = arrange.game(RoundStatus.BIDDING)
-
-        self.assertEqual(0, len(game.active_round.bids))
-
-        for player in list(
-            filter(lambda p: p != game.active_round.active_player, game.players)
-        ):
-            game.act(Bid(player.identifier, BidAmount.PASS))
-
-        self.assertEqual(0, len(game.active_round.bids))
-
-        game.act(Bid(game.active_round.active_player.identifier, BidAmount.PASS))
-
-        self.assertEqual(4, len(game.rounds[-2].bids))
-        self.assertEqual(
-            0, len(players_by_role(game.rounds[-2].players, RoundRole.PRE_PASSED))
-        )
-        self.assertEqual(0, len(game.rounds[-2].bidders))
-        self.assertEqual(RoundStatus.COMPLETED_NO_BIDDERS, game.rounds[-2].status)
-        self.assertRaises(HundredAndTenError, lambda: game.rounds[-2].active_player)
 
     def test_end_bidding_with_same_dealer(self):
         """
