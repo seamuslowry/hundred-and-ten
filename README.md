@@ -455,30 +455,6 @@ from hundredandten import HundredAndTen, Bid, BidAmount
 game.act(Bid('active_player_identifier', BidAmount.FIFTEEN))
 ```
 
-To pre-pass, a non-active player must bid a pass.
-
-```python
-from hundredandten import HundredAndTen, Bid, BidAmount
-
-# set up and start the game
-
-game.act(Bid('non_active_player_identifier', BidAmount.PASS))
-# when 'non_active_player_identifier' becomes the active player, they will pass
-```
-
-### `HundredAndTen.act` to `Unpass`
-
-If a player has prepassed, but would now like to `Bid` a non-zero amount, they should `Unpass` to avoid automatically passing on their turn.
-
-```python
-from hundredandten import HundredAndTen, Bid, BidAmount, Unpass
-
-# set up and start the game
-# pass as the non active player
-
-game.act(Unpass('non_active_player_identifier'))
-```
-
 ### `HundredAndTen.act` to `SelectTrump`
 
 Once a player has won the bid, that player must select the trump suit for that round.

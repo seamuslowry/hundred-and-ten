@@ -14,11 +14,6 @@ class Action(Event):
     identifier: str
 
 
-@dataclass
-class Unpass(Action):
-    """A class to represent the unpass action"""
-
-
 @dataclass(order=True)
 class Bid(Action):
     """A class to keep track of bid information"""

@@ -32,7 +32,6 @@ class RoundRole(Enum):
     """The roles a person can have in a round"""
 
     DEALER = 1
-    PRE_PASSED = 2
 
 
 class BidAmount(IntEnum):

@@ -11,7 +11,6 @@ from hundredandten.actions import (
     Discard,
     Play,
     SelectTrump,
-    Unpass,
 )
 from hundredandten.constants import (
     HAND_SIZE,
@@ -41,7 +40,6 @@ from hundredandten.player import (
     player_after,
     player_by_identifier,
     players_by_role,
-    remove_player_role,
 )
 from hundredandten.trick import Trick
 
@@ -322,10 +320,6 @@ class Round:
         if isinstance(action, Bid):
             self.__bid(action)
             self.__invalidate_cached_properties()
-            self.__handle_prepass()
-        if isinstance(action, Unpass):
-            self.__unpass(action)
-            self.__invalidate_cached_properties()
         if isinstance(action, SelectTrump):
             self.__select_trump(action)
             self.__invalidate_cached_properties()
@@ -348,14 +342,8 @@ class Round:
             and self.active_player == player_by_identifier(self.players, identifier)
         ):
             self.__handle_bid(identifier, amount)
-        elif amount == BidAmount.PASS:
-            add_player_role(self.players, identifier, RoundRole.PRE_PASSED)
         else:
             raise HundredAndTenError("Cannot bid out of order")
-
-    def __unpass(self, unpass: Unpass) -> None:
-        """Discount a prepass bid from the identified player"""
-        remove_player_role(self.players, unpass.identifier, RoundRole.PRE_PASSED)
 
     def __select_trump(self, select_trump: SelectTrump) -> None:
         """Select the passed suit as trump"""
@@ -438,22 +426,12 @@ class Round:
                 f"Player {identifier} cannot place a bid for {amount.value}"
             )
 
-    def __handle_prepass(self) -> None:
-        if (
-            self.status == RoundStatus.BIDDING
-            and RoundRole.PRE_PASSED in self.active_player.roles
-        ):
-            remove_player_role(
-                self.players, self.active_player.identifier, RoundRole.PRE_PASSED
-            )
-            self.act(Bid(self.active_player.identifier, BidAmount.PASS))
-
     def __is_available_bid(self, identifier: str, amount: BidAmount) -> bool:
         """Determine if the listed bid amount is available to the listed player"""
         player = player_by_identifier(self.players, identifier)
         return (
             # the identified player must be able to submit a bid
-            (player in self.bidders and RoundRole.PRE_PASSED not in player.roles)
+            player in self.bidders
             and
             # pass is always available as a bid
             (

@@ -2,10 +2,10 @@
 
 from unittest import TestCase
 
-from hundredandten.actions import Bid, Unpass
+from hundredandten.actions import Bid
 from hundredandten.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.hundred_and_ten_error import HundredAndTenError
-from hundredandten.player import player_after, players_by_role, remove_player_role
+from hundredandten.player import remove_player_role
 from tests import arrange
 
 
@@ -89,6 +89,10 @@ class TestBidding(TestCase):
 
         game.act(Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
 
+        self.assertIsNone(game.active_round.active_bidder)  # competing bids
+
+        game.act(Bid(game.active_round.active_player.identifier, BidAmount.PASS))
+
         self.assertEqual(game.active_round.active_bidder, game.active_round.dealer)
 
     def test_bid_from_passed_player(self):
@@ -113,52 +117,3 @@ class TestBidding(TestCase):
             game.act,
             Bid(game.active_round.inactive_players[0].identifier, BidAmount.FIFTEEN),
         )
-
-    def test_pass_from_inactive_player(self):
-        """Inactive player can prepass"""
-
-        game = arrange.game(RoundStatus.BIDDING)
-
-        game.act(Bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS))
-
-        self.assertEqual(0, len(game.active_round.bids))
-        self.assertIn(RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles)
-
-    def test_unpass_from_prepassed_player(self):
-        """Prepassed player can unpass"""
-
-        game = arrange.game(RoundStatus.BIDDING)
-
-        game.act(Bid(game.active_round.inactive_players[0].identifier, BidAmount.PASS))
-
-        self.assertIn(RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles)
-
-        game.act(Unpass(game.active_round.inactive_players[0].identifier))
-
-        self.assertEqual(0, len(game.active_round.bids))
-        self.assertNotIn(
-            RoundRole.PRE_PASSED, game.active_round.inactive_players[0].roles
-        )
-
-    def test_prepass(self):
-        """When the next player has prepassed, auto pass for them"""
-        game = arrange.game(RoundStatus.BIDDING)
-
-        next_player = player_after(
-            game.active_round.players, game.active_round.active_player.identifier
-        )
-
-        game.act(Bid(next_player.identifier, BidAmount.PASS))
-
-        self.assertEqual(0, len(game.active_round.bids))
-
-        game.act(Bid(game.active_round.active_player.identifier, BidAmount.PASS))
-
-        self.assertEqual(2, len(game.active_round.bids))
-        self.assertEqual(RoundStatus.BIDDING, game.status)
-        self.assertEqual(
-            0, len(players_by_role(game.active_round.players, RoundRole.PRE_PASSED))
-        )
-        self.assertIn(game.active_round.active_player, game.active_round.bidders)
-        # play will have passed the previously "next" player since they pre-passed
-        self.assertNotEqual(game.active_round.active_player, next_player)

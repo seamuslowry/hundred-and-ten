@@ -54,26 +54,26 @@ def __game(
 
 def pass_round(game_to_pass: Game) -> None:
     """Pass the current round of the provided game"""
-    for player in game_to_pass.active_round.bidders:
-        game_to_pass.act(Bid(player.identifier, BidAmount.PASS))
+    for _ in range(len(game_to_pass.active_round.bidders)):
+        game_to_pass.act(Bid(game_to_pass.active_player.identifier, BidAmount.PASS))
 
 
 def pass_to_dealer(game_to_pass: Game) -> None:
     """Pass the current round until reaching the dealer"""
-    for player in filter(
-        lambda p: p != game_to_pass.active_round.dealer,
-        game_to_pass.active_round.bidders,
-    ):
-        game_to_pass.act(Bid(player.identifier, BidAmount.PASS))
+    while (
+        p := game_to_pass.active_player
+    ).identifier != game_to_pass.active_round.dealer.identifier:
+        game_to_pass.act(Bid(p.identifier, BidAmount.PASS))
 
 
 def bid(game_to_bid: Game) -> None:
     """Have the active player place a bid"""
-    for player in game_to_bid.active_round.inactive_players:
-        game_to_bid.act(Bid(player.identifier, BidAmount.PASS))
     game_to_bid.act(
         Bid(game_to_bid.active_round.active_player.identifier, BidAmount.FIFTEEN)
     )
+
+    while game_to_bid.status != RoundStatus.TRUMP_SELECTION:
+        game_to_bid.act(Bid(game_to_bid.active_player.identifier, BidAmount.PASS))
 
 
 def select_trump(game_to_select: Game) -> None:
