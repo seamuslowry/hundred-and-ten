@@ -71,8 +71,8 @@ class TestAutomatedPlay(TestCase):
         )
 
         self.assertEqual(
-            initial_moves, automated_game_after_start.moves[: len(initial_moves)]
+            initial_moves, automated_game_after_start.actions[: len(initial_moves)]
         )
         self.assertNotEqual(
-            initial_moves, automated_game_from_start.moves[: len(initial_moves)]
+            initial_moves, automated_game_from_start.actions[: len(initial_moves)]
         )

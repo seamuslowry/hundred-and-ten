@@ -151,3 +151,4 @@ class TestPlayCard(TestCase):
         game = arrange.game(RoundStatus.TRICKS, arrange.play_round)
 
         self.assertEqual(2, len(game.rounds))
+        self.assertTrue(game.rounds[-2].completed)

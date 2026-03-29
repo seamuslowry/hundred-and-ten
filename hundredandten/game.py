@@ -17,7 +17,6 @@ from hundredandten.constants import (
 )
 from hundredandten.decisions import trumps
 from hundredandten.deck import Card, defined_cards
-from hundredandten.events import Event, GameEnd, GameStart, Score
 from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.player import (
     AutomatedPlayer,
@@ -41,6 +40,7 @@ from hundredandten.state import (
     TrickState,
     Unknown,
 )
+from hundredandten.trick import Score
 
 
 @dataclass
@@ -127,19 +127,9 @@ class Game:
         )
 
     @property
-    def moves(self) -> list[Action]:
-        """All moves that have been played in the game."""
-        return [move for move in self.events if isinstance(move, Action)]
-
-    @property
-    def events(self) -> list[Event]:
-        """The events that occurred in the game."""
-
-        return [
-            GameStart(),
-            *chain.from_iterable(r.events for r in self._rounds),
-            *([] if not self.winner else [GameEnd(self.winner.identifier)]),
-        ]
+    def actions(self) -> list[Action]:
+        """All actions that have been taken in the game."""
+        return list(chain.from_iterable(r.actions for r in self.rounds))
 
     @property
     def score_history(self) -> list[Score]:
