@@ -2,7 +2,7 @@
 
 import hashlib
 from dataclasses import InitVar, dataclass, field
-from itertools import chain, combinations
+from itertools import combinations
 from random import Random
 from typing import Optional, Sequence
 from uuid import UUID, uuid4
@@ -129,7 +129,7 @@ class Game:
     @property
     def actions(self) -> list[Action]:
         """All actions that have been taken in the game."""
-        return list(chain.from_iterable(r.actions for r in self.rounds))
+        return [action for r in self.rounds for action in r.actions]
 
     @property
     def score_history(self) -> list[Score]:
