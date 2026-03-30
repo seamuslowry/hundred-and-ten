@@ -45,38 +45,49 @@ class BidAmount(IntEnum):
     SHOOT_THE_MOON = 60
 
 
-class SelectableSuit(Enum):
-    """The card suits that can be selected as trump for a round"""
+class _Suit(Enum):
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Enum):
+            return self.value == other.value
+        return NotImplemented
 
-    HEARTS = 0
-    CLUBS = 1
-    SPADES = 2
-    DIAMONDS = 3
-
-
-class UnselectableSuit(Enum):
-    """The card suits that cannot be selected as trump for a round"""
-
-    JOKER = 1
+    def __hash__(self) -> int:
+        return hash(self.value)
 
 
-CardSuit = Union[SelectableSuit, UnselectableSuit]
+class CardSuit(_Suit):
+    """The valid card suits"""
+
+    HEARTS = "HEARTS"
+    CLUBS = "CLUBS"
+    SPADES = "SPADES"
+    DIAMONDS = "DIAMONDS"
+    JOKER = "JOKER"
+
+
+class SelectableSuit(_Suit):
+    """The selectable card suits"""
+
+    HEARTS = "HEARTS"
+    CLUBS = "CLUBS"
+    SPADES = "SPADES"
+    DIAMONDS = "DIAMONDS"
 
 
 class CardNumber(Enum):
     """The valid card values"""
 
-    JOKER = 1
-    TWO = 2
-    THREE = 3
-    FOUR = 4
-    FIVE = 5
-    SIX = 6
-    SEVEN = 7
-    EIGHT = 8
-    NINE = 9
-    TEN = 10
-    JACK = 11
-    QUEEN = 12
-    KING = 13
-    ACE = 14
+    JOKER = "JOKER"
+    TWO = "TWO"
+    THREE = "THREE"
+    FOUR = "FOUR"
+    FIVE = "FIVE"
+    SIX = "SIX"
+    SEVEN = "SEVEN"
+    EIGHT = "EIGHT"
+    NINE = "NINE"
+    TEN = "TEN"
+    JACK = "JACK"
+    QUEEN = "QUEEN"
+    KING = "KING"
+    ACE = "ACE"
