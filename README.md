@@ -503,7 +503,7 @@ game.act(Play('active_player', game.active_round.active_player.hand[0]))
 
 ## Automated Play
 
-Automated players in Hundred and Ten are first-class citizens. Instead of a simple "suggested move" API, the engine uses an observation-based architecture where automated players receive a "slice" of the game state and return an action.
+Automated players in Hundred and Ten are first-class citizens. Instead of a simple "suggested action" API, the engine uses an observation-based architecture where automated players receive a "slice" of the game state and return an action.
 
 ### GameState Observation
 
@@ -516,7 +516,7 @@ The `GameState` provides:
 - `bidding`: History of bids and the selected trump suit.
 - `tricks`: Information about completed tricks and the current in-progress trick.
 - `cards`: Knowledge about all cards in the deck (whether they are in hand, played, discarded, or unknown).
-- `available_actions`: A list of all legal moves the player can make.
+- `available_actions`: A list of all legal actions the player can take.
 
 ### Built-in AI
 
