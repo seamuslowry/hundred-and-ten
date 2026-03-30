@@ -6,9 +6,9 @@
 A python package to provide an engine for playing the game Hundred and Ten.
 
 ```python
-from hundredandten import HundredAndTen
+from hundredandten import Game
 
-game = HundredAndTen()
+game = Game()
 ```
 
 ## How To Play
@@ -384,12 +384,12 @@ class MySmartPlayer(AutomatedPlayer):
 
 ## Starting a Game
 
-### `HundredAndTen.start_game`
+### `Game.start_game`
 
-Start a game by initializing a `HundredAndTen` instance with a group of players. Use `HumanPlayer` for people and any subclass of `AutomatedPlayer` for machine play.
+Start a game by initializing a `Game` instance with a group of players. Use `HumanPlayer` for people and any subclass of `AutomatedPlayer` for machine play.
 
 ```python
-game = HundredAndTen([
+game = Game([
     HumanPlayer('player_1'),
     HumanPlayer('player_2'),
     HumanPlayer('player_3'),
@@ -401,7 +401,7 @@ Automated players will act automatically as soon as it is their turn. If a human
 
 ## Determining the State of a Game
 
-### `HundredAndTen.status`
+### `Game.status`
 
 The status of the game can be one of the following values
 
@@ -412,11 +412,11 @@ The status of the game can be one of the following values
 - `RoundStatus.COMPLETED`: The current round is complete with tricks won by the players. This should also be a transitionary state. Any game that reaches this state should either begin a new round and enter `RoundStatus.BIDDING` or determine a winner and enter `GameStatus.WON`
 - `GameStatus.WON`: The game is complete and a winner has been determined. No further actions are allowed.
 
-### `HundredAndTen.active_round.active_player`
+### `Game.active_round.active_player`
 
 This field will hold the current active player.
 
-### `HundredAndTen.scores`
+### `Game.scores`
 
 This field will hold the current score values. In the form of a `dict[str, int]`.
 
@@ -431,36 +431,36 @@ For example:
 }
 ```
 
-### `HundredAndTen.winner`
+### `Game.winner`
 
 This field will hold the winner of the game, if the game is in `GameStatus.WON`. Otherwise, it will be `None`.
 
 ## Playing a Game
 
-Once a game has begun, the `HundredAndTen` instance should only be interacted with through the `act` method. In this manner, players can bid, unpass, select trump, discard cards, or play a card.
+Once a game has begun, the `Game` instance should only be interacted with through the `act` method. In this manner, players can bid, unpass, select trump, discard cards, or play a card.
 
 Each `act` can only be performed by the current active player. If another player attempts to act, it will result in an error.
 
 The exception to this is pre-passing. Any player may pass before their turn during the bidding stage. A bid of any other amount will still result in an error.
 
-### `HundredAndTen.act` to `Bid`
+### `Game.act` to `Bid`
 
 To bid, call `act` with a `Bid` object.
 
 ```python
-from hundredandten import HundredAndTen, Bid, BidAmount
+from hundredandten import Game, Bid, BidAmount
 
 # set up and start the game
 
 game.act(Bid('active_player_identifier', BidAmount.FIFTEEN))
 ```
 
-### `HundredAndTen.act` to `SelectTrump`
+### `Game.act` to `SelectTrump`
 
 Once a player has won the bid, that player must select the trump suit for that round.
 
 ```python
-from hundredandten import HundredAndTen, SelectTrump, SelectableSuit
+from hundredandten import Game, SelectTrump, SelectableSuit
 
 # set up and start the game
 # select a bidder
@@ -469,13 +469,13 @@ from hundredandten import HundredAndTen, SelectTrump, SelectableSuit
 game.act(SelectTrump('bidder', SelectableSuit.CLUBS))
 ```
 
-### `HundredAndTen.act` to `Discard`
+### `Game.act` to `Discard`
 
 Once trump has been selected, each player will have the opportunity to discard a portion of their hand and refill with new cards.
 This must be done in player order.
 
 ```python
-from hundredandten import HundredAndTen, Discard
+from hundredandten import Game, Discard
 
 # set up and start the game
 # select a bidder
@@ -484,14 +484,14 @@ from hundredandten import HundredAndTen, Discard
 game.act(Discard('active_player', game.active_round.active_player.hand[1:3]))
 ```
 
-### `HundredAndTen.act` to `Play`
+### `Game.act` to `Play`
 
 Once bidding, trump selection, and discard have all occurred. Players will play through tricks.
 
 This action will enforce that played cards follow the rule relating to ["bleeding"](#bleeding).
 
 ```python
-from hundredandten import HundredAndTen, Play
+from hundredandten import Game, Play
 
 # set up and start the game
 # select a bidder

@@ -1,7 +1,7 @@
 """Init the hundredandten module"""
 
-from .game import Game as HundredAndTen
+from .game import Game
 
 __all__ = [
-    "HundredAndTen",
+    "Game",
 ]
