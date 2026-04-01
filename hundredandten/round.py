@@ -25,7 +25,7 @@ from hundredandten.decisions import (
     trumps,
 )
 from hundredandten.deck import Deck
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 from hundredandten.player import (
     Player,
     RoundPlayer,

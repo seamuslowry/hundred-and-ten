@@ -11,7 +11,7 @@ from hundredandten.constants import (
     SelectableSuit,
 )
 from hundredandten.deck import Card
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 from hundredandten.player import player_after
 from tests import arrange
 

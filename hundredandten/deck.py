@@ -5,7 +5,7 @@ from random import Random
 from uuid import uuid4
 
 from hundredandten.constants import CardNumber, CardSuit
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 
 
 @dataclass

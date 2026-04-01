@@ -17,7 +17,7 @@ from hundredandten.constants import (
 )
 from hundredandten.decisions import trumps
 from hundredandten.deck import Card, defined_cards
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 from hundredandten.player import (
     AutomatedPlayer,
     Player,

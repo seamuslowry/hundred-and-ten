@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from hundredandten.actions import Bid
 from hundredandten.constants import BidAmount, RoundStatus
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 from tests import arrange
 
 

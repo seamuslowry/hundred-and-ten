@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.constants import RoundRole
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 from hundredandten.player import RoundPlayer, add_player_role, remove_player_role
 
 
