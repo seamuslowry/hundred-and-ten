@@ -164,10 +164,9 @@ class Game:
         """
         return self.__scores(len(self._rounds))
 
-    def act(self, action: Action) -> None:
+    def act(self, action: Action) -> list[Action]:
         """Perform an action as a player of the game"""
-        self.__act(action)
-        self.__automated_act()
+        return [*self.__act(action), *self.__automated_act()]
 
     def game_state_for(self, identifier: str) -> GameState:
         """Build a GameState observation for the identified player.
@@ -362,7 +361,8 @@ class Game:
         )
         return tuple(Play(player.identifier, card) for card in playable)
 
-    def __automated_act(self):
+    def __automated_act(self) -> list[Action]:
+        resulting_actions = []
         while (
             isinstance(self.status, RoundStatus)
             and isinstance(self.active_player, AutomatedPlayer)
@@ -373,16 +373,20 @@ class Game:
             )
             is not None
         ):
-            self.__act(action)
+            resulting_actions.extend(self.__act(action))
 
-    def __act(self, action: Action) -> None:
+        return resulting_actions
+
+    def __act(self, action: Action) -> list[Action]:
         """Perform an action as a player of the game"""
-        self.active_round.act(action)
+        resulting_actions = self.active_round.act(action)
         # handle creation of new round if appropriate
         if isinstance(action, Bid):
             self.__end_bid()
         if isinstance(action, Play):
             self.__end_play()
+
+        return resulting_actions
 
     def __end_bid(self):
         if self.status == RoundStatus.COMPLETED_NO_BIDDERS:
