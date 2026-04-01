@@ -13,17 +13,20 @@ jobs:
       version: ${{ steps.version.outputs.value }}
     steps:
       - uses: actions/checkout@v6
+
       - name: Read version from pyproject.toml
         id: version
         uses: SebRollen/toml-action@v1.2.0
         with:
           file: pyproject.toml
           field: project.version
+
       - name: Check if tag exists
         id: check_tag
         uses: mukunku/tag-exists-action@v1.7.0
         with:
           tag: ${{ steps.version.outputs.value }}
+
       - name: Create tag
         if: steps.check_tag.outputs.exists == 'false'
         uses: joutvhu/create-tag@v1
@@ -35,8 +38,15 @@ jobs:
   publish:
     needs: tag-new-version
     if: needs.tag-new-version.outputs.tag_already_exists == 'false'
-    uses: seamuslowry/workflows/.github/workflows/publish_python.yml@main
-    with:
-      release-version: ${{ needs.tag-new-version.outputs.version }}
-    secrets:
-      py_pi_token: ${{ secrets.PYPI_API_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Build and Publish to PyPI
+        run: |
+          uv build
+          uv publish --token "${{ secrets.PYPI_API_TOKEN }}"
