@@ -368,7 +368,7 @@ You can create custom AI by extending `AutomatedPlayer` and implementing the `ac
 
 ```python
 class MySmartPlayer(AutomatedPlayer):
-    def act(self, game_state: GameState) -> Action:
+    def act(self, game_state: GameState) -> Optional[Action]:
         # logic to determine the best action based on game_state
         # for example, always play the first available card during tricks
         if game_state.available_plays:
@@ -380,7 +380,6 @@ class MySmartPlayer(AutomatedPlayer):
 ### Roles
 
 - `RoundRole.DEALER`: This player is acting as the dealer for the current round. This role is only attached to persons/players at the round level, not the game level. This role describes the individual as the dealer and does offer inherent play differences as described in the [rules](#how-to-play).
-- `RoundRole.PRE_PASSED`: This player has elected to pass before their bidding turn. When play reaches them, they will perform a pass action automatically.
 
 ## Starting a Game
 
@@ -440,8 +439,6 @@ This field will hold the winner of the game, if the game is in `GameStatus.WON`.
 Once a game has begun, the `Game` instance should only be interacted with through the `act` method. In this manner, players can bid, unpass, select trump, discard cards, or play a card.
 
 Each `act` can only be performed by the current active player. If another player attempts to act, it will result in an error.
-
-The exception to this is pre-passing. Any player may pass before their turn during the bidding stage. A bid of any other amount will still result in an error.
 
 ### `Game.act` to `Bid`
 
@@ -504,6 +501,8 @@ game.act(Play('active_player', game.active_round.active_player.hand[0]))
 ## Automated Play
 
 Automated players in Hundred and Ten are first-class citizens. Instead of a simple "suggested action" API, the engine uses an observation-based architecture where automated players receive a "slice" of the game state and return an action.
+
+The act method will return all actions that occured as a result of that action. When there are no automated players, this will always be only the input action. With automated players, this will include the actions those players took automatically in response to the action, if any.
 
 ### GameState Observation
 
