@@ -6,20 +6,7 @@ on:
       - test/*
 
 jobs:
-  get-tag:
-    runs-on: ubuntu-latest
-    outputs:
-      tag: ${{ steps.retrieve-tag.outputs.latest_tag }}
-    steps:
-      - id: checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - id: retrieve-tag
-        run: echo "latest_tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
-
   publish:
-    needs: get-tag
     environment: test
     runs-on: ubuntu-latest
     steps:
@@ -31,6 +18,6 @@ jobs:
 
       - name: Build and Publish to Test PyPI
         run: |
-          uv version ${{ needs.get-tag.outputs.tag }}.dev${{ github.run_number }}
+          uv version $(uv version --short).dev${{ github.run_number }}
           uv build
           uv publish --index testpypi
