@@ -7,7 +7,10 @@ on:
 
 jobs:
   publish:
+    environment: release
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v6
 
@@ -18,4 +21,4 @@ jobs:
       - name: Build and Publish to PyPI
         run: |
           uv build
-          uv publish --token "${{ secrets.PYPI_API_TOKEN }}"
+          uv publish
