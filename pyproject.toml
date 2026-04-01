@@ -45,3 +45,8 @@ target-version = ["py314"]
 
 [tool.uv.build-backend]
 module-root = "."
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://upload.test.pypi.org/legacy/"

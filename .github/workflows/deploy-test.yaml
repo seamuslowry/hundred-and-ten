@@ -33,4 +33,4 @@ jobs:
         run: |
           uv version ${{ needs.get-tag.outputs.tag }}.dev${{ github.run_number }}
           uv build
-          uv publish --repository testpypi
+          uv publish --index testpypi
