@@ -20,4 +20,4 @@ jobs:
         run: |
           uv version $(uv version --short).dev${{ github.run_number }}
           uv build
-          uv publish --index testpypi
+          uv publish --publish-url https://upload.test.pypi.org/legacy/
