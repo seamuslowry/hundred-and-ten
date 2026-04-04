@@ -2,6 +2,7 @@
 
 from dataclasses import InitVar, dataclass, field
 from functools import cached_property
+from itertools import chain
 from typing import Optional
 
 from hundredandten.actions import (
@@ -23,16 +24,8 @@ from hundredandten.constants import (
 from hundredandten.decisions import (
     trumps,
 )
-from hundredandten.deck import Card, Deck
-from hundredandten.events import (
-    Event,
-    RoundEnd,
-    RoundStart,
-    Score,
-    TrickEnd,
-    TrickStart,
-)
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.deck import Deck
+from hundredandten.errors import HundredAndTenError
 from hundredandten.player import (
     Player,
     RoundPlayer,
@@ -41,7 +34,7 @@ from hundredandten.player import (
     player_by_identifier,
     players_by_role,
 )
-from hundredandten.trick import Trick
+from hundredandten.trick import Score, Trick
 
 
 @dataclass
@@ -222,33 +215,13 @@ class Round:
         return RoundStatus.BIDDING
 
     @cached_property
-    def events(self) -> list[Event]:
-        """The events that occurred in the round."""
-        trick_events: list[list[Event]] = [
-            [
-                TrickStart(),
-                *trick.plays,
-                # don't include the trick end event if it hasn't ended
-                *(
-                    [TrickEnd(trick.winning_play.identifier)]
-                    if (trick.winning_play and len(trick.plays) == len(self.players))
-                    else []
-                ),
-            ]
-            for trick in self.tricks
-        ]
-
+    def actions(self) -> list[Action]:
+        """The actions that occurred in the round."""
         return [
-            RoundStart(
-                self.dealer.identifier,
-                {p.identifier: self._original_hand(p.identifier) for p in self.players},
-            ),
             *self._bids,
             *([self._select_trump] if self._select_trump else []),
             *self._discards,
-            *[trick_event for event_list in trick_events for trick_event in event_list],
-            # don't include the round end event if it hasn't ended
-            *([RoundEnd(scores=self.scores)] if self.completed else []),
+            *chain.from_iterable(trick.plays for trick in self.tricks),
         ]
 
     @cached_property
@@ -315,7 +288,7 @@ class Round:
 
         return base_scores
 
-    def act(self, action: Action) -> None:
+    def act(self, action: Action) -> list[Action]:
         """Perform an action as a player of the game"""
         if isinstance(action, Bid):
             self.__bid(action)
@@ -332,6 +305,7 @@ class Round:
             self.__invalidate_cached_properties()
             self.__end_play()
         self.__invalidate_cached_properties()
+        return [action]
 
     def __bid(self, bid: Bid) -> None:
         """Record a bid from a player"""
@@ -410,13 +384,6 @@ class Round:
             for bid_amount in BidAmount
             if self.__is_available_bid(identifier, bid_amount)
         ]
-
-    def _original_hand(self, identifier: str) -> list[Card]:
-        """Return the identified player's original hand"""
-        player = player_by_identifier(self.players, identifier)
-        discard = next((d for d in self.discards if d.identifier == identifier), None)
-
-        return discard.cards + discard.kept if discard else player.hand
 
     def __handle_bid(self, identifier: str, amount: BidAmount) -> None:
         if amount in self.available_bids(identifier):

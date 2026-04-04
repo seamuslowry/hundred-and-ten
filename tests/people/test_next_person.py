@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 from hundredandten.player import RoundPlayer, player_after
 
 

@@ -1,7 +1,22 @@
 name: 100% Coverage
+
 on:
   - push
 
 jobs:
   test:
-    uses: seamuslowry/workflows/.github/workflows/test_python.yml@main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync --group test
+
+      - name: Run tests with coverage
+        run: uv run coverage run --branch --source=. -m pytest tests
+
+      - name: Check coverage
+        run: uv run coverage report --fail-under=100

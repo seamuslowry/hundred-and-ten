@@ -2,12 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.constants import (
-    BidAmount,
-    CardNumber,
-    SelectableSuit,
-    UnselectableSuit,
-)
+from hundredandten.constants import BidAmount, CardNumber, CardSuit
 from hundredandten.decisions import max_bid
 from hundredandten.deck import Card
 
@@ -25,8 +20,8 @@ class TestBidDecision(TestCase):
             BidAmount.FIFTEEN,
             max_bid(
                 [
-                    Card(CardNumber.FIVE, SelectableSuit.CLUBS),
-                    Card(CardNumber.QUEEN, SelectableSuit.CLUBS),
+                    Card(CardNumber.FIVE, CardSuit.CLUBS),
+                    Card(CardNumber.QUEEN, CardSuit.CLUBS),
                 ]
             ),
         )
@@ -37,8 +32,8 @@ class TestBidDecision(TestCase):
             BidAmount.PASS,
             max_bid(
                 [
-                    Card(CardNumber.JACK, SelectableSuit.CLUBS),
-                    Card(CardNumber.QUEEN, SelectableSuit.CLUBS),
+                    Card(CardNumber.JACK, CardSuit.CLUBS),
+                    Card(CardNumber.QUEEN, CardSuit.CLUBS),
                 ]
             ),
         )
@@ -49,9 +44,9 @@ class TestBidDecision(TestCase):
             BidAmount.FIFTEEN,
             max_bid(
                 [
-                    Card(CardNumber.JACK, SelectableSuit.CLUBS),
-                    Card(CardNumber.JOKER, UnselectableSuit.JOKER),
-                    Card(CardNumber.QUEEN, SelectableSuit.CLUBS),
+                    Card(CardNumber.JACK, CardSuit.CLUBS),
+                    Card(CardNumber.JOKER, CardSuit.JOKER),
+                    Card(CardNumber.QUEEN, CardSuit.CLUBS),
                 ]
             ),
         )
@@ -62,8 +57,8 @@ class TestBidDecision(TestCase):
             BidAmount.TWENTY,
             max_bid(
                 [
-                    Card(CardNumber.FIVE, SelectableSuit.CLUBS),
-                    Card(CardNumber.JACK, SelectableSuit.CLUBS),
+                    Card(CardNumber.FIVE, CardSuit.CLUBS),
+                    Card(CardNumber.JACK, CardSuit.CLUBS),
                 ]
             ),
         )
@@ -74,9 +69,9 @@ class TestBidDecision(TestCase):
             BidAmount.TWENTY_FIVE,
             max_bid(
                 [
-                    Card(CardNumber.FIVE, SelectableSuit.CLUBS),
-                    Card(CardNumber.JACK, SelectableSuit.CLUBS),
-                    Card(CardNumber.JOKER, UnselectableSuit.JOKER),
+                    Card(CardNumber.FIVE, CardSuit.CLUBS),
+                    Card(CardNumber.JACK, CardSuit.CLUBS),
+                    Card(CardNumber.JOKER, CardSuit.JOKER),
                 ]
             ),
         )
@@ -87,10 +82,10 @@ class TestBidDecision(TestCase):
             BidAmount.THIRTY,
             max_bid(
                 [
-                    Card(CardNumber.FIVE, SelectableSuit.CLUBS),
-                    Card(CardNumber.JACK, SelectableSuit.CLUBS),
-                    Card(CardNumber.JOKER, UnselectableSuit.JOKER),
-                    Card(CardNumber.ACE, SelectableSuit.HEARTS),
+                    Card(CardNumber.FIVE, CardSuit.CLUBS),
+                    Card(CardNumber.JACK, CardSuit.CLUBS),
+                    Card(CardNumber.JOKER, CardSuit.JOKER),
+                    Card(CardNumber.ACE, CardSuit.HEARTS),
                 ]
             ),
         )
@@ -101,11 +96,11 @@ class TestBidDecision(TestCase):
             BidAmount.SHOOT_THE_MOON,
             max_bid(
                 [
-                    Card(CardNumber.FIVE, SelectableSuit.CLUBS),
-                    Card(CardNumber.JACK, SelectableSuit.CLUBS),
-                    Card(CardNumber.JOKER, UnselectableSuit.JOKER),
-                    Card(CardNumber.ACE, SelectableSuit.HEARTS),
-                    Card(CardNumber.ACE, SelectableSuit.CLUBS),
+                    Card(CardNumber.FIVE, CardSuit.CLUBS),
+                    Card(CardNumber.JACK, CardSuit.CLUBS),
+                    Card(CardNumber.JOKER, CardSuit.JOKER),
+                    Card(CardNumber.ACE, CardSuit.HEARTS),
+                    Card(CardNumber.ACE, CardSuit.CLUBS),
                 ]
             ),
         )

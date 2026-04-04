@@ -4,8 +4,8 @@ from unittest import TestCase
 
 from hundredandten.actions import Action, Bid
 from hundredandten.constants import BidAmount, GameStatus
+from hundredandten.errors import HundredAndTenError
 from hundredandten.game import Game
-from hundredandten.hundred_and_ten_error import HundredAndTenError
 from hundredandten.player import NaiveAutomatedPlayer
 from tests import arrange
 
@@ -39,8 +39,8 @@ class TestAutomatedPlay(TestCase):
             game.game_state_for(game.players[0].identifier),
         )
 
-    def test_initial_moves_dont_automate(self):
-        """When starting a game with automated players, initial moves do not trigger automation"""
+    def test_initial_actions_dont_automate(self):
+        """When starting a game with automated players, initial actions do not trigger automation"""
         automated_game_from_start = Game(
             seed=AUTOMATED_SEED,
             players=[
@@ -51,7 +51,7 @@ class TestAutomatedPlay(TestCase):
             ],
         )
 
-        initial_moves: list[Action] = [
+        initial_actions: list[Action] = [
             Bid(identifier="automated1", amount=BidAmount.FIFTEEN),
             Bid(identifier="automated2", amount=BidAmount.TWENTY),
             Bid(identifier="automated3", amount=BidAmount.TWENTY_FIVE),
@@ -67,12 +67,12 @@ class TestAutomatedPlay(TestCase):
                 NaiveAutomatedPlayer(identifier="automated2"),
                 NaiveAutomatedPlayer(identifier="automated3"),
             ],
-            initial_moves=initial_moves,
+            initial_actions=initial_actions,
         )
 
         self.assertEqual(
-            initial_moves, automated_game_after_start.moves[: len(initial_moves)]
+            initial_actions, automated_game_after_start.actions[: len(initial_actions)]
         )
         self.assertNotEqual(
-            initial_moves, automated_game_from_start.moves[: len(initial_moves)]
+            initial_actions, automated_game_from_start.actions[: len(initial_actions)]
         )

@@ -17,7 +17,7 @@ from hundredandten.decisions import (
     worst_card_beating,
 )
 from hundredandten.deck import Card
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 from hundredandten.state import GameState
 
 

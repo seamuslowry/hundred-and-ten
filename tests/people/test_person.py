@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.constants import CardNumber, RoundRole, SelectableSuit
+from hundredandten.constants import CardNumber, CardSuit, RoundRole
 from hundredandten.deck import Card
 from hundredandten.player import HumanPlayer, RoundPlayer
 
@@ -18,7 +18,7 @@ class TestPlayer(TestCase):
             RoundPlayer(
                 identifier,
                 roles={RoundRole.DEALER},
-                hand=[Card(CardNumber.ACE, SelectableSuit.CLUBS)],
+                hand=[Card(CardNumber.ACE, CardSuit.CLUBS)],
             ),
         )
         self.assertNotEqual(HumanPlayer("one"), HumanPlayer("two"))

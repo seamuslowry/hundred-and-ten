@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.constants import CardNumber, SelectableSuit
+from hundredandten.constants import CardNumber, CardSuit, SelectableSuit
 from hundredandten.decisions import desired_trump
 from hundredandten.deck import Card
 
@@ -16,10 +16,10 @@ class TestTrumpDecision(TestCase):
             SelectableSuit.HEARTS,
             desired_trump(
                 [
-                    Card(CardNumber.FIVE, SelectableSuit.CLUBS),
-                    Card(CardNumber.QUEEN, SelectableSuit.CLUBS),
-                    Card(CardNumber.FIVE, SelectableSuit.HEARTS),
-                    Card(CardNumber.KING, SelectableSuit.HEARTS),
+                    Card(CardNumber.FIVE, CardSuit.CLUBS),
+                    Card(CardNumber.QUEEN, CardSuit.CLUBS),
+                    Card(CardNumber.FIVE, CardSuit.HEARTS),
+                    Card(CardNumber.KING, CardSuit.HEARTS),
                 ]
             ),
         )

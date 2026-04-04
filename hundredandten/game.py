@@ -2,7 +2,7 @@
 
 import hashlib
 from dataclasses import InitVar, dataclass, field
-from itertools import chain, combinations
+from itertools import combinations
 from random import Random
 from typing import Optional, Sequence
 from uuid import UUID, uuid4
@@ -17,8 +17,7 @@ from hundredandten.constants import (
 )
 from hundredandten.decisions import trumps
 from hundredandten.deck import Card, defined_cards
-from hundredandten.events import Event, GameEnd, GameStart, Score
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 from hundredandten.player import (
     AutomatedPlayer,
     Player,
@@ -41,6 +40,7 @@ from hundredandten.state import (
     TrickState,
     Unknown,
 )
+from hundredandten.trick import Score
 
 
 @dataclass
@@ -49,11 +49,11 @@ class Game:
 
     players: list[Player] = field(default_factory=list)
     seed: str = field(default_factory=lambda: str(uuid4()))
-    initial_moves: InitVar[Optional[list[Action]]] = field(default=None)
+    initial_actions: InitVar[Optional[list[Action]]] = field(default=None)
 
     _rounds: list[Round] = field(default_factory=list, init=False, repr=False)
 
-    def __post_init__(self, initial_moves: Optional[list[Action]]):
+    def __post_init__(self, initial_actions: Optional[list[Action]]):
         if len(self.players) < 2:
             raise HundredAndTenError("Cannot have a game with less than 2 players")
         if len(self.players) > 4:
@@ -62,8 +62,8 @@ class Game:
         # manually create the first round
         self.__new_round(self.players[0].identifier)
 
-        for move in initial_moves or []:
-            self.__act(move)  # don't trigger automation for already made moves
+        for action in initial_actions or []:
+            self.__act(action)  # don't trigger automation for already taken actions
 
         self.__automated_act()
 
@@ -127,19 +127,9 @@ class Game:
         )
 
     @property
-    def moves(self) -> list[Action]:
-        """All moves that have been played in the game."""
-        return [move for move in self.events if isinstance(move, Action)]
-
-    @property
-    def events(self) -> list[Event]:
-        """The events that occurred in the game."""
-
-        return [
-            GameStart(),
-            *chain.from_iterable(r.events for r in self._rounds),
-            *([] if not self.winner else [GameEnd(self.winner.identifier)]),
-        ]
+    def actions(self) -> list[Action]:
+        """All actions that have been taken in the game."""
+        return [action for r in self.rounds for action in r.actions]
 
     @property
     def score_history(self) -> list[Score]:
@@ -174,10 +164,9 @@ class Game:
         """
         return self.__scores(len(self._rounds))
 
-    def act(self, action: Action) -> None:
+    def act(self, action: Action) -> list[Action]:
         """Perform an action as a player of the game"""
-        self.__act(action)
-        self.__automated_act()
+        return [*self.__act(action), *self.__automated_act()]
 
     def game_state_for(self, identifier: str) -> GameState:
         """Build a GameState observation for the identified player.
@@ -372,7 +361,8 @@ class Game:
         )
         return tuple(Play(player.identifier, card) for card in playable)
 
-    def __automated_act(self):
+    def __automated_act(self) -> list[Action]:
+        resulting_actions = []
         while (
             isinstance(self.status, RoundStatus)
             and isinstance(self.active_player, AutomatedPlayer)
@@ -383,16 +373,20 @@ class Game:
             )
             is not None
         ):
-            self.__act(action)
+            resulting_actions.extend(self.__act(action))
 
-    def __act(self, action: Action) -> None:
+        return resulting_actions
+
+    def __act(self, action: Action) -> list[Action]:
         """Perform an action as a player of the game"""
-        self.active_round.act(action)
+        resulting_actions = self.active_round.act(action)
         # handle creation of new round if appropriate
         if isinstance(action, Bid):
             self.__end_bid()
         if isinstance(action, Play):
             self.__end_play()
+
+        return resulting_actions
 
     def __end_bid(self):
         if self.status == RoundStatus.COMPLETED_NO_BIDDERS:

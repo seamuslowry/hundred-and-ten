@@ -1,21 +1,14 @@
 """All the actions a player can take to interact with the game"""
 
 from dataclasses import dataclass, field
+from typing import Union
 
 from hundredandten.constants import BidAmount, SelectableSuit
 from hundredandten.deck import Card
-from hundredandten.events import Event
-
-
-@dataclass
-class Action(Event):
-    """A superclass for actions in the game"""
-
-    identifier: str
 
 
 @dataclass(order=True)
-class Bid(Action):
+class Bid:
     """A class to keep track of bid information"""
 
     identifier: str = field(compare=False)
@@ -26,16 +19,18 @@ class Bid(Action):
 
 
 @dataclass
-class SelectTrump(Action):
+class SelectTrump:
     """A class to represent the select trump action"""
 
+    identifier: str
     suit: SelectableSuit
 
 
 @dataclass
-class Discard(Action):
+class Discard:
     """A class to keep track of one player's discard action"""
 
+    identifier: str
     cards: list[Card]
 
 
@@ -43,11 +38,18 @@ class Discard(Action):
 class DetailedDiscard(Discard):
     """A class to keep track of all details of one player's discard action"""
 
+    identifier: str
+
     kept: list[Card]
 
 
 @dataclass
-class Play(Action):
+class Play:
     """A class to keep track of one play in a trick"""
 
+    identifier: str
+
     card: Card
+
+
+type Action = Union[Bid, SelectTrump, Discard, Play]

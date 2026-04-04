@@ -111,7 +111,7 @@ def play_round(game_to_play: Game) -> None:
 
 
 def __get_bidding_game(seed: Optional[str]) -> Game:
-    """Returns a game with no moves"""
+    """Returns a game with no actions taken"""
     new_game = Game(
         players=list(
             map(

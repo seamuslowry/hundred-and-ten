@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from hundredandten.actions import Bid
 from hundredandten.constants import BidAmount, RoundStatus
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.errors import HundredAndTenError
 from tests import arrange
 
 
@@ -47,6 +47,7 @@ class TestEndBidding(TestCase):
 
         # old round ended as completed no bidders
         self.assertEqual(game.rounds[-2].status, RoundStatus.COMPLETED_NO_BIDDERS)
+        self.assertTrue(game.rounds[-2].completed)
         # new round in bidding
         self.assertEqual(game.status, RoundStatus.BIDDING)
 

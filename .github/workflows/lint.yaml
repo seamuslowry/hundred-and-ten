@@ -1,7 +1,30 @@
 name: Code Quality
+
 on:
   - push
 
 jobs:
   lint:
-    uses: seamuslowry/workflows/.github/workflows/lint_python.yml@main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync --group lint
+
+      - name: PyLint
+        run: |
+          readarray -t py_files < <(git ls-files '*.py')
+          uv run pylint "${py_files[@]}"
+
+      - name: Pyright
+        run: uv run pyright
+
+      - name: Ruff check
+        run: uv run ruff check .
+
+      - name: Black check
+        run: uv run black --check .

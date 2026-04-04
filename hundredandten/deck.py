@@ -4,13 +4,8 @@ from dataclasses import dataclass, field
 from random import Random
 from uuid import uuid4
 
-from hundredandten.constants import (
-    CardNumber,
-    CardSuit,
-    SelectableSuit,
-    UnselectableSuit,
-)
-from hundredandten.hundred_and_ten_error import HundredAndTenError
+from hundredandten.constants import CardNumber, CardSuit
+from hundredandten.errors import HundredAndTenError
 
 
 @dataclass
@@ -26,7 +21,7 @@ class CardInfo:
 
 
 card_info = {
-    SelectableSuit.HEARTS: {
+    CardSuit.HEARTS: {
         CardNumber.TWO: CardInfo(trump_value=0, weak_trump_value=0),
         CardNumber.THREE: CardInfo(trump_value=1, weak_trump_value=1),
         CardNumber.FOUR: CardInfo(trump_value=2, weak_trump_value=2),
@@ -43,7 +38,7 @@ card_info = {
             trump_value=11, weak_trump_value=12, always_trump=True
         ),
     },
-    SelectableSuit.DIAMONDS: {
+    CardSuit.DIAMONDS: {
         CardNumber.TWO: CardInfo(trump_value=0, weak_trump_value=0),
         CardNumber.THREE: CardInfo(trump_value=1, weak_trump_value=1),
         CardNumber.FOUR: CardInfo(trump_value=2, weak_trump_value=2),
@@ -58,7 +53,7 @@ card_info = {
         CardNumber.KING: CardInfo(trump_value=9, weak_trump_value=11),
         CardNumber.ACE: CardInfo(trump_value=10, weak_trump_value=12),
     },
-    SelectableSuit.SPADES: {
+    CardSuit.SPADES: {
         CardNumber.TWO: CardInfo(trump_value=7, weak_trump_value=8),
         CardNumber.THREE: CardInfo(trump_value=6, weak_trump_value=7),
         CardNumber.FOUR: CardInfo(trump_value=5, weak_trump_value=6),
@@ -73,7 +68,7 @@ card_info = {
         CardNumber.KING: CardInfo(trump_value=9, weak_trump_value=11),
         CardNumber.ACE: CardInfo(trump_value=10, weak_trump_value=12),
     },
-    SelectableSuit.CLUBS: {
+    CardSuit.CLUBS: {
         CardNumber.TWO: CardInfo(trump_value=7, weak_trump_value=8),
         CardNumber.THREE: CardInfo(trump_value=6, weak_trump_value=7),
         CardNumber.FOUR: CardInfo(trump_value=5, weak_trump_value=6),
@@ -88,7 +83,7 @@ card_info = {
         CardNumber.KING: CardInfo(trump_value=9, weak_trump_value=11),
         CardNumber.ACE: CardInfo(trump_value=10, weak_trump_value=12),
     },
-    UnselectableSuit.JOKER: {
+    CardSuit.JOKER: {
         CardNumber.JOKER: CardInfo(
             trump_value=12, weak_trump_value=12, always_trump=True
         )
