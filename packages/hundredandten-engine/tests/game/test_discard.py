@@ -80,8 +80,7 @@ class TestDiscard(TestCase):
 
         game = arrange.game(RoundStatus.DISCARD)
 
-        self.assertEqual(
-            32, len(game.available_actions(game.active_player.identifier)))
+        self.assertEqual(32, len(game.available_actions(game.active_player.identifier)))
 
     def test_cant_discard_on_other_turn(self):
         """Can't discard when not your turn"""
@@ -89,4 +88,8 @@ class TestDiscard(TestCase):
         game = arrange.game(RoundStatus.DISCARD)
 
         self.assertEqual(
-            0, len(game.available_actions(game.active_round.inactive_players[0].identifier)))
+            0,
+            len(
+                game.available_actions(game.active_round.inactive_players[0].identifier)
+            ),
+        )

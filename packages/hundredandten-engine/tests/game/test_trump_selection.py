@@ -59,5 +59,4 @@ class TestTrumpSelection(TestCase):
 
         game = arrange.game(RoundStatus.TRUMP_SELECTION)
 
-        self.assertEqual(
-            4, len(game.available_actions(game.active_player.identifier)))
+        self.assertEqual(4, len(game.available_actions(game.active_player.identifier)))

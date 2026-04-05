@@ -106,7 +106,9 @@ class TestBidding(TestCase):
         once_active_player = game.active_round.active_player.identifier
         game.act(Bid(once_active_player, BidAmount.PASS))
 
-        self.assertRaises(HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN))
+        self.assertRaises(
+            HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN)
+        )
 
     def test_bid_from_inactive_player(self):
         """Inactive player cannot place a bid"""
@@ -126,7 +128,10 @@ class TestBidding(TestCase):
 
         self.assertEqual(6, len(game.available_actions(game.active_player.identifier)))
         self.assertTrue(
-            all(isinstance(a, Bid) for a in game.available_actions(game.active_player.identifier))
+            all(
+                isinstance(a, Bid)
+                for a in game.available_actions(game.active_player.identifier)
+            )
         )
 
     def test_no_bids_available_when_not_your_turn(self):
@@ -135,7 +140,10 @@ class TestBidding(TestCase):
         game = arrange.game(RoundStatus.BIDDING)
 
         self.assertEqual(
-            0, len(game.available_actions(game.active_round.inactive_players[0].identifier))
+            0,
+            len(
+                game.available_actions(game.active_round.inactive_players[0].identifier)
+            ),
         )
 
     def test_only_pass_available_when_cant_take(self):
