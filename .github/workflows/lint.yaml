@@ -18,7 +18,7 @@ jobs:
       - name: PyLint
         run: |
           py_files=($(find packages -name '*.py' -type f))
-          uv run pylint "${py_files[@]}"
+          uv run --package hundredandten-engine pylint "${py_files[@]}"
 
       - name: Pyright
         run: uv run pyright
