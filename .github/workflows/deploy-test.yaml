@@ -23,5 +23,6 @@ jobs:
         run: |
           uv version --package hundredandten-engine --bump patch --bump dev=${{ github.run_number }}
           uv version --package hundredandten-automation --bump patch --bump dev=${{ github.run_number }}
-          uv build --package hundredandten-engine --package hundredandten-automation
+          uv build --package hundredandten-engine
+          uv build --package hundredandten-automation
           uv publish --index testpypi
