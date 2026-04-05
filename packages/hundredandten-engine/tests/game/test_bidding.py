@@ -106,9 +106,7 @@ class TestBidding(TestCase):
         once_active_player = game.active_round.active_player.identifier
         game.act(Bid(once_active_player, BidAmount.PASS))
 
-        self.assertRaises(
-            HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN)
-        )
+        self.assertRaises(HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN))
 
     def test_bid_from_inactive_player(self):
         """Inactive player cannot place a bid"""
@@ -120,3 +118,37 @@ class TestBidding(TestCase):
             game.act,
             Bid(game.active_round.inactive_players[0].identifier, BidAmount.FIFTEEN),
         )
+
+    def test_all_bids_available_at_start(self):
+        """All bids can be made before anyone bids"""
+
+        game = arrange.game(RoundStatus.BIDDING)
+
+        self.assertEqual(6, len(game.available_actions(game.active_player.identifier)))
+        self.assertTrue(
+            all(isinstance(a, Bid) for a in game.available_actions(game.active_player.identifier))
+        )
+
+    def test_no_bids_available_when_not_your_turn(self):
+        """No bids available when not your turn"""
+
+        game = arrange.game(RoundStatus.BIDDING)
+
+        self.assertEqual(
+            0, len(game.available_actions(game.active_round.inactive_players[0].identifier))
+        )
+
+    def test_only_pass_available_when_cant_take(self):
+        """Only pass is available when you cant take the bid"""
+
+        game = arrange.game(RoundStatus.BIDDING)
+
+        first = game.active_player.identifier
+        game.act(Bid(first, BidAmount.SHOOT_THE_MOON))
+
+        second = game.active_player.identifier
+
+        # player has changed
+        self.assertNotEqual(first, second)
+
+        self.assertEqual((Bid(second, BidAmount.PASS),), game.available_actions(second))
