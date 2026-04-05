@@ -103,7 +103,9 @@ class TestBidding(TestCase):
         once_active_player = game.active_round.active_player.identifier
         game.act(Bid(once_active_player, BidAmount.PASS))
 
-        self.assertRaises(HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN))
+        self.assertRaises(
+            HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN)
+        )
 
     def test_bid_from_inactive_player(self):
         """Inactive player cannot place a bid"""

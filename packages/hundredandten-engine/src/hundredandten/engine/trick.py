@@ -5,8 +5,8 @@ from typing import Callable, Optional
 
 from .actions import Play
 from .constants import CardSuit, SelectableSuit
-from .trumps import bleeds
 from .deck import Card
+from .trumps import bleeds
 
 
 @dataclass

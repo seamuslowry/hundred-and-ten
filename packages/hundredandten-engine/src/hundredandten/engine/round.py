@@ -21,9 +21,6 @@ from .constants import (
     RoundStatus,
     SelectableSuit,
 )
-from .trumps import (
-    trumps,
-)
 from .deck import Deck
 from .errors import HundredAndTenError
 from .player import (
@@ -35,6 +32,9 @@ from .player import (
     players_by_role,
 )
 from .trick import Score, Trick
+from .trumps import (
+    trumps,
+)
 
 
 @dataclass

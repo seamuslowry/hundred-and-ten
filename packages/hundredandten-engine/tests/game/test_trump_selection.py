@@ -19,7 +19,9 @@ class TestTrumpSelection(TestCase):
         self.assertRaises(
             HundredAndTenError,
             game.act,
-            SelectTrump(game.active_round.active_player.identifier, SelectableSuit.CLUBS),
+            SelectTrump(
+                game.active_round.active_player.identifier, SelectableSuit.CLUBS
+            ),
         )
         self.assertIsNone(game.active_round.trump)
 
@@ -31,7 +33,9 @@ class TestTrumpSelection(TestCase):
         self.assertRaises(
             HundredAndTenError,
             game.act,
-            SelectTrump(game.active_round.inactive_players[0].identifier, SelectableSuit.CLUBS),
+            SelectTrump(
+                game.active_round.inactive_players[0].identifier, SelectableSuit.CLUBS
+            ),
         )
         self.assertIsNone(game.active_round.trump)
 

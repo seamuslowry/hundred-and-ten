@@ -15,7 +15,6 @@ from .constants import (
     RoundStatus,
     SelectableSuit,
 )
-from .trumps import trumps
 from .errors import HundredAndTenError
 from .player import (
     Player,
@@ -23,8 +22,8 @@ from .player import (
     player_by_identifier,
 )
 from .round import Round
-
 from .trick import Score
+from .trumps import trumps
 
 
 @dataclass
@@ -154,6 +153,7 @@ class Game:
         self,
         identifier: str,
     ) -> tuple[Action, ...]:
+        """Return all actions available to the player currently"""
         game_round = self.active_round
         player = player_by_identifier(game_round.players, identifier)
         if (
