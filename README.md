@@ -16,7 +16,7 @@ This project uses [uv](https://github.com/astral-sh/uv) for workspace management
 ### Installation
 
 ```bash
-uv sync --group lint --group test
+uv sync --all-groups
 ```
 
 ### Run tests
