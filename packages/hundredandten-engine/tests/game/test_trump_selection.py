@@ -44,9 +44,12 @@ class TestTrumpSelection(TestCase):
 
         game = arrange.game(RoundStatus.TRUMP_SELECTION)
 
-        trump = SelectableSuit.DIAMONDS
+        select = SelectTrump(
+            game.active_round.active_player.identifier, SelectableSuit.DIAMONDS
+        )
 
-        game.act(SelectTrump(game.active_round.active_player.identifier, trump))
+        game.act(select)
 
-        self.assertEqual(trump, game.active_round.trump)
+        self.assertEqual(select.suit, game.active_round.trump)
         self.assertEqual(RoundStatus.DISCARD, game.status)
+        self.assertEqual(select, game.actions[-1])

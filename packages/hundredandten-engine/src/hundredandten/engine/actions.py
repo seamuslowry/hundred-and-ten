@@ -35,15 +35,6 @@ class Discard:
 
 
 @dataclass
-class DetailedDiscard(Discard):
-    """A class to keep track of all details of one player's discard action"""
-
-    identifier: str
-
-    kept: list[Card]
-
-
-@dataclass
 class Play:
     """A class to keep track of one play in a trick"""
 

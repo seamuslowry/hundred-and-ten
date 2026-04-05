@@ -51,11 +51,13 @@ class TestDiscard(TestCase):
 
         player = game.active_round.active_player
         initial_hand = list(player.hand)
-        game.act(Discard(player.identifier, player.hand))
+        discard = Discard(player.identifier, player.hand)
+        game.act(discard)
 
         self.assertEqual(HAND_SIZE, len(player.hand))
         self.assertEqual(HAND_SIZE, len(initial_hand))
         self.assertFalse(any(card in player.hand for card in initial_hand))
+        self.assertEqual(discard, game.actions[-1])
 
     def test_discard_part_of_hand(self):
         """Can discard a part of your hand"""
@@ -71,3 +73,4 @@ class TestDiscard(TestCase):
         self.assertEqual(HAND_SIZE, len(player.hand))
         self.assertTrue(all(card in player.hand for card in remaining_in_hand))
         self.assertFalse(any(card in player.hand for card in discard.cards))
+        self.assertEqual(discard, game.actions[-1])

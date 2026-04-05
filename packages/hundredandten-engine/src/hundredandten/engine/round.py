@@ -8,7 +8,6 @@ from typing import Optional
 from .actions import (
     Action,
     Bid,
-    DetailedDiscard,
     Discard,
     Play,
     SelectTrump,
@@ -49,9 +48,7 @@ class Round:
     _deck: Deck = field(init=False, repr=False)
     _bids: list[Bid] = field(default_factory=list, init=False, repr=False)
     _select_trump: Optional[SelectTrump] = field(default=None, init=False, repr=False)
-    _discards: list[DetailedDiscard] = field(
-        default_factory=list, init=False, repr=False
-    )
+    _discards: list[Discard] = field(default_factory=list, init=False, repr=False)
     _tricks: list[Trick] = field(default_factory=list, init=False, repr=False)
 
     def __post_init__(
@@ -80,7 +77,7 @@ class Round:
         return self._select_trump
 
     @property
-    def discards(self) -> list[DetailedDiscard]:
+    def discards(self) -> list[Discard]:
         """All discards in this round."""
         return self._discards
 
@@ -351,9 +348,7 @@ class Round:
 
         self.active_player.hand = [*remaining]
         self.active_player.hand.extend(self.deck.draw(len(discard.cards)))
-        self._discards.append(
-            DetailedDiscard(discard.identifier, discard.cards, remaining)
-        )
+        self._discards.append(discard)
 
     def __play(self, play: Play) -> None:
         """Play the specified card from the identified player's hand"""

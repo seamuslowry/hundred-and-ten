@@ -47,6 +47,7 @@ class TestPlayCard(TestCase):
         self.assertEqual(HAND_SIZE - 1, len(original_active_player.hand))
         self.assertNotIn(play.card, original_active_player.hand)
         self.assertNotEqual(original_active_player, game.active_round.active_player)
+        self.assertEqual(play, game.actions[-1])
 
     def test_cannot_play_twice_in_a_trick(self):
         """Each person can only play once per trick"""

@@ -36,11 +36,9 @@ class Game:
 
     def __post_init__(self):
         if len(self.players) < 2:
-            raise HundredAndTenError(
-                "Cannot have a game with less than 2 players")
+            raise HundredAndTenError("Cannot have a game with less than 2 players")
         if len(self.players) > 4:
-            raise HundredAndTenError(
-                "Cannot have a game with more than 4 players")
+            raise HundredAndTenError("Cannot have a game with more than 4 players")
 
         # manually create the first round
         self.__new_round(self.players[0].identifier)
@@ -223,8 +221,7 @@ class Game:
             f"deck-seed|{self.seed}|round:{len(self._rounds)}".encode()
         ).hexdigest()
 
-        deck_seed = str(
-            UUID(int=Random(r_deck_seed).getrandbits(128), version=4))
+        deck_seed = str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4))
 
         self._rounds.append(
             Round(
@@ -269,7 +266,6 @@ class Game:
                 continue
 
             for score in game_round.scores:
-                scores[score.identifier] = scores.get(
-                    score.identifier, 0) + score.value
+                scores[score.identifier] = scores.get(score.identifier, 0) + score.value
 
         return scores

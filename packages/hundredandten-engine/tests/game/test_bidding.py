@@ -31,10 +31,13 @@ class TestBidding(TestCase):
 
         game = arrange.game(RoundStatus.BIDDING)
 
-        game.act(Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN))
+        bid = Bid(game.active_round.active_player.identifier, BidAmount.FIFTEEN)
+
+        game.act(bid)
 
         self.assertEqual(1, len(game.active_round.bids))
         self.assertEqual(BidAmount.FIFTEEN, game.active_round.bids[0].amount)
+        self.assertEqual(bid, game.actions[-1])
 
     def test_low_bid_from_active_player(self):
         """Active player cannot place a bid below the current bid"""

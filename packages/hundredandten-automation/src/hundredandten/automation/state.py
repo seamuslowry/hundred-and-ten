@@ -7,7 +7,6 @@ from hundredandten.engine import Game
 from hundredandten.engine.actions import (
     Action,
     Bid,
-    DetailedDiscard,
     Discard,
     Play,
     SelectTrump,
@@ -118,7 +117,7 @@ class AvailableActionFactory:
                 return AvailableBid.from_engine(a)
             case SelectTrump():
                 return AvailableSelectTrump.from_engine(a)
-            case Discard() | DetailedDiscard():
+            case Discard():
                 return AvailableDiscard.from_engine(a)
             case Play():
                 return AvailablePlay.from_engine(a)
