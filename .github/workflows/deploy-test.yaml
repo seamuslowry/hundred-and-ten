@@ -20,6 +20,6 @@ jobs:
 
       - name: Build and Publish to Test PyPI
         run: |
-          uv version --package hundredandten-engine --bump dev=${{ github.run_number }}
+          uv version --package hundredandten-engine --bump patch dev=${{ github.run_number }}
           uv build --all-packages
           uv publish --index testpypi
