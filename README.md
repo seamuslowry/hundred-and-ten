@@ -21,15 +21,13 @@ uv sync --all-groups --all-packages
 ### Run tests
 
 ```bash
-cd packages/hundredandten-engine && uv run pytest
-cd packages/hundredandten-automation && uv run pytest
+uv run pytest
 ```
 
 ### Coverage
 
 ```bash
-cd packages/hundredandten-engine && uv run coverage run -m pytest && uv run coverage report
-cd packages/hundredandten-engine && uv run coverage run -m pytest && uv run coverage report
+uv run coverage run -m pytest && uv run coverage report -m
 ```
 
 ### Linting
@@ -57,7 +55,8 @@ uv build --all-packages
 /
 ├── packages/
 │   └── hundredandten-automation/  (automation package)
-│   └── hundredandten-engine/  (game engine package)
+│   └── hundredandten-engine/   (game engine package)
+│   └── hundredandten-testing/  (internal; shared testing package)
 ├── pyproject.toml             (workspace root)
 ├── uv.lock                    (workspace lockfile)
 └── README.md                  (this file)
