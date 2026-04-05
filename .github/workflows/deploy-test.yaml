@@ -20,6 +20,6 @@ jobs:
 
       - name: Build and Publish to Test PyPI
         run: |
-          uv version $(uv version --short).dev${{ github.run_number }}
-          uv build
-          uv publish --index testpypi
+          uv version --package hundredandten-engine $(uv version --package hundredandten-engine --short).dev${{ github.run_number }}
+          uv build --package hundredandten-engine
+          uv publish --index testpypi dist/hundredandten_engine-*
