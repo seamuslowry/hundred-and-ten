@@ -6,12 +6,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - hundredandten-engine
-          - hundredandten-automation
     steps:
       - uses: actions/checkout@v6
 
@@ -19,12 +13,10 @@ jobs:
         with:
           enable-cache: true
 
-      - run: uv sync --locked --all-groups --package ${{ matrix.package }}
+      - run: uv sync --locked --group test --all-packages
 
       - name: Run tests with coverage
-        working-directory: packages/${{ matrix.package }}
-        run: uv run --package ${{ matrix.package }} coverage run -m pytest
+        run: uv run coverage run -m pytest
 
       - name: Check coverage
-        working-directory: packages/${{ matrix.package }}
-        run: uv run --package ${{ matrix.package }} coverage report
+        run: uv run coverage report -m
