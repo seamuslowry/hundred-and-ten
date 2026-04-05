@@ -1,7 +1,7 @@
 """Represent a game of Hundred and Ten"""
 
 import hashlib
-from dataclasses import InitVar, dataclass, field
+from dataclasses import dataclass, field
 from itertools import combinations
 from random import Random
 from typing import Optional, Sequence
@@ -32,21 +32,18 @@ class Game:
 
     players: list[Player] = field(default_factory=list)
     seed: str = field(default_factory=lambda: str(uuid4()))
-    initial_actions: InitVar[Optional[list[Action]]] = field(default=None)
-
     _rounds: list[Round] = field(default_factory=list, init=False, repr=False)
 
-    def __post_init__(self, initial_actions: Optional[list[Action]]):
+    def __post_init__(self):
         if len(self.players) < 2:
-            raise HundredAndTenError("Cannot have a game with less than 2 players")
+            raise HundredAndTenError(
+                "Cannot have a game with less than 2 players")
         if len(self.players) > 4:
-            raise HundredAndTenError("Cannot have a game with more than 4 players")
+            raise HundredAndTenError(
+                "Cannot have a game with more than 4 players")
 
         # manually create the first round
         self.__new_round(self.players[0].identifier)
-
-        for action in initial_actions or []:
-            self.act(action)
 
     @property
     def status(self) -> AnyStatus:
@@ -226,7 +223,8 @@ class Game:
             f"deck-seed|{self.seed}|round:{len(self._rounds)}".encode()
         ).hexdigest()
 
-        deck_seed = str(UUID(int=Random(r_deck_seed).getrandbits(128), version=4))
+        deck_seed = str(
+            UUID(int=Random(r_deck_seed).getrandbits(128), version=4))
 
         self._rounds.append(
             Round(
@@ -271,6 +269,7 @@ class Game:
                 continue
 
             for score in game_round.scores:
-                scores[score.identifier] = scores.get(score.identifier, 0) + score.value
+                scores[score.identifier] = scores.get(
+                    score.identifier, 0) + score.value
 
         return scores
