@@ -1,0 +1,432 @@
+"""Represent the state of a game as observed by a single player"""
+
+from dataclasses import dataclass
+from typing import Optional, Union, Self
+
+from hundredandten.engine.actions import Action, DetailedDiscard, Bid, Discard, Play, SelectTrump
+from hundredandten.engine.constants import BidAmount, RoundStatus, SelectableSuit
+from hundredandten.engine.deck import Card, defined_cards
+from hundredandten.engine.player import player_by_identifier, RoundPlayer
+from hundredandten.engine import Game
+from hundredandten.engine.round import Round
+
+
+@dataclass(frozen=True)
+class AutomatedBid:
+    amount: BidAmount
+
+    @classmethod
+    def from_engine(cls, b: Bid) -> Self:
+        return cls(b.amount)
+
+
+@dataclass(frozen=True)
+class AutomatedDiscard:
+    cards: list[Card]
+
+    @classmethod
+    def from_engine(cls, d: Discard) -> Self:
+        return cls(d.cards)
+
+
+@dataclass(frozen=True)
+class AutomatedSelectTrump:
+    suit: SelectableSuit
+
+    @classmethod
+    def from_engine(cls, b: SelectTrump) -> Self:
+        return cls(b.suit)
+
+
+@dataclass(frozen=True)
+class AutomatedPlay:
+    card: Card
+
+    @classmethod
+    def from_engine(cls, b: Play) -> Self:
+        return cls(b.card)
+
+
+type AutomatedAction = Union[
+    AutomatedBid,
+    AutomatedSelectTrump,
+    AutomatedDiscard,
+    AutomatedPlay
+]
+
+
+class AutomatedActionFactory:
+    """Factory class for creating automated actions from engine actions."""
+
+    @staticmethod
+    def from_engine(a: Action) -> AutomatedAction:
+        """Create an automated Action from an engine Action."""
+        match a:
+            case Bid():
+                return AutomatedBid.from_engine(a)
+            case SelectTrump():
+                return AutomatedSelectTrump.from_engine(a)
+            case Discard() | DetailedDiscard():
+                return AutomatedDiscard.from_engine(a)
+            case Play():
+                return AutomatedPlay.from_engine(a)
+        raise ValueError(
+            f"Could not convert engine action {a} to an internal action"
+        )  # pragma: nocover
+
+
+@dataclass(frozen=True)
+class InHand:
+    """Card is in this player's hand"""
+
+
+@dataclass(frozen=True)
+class Played:
+    """Card was played in a specific trick by a specific seat"""
+
+    trick_index: int
+    seat: int
+
+
+@dataclass(frozen=True)
+class Discarded:
+    """Card was discarded by a specific seat"""
+
+    seat: int
+
+
+@dataclass(frozen=True)
+class Unknown:
+    """Card location is not known to this player"""
+
+
+CardStatus = Union[InHand, Played, Discarded, Unknown]
+
+
+@dataclass(frozen=True)
+class CardKnowledge:
+    """Hold the known information about a card and its status"""
+
+    card: Card
+    status: CardStatus
+
+
+@dataclass(frozen=True)
+class BidEvent:
+    """A bid placed by a player at a relative seat"""
+
+    seat: int
+    amount: BidAmount
+
+
+@dataclass(frozen=True)
+class TrickPlay:
+    """A card played in a trick by a player at a relative seat"""
+
+    seat: int
+    card: Card
+
+
+@dataclass(frozen=True)
+class CompletedTrick:
+    """A completed trick with all plays and the winner"""
+
+    plays: tuple[TrickPlay, ...]
+    winner_seat: int
+
+
+@dataclass(frozen=True)
+class TableInfo:
+    """Table shape and positions.
+
+    scores is ordered by relative seat (index 0 = self, increasing clockwise).
+    """
+
+    num_players: int
+    dealer_seat: int
+    bidder_seat: Optional[int]
+    scores: tuple[int, ...]
+
+
+@dataclass(frozen=True)
+class BiddingState:
+    """Bidding phase state including the resulting trump"""
+
+    bid_history: tuple[BidEvent, ...]
+    active_bid: Optional[BidAmount]
+    trump: Optional[SelectableSuit]
+
+
+@dataclass(frozen=True)
+class TrickState:
+    """Trick phase state"""
+
+    completed_tricks: tuple[CompletedTrick, ...]
+    current_trick_plays: tuple[TrickPlay, ...]
+
+
+@dataclass(frozen=True)
+class GameState:
+    """The game state as observed by the active player at decision time.
+
+    All positions are seat-relative: self is always seat 0,
+    and other seats are numbered clockwise.
+    """
+
+    # Phase
+    status: RoundStatus
+
+    # Table shape and relative positions/scores
+    table: TableInfo
+
+    # Player's own hand
+    hand: tuple[Card, ...]
+
+    # Bidding and trump state
+    bidding: BiddingState
+
+    # Trick state
+    tricks: TrickState
+
+    # Card knowledge (all 53 cards)
+    cards: tuple[CardKnowledge, ...]
+
+    # Legal actions for the active player
+    available_actions: tuple[AutomatedAction, ...]
+
+    @property
+    def available_bids(self) -> tuple[Bid, ...]:
+        """Return only Bid actions from available_actions"""
+        return tuple(a for a in self.available_actions if isinstance(a, Bid))
+
+    @property
+    def available_trump_selections(self) -> tuple[SelectTrump, ...]:
+        """Return only SelectTrump actions from available_actions"""
+        return tuple(a for a in self.available_actions if isinstance(a, SelectTrump))
+
+    @property
+    def available_discards(self) -> tuple[Discard, ...]:
+        """Return only Discard actions from available_actions"""
+        return tuple(a for a in self.available_actions if isinstance(a, Discard))
+
+    @property
+    def available_plays(self) -> tuple[Play, ...]:
+        """Return only Play actions from available_actions"""
+        return tuple(a for a in self.available_actions if isinstance(a, Play))
+
+    @property
+    def is_bidder(self) -> bool:
+        """Return True if the active player is the bidder"""
+        return self.table.bidder_seat == 0
+
+    @property
+    def is_dealer(self) -> bool:
+        """Return True if the active player is the dealer"""
+        return self.table.dealer_seat == 0
+
+    @property
+    def num_players(self) -> int:
+        """Return the number of players at the table"""
+        return self.table.num_players
+
+    @property
+    def dealer_seat(self) -> int:
+        """Return the dealer seat relative to the active player"""
+        return self.table.dealer_seat
+
+    @property
+    def bidder_seat(self) -> Optional[int]:
+        """Return the bidder seat relative to the active player"""
+        return self.table.bidder_seat
+
+    @property
+    def scores(self) -> tuple[int, ...]:
+        """Return scores ordered by relative seat (index 0 = self, increasing clockwise)"""
+        return self.table.scores
+
+    @property
+    def bid_history(self) -> tuple[BidEvent, ...]:
+        """Return bids placed so far in relative-seat order"""
+        return self.bidding.bid_history
+
+    @property
+    def active_bid(self) -> Optional[BidAmount]:
+        """Return the current high bid"""
+        return self.bidding.active_bid
+
+    @property
+    def trump(self) -> Optional[SelectableSuit]:
+        """Return the selected trump suit"""
+        return self.bidding.trump
+
+    @property
+    def completed_tricks(self) -> tuple[CompletedTrick, ...]:
+        """Return completed tricks with relative winner seats"""
+        return self.tricks.completed_tricks
+
+    @property
+    def current_trick_plays(self) -> tuple[TrickPlay, ...]:
+        """Return plays in the current in-progress trick"""
+        return self.tricks.current_trick_plays
+
+    @classmethod
+    def from_game(cls, game: Game, identifier: str) -> Self:
+        """Build a GameState observation for the identified player.
+
+        All seats are rotated so that the requesting player is seat 0.
+        Cards the player cannot see are marked Unknown.
+        """
+        game_round = game.active_round
+        players = game_round.players
+        num_players = len(players)
+        non_relative_seat_by_identifier = {
+            round_player.identifier: index for index, round_player in enumerate(players)
+        }
+        player = player_by_identifier(players, identifier)
+        player_index = non_relative_seat_by_identifier[identifier]
+
+        current_scores = game.scores
+        table = TableInfo(
+            num_players=num_players,
+            dealer_seat=GameState.__relative_seat(
+                non_relative_seat_by_identifier,
+                player.identifier,
+                game_round.dealer.identifier,
+                num_players,
+            ),
+            bidder_seat=(
+                GameState.__relative_seat(
+                    non_relative_seat_by_identifier,
+                    player.identifier,
+                    game_round.active_bidder.identifier,
+                    num_players,
+                )
+                if game_round.active_bidder
+                else None
+            ),
+            scores=tuple(
+                current_scores.get(
+                    players[(player_index + i) % num_players].identifier, 0
+                )
+                for i in range(num_players)
+            ),
+        )
+        bidding = BiddingState(
+            bid_history=tuple(
+                BidEvent(
+                    seat=GameState.__relative_seat(
+                        non_relative_seat_by_identifier,
+                        player.identifier,
+                        bid.identifier,
+                        num_players,
+                    ),
+                    amount=bid.amount,
+                )
+                for bid in game_round.bids
+            ),
+            active_bid=game_round.active_bid,
+            trump=game_round.trump,
+        )
+
+        return cls(status=game_round.status, table=table, hand=tuple(player.hand),
+                   bidding=bidding, tricks=GameState.__build_trick_state(
+                       game_round, player, non_relative_seat_by_identifier),
+                   cards=GameState.__build_card_knowledge(
+                       game_round, player, non_relative_seat_by_identifier),
+                   available_actions=tuple(AutomatedActionFactory.from_engine(a)
+                                           for a in game.available_actions(identifier)),)
+
+    @staticmethod
+    def __build_card_knowledge(
+        game_round: Round,
+        player: RoundPlayer,
+        non_relative_seat_by_identifier: dict[str, int],
+    ) -> tuple[CardKnowledge, ...]:
+        card_status_by_card: dict[Card, InHand | Played | Discarded] = {}
+        num_players = len(game_round.players)
+
+        for card in player.hand:
+            card_status_by_card[card] = InHand()
+
+        for trick_index, trick in enumerate(game_round.tricks):
+            for play in trick.plays:
+                card_status_by_card[play.card] = Played(
+                    trick_index=trick_index,
+                    seat=GameState.__relative_seat(
+                        non_relative_seat_by_identifier,
+                        player.identifier,
+                        play.identifier,
+                        num_players,
+                    ),
+                )
+
+        for discard in game_round.discards:
+            if discard.identifier == player.identifier:
+                for card in discard.cards:
+                    card_status_by_card[card] = Discarded(seat=0)
+
+        unknown = Unknown()
+        return tuple(
+            CardKnowledge(
+                card=card,
+                status=card_status_by_card.get(card, unknown),
+            )
+            for card in defined_cards
+        )
+
+    @staticmethod
+    def __build_trick_state(
+        game_round: Round,
+        player: RoundPlayer,
+        non_relative_seat_by_identifier: dict[str, int],
+    ) -> TrickState:
+        completed_tricks: list[CompletedTrick] = []
+        current_trick_plays: tuple[TrickPlay, ...] = ()
+        num_players = len(game_round.players)
+
+        for trick in game_round.tricks:
+            trick_plays = tuple(
+                TrickPlay(
+                    seat=GameState.__relative_seat(
+                        non_relative_seat_by_identifier,
+                        player.identifier,
+                        play.identifier,
+                        num_players,
+                    ),
+                    card=play.card,
+                )
+                for play in trick.plays
+            )
+            if len(trick.plays) == len(game_round.players):
+                winner_play = trick.winning_play
+                assert winner_play is not None
+                completed_tricks.append(
+                    CompletedTrick(
+                        plays=trick_plays,
+                        winner_seat=GameState.__relative_seat(
+                            non_relative_seat_by_identifier,
+                            player.identifier,
+                            winner_play.identifier,
+                            num_players,
+                        ),
+                    )
+                )
+            else:
+                current_trick_plays = trick_plays
+
+        return TrickState(
+            completed_tricks=tuple(completed_tricks),
+            current_trick_plays=current_trick_plays,
+        )
+
+    @staticmethod
+    def __relative_seat(
+        non_relative_seat_by_identifier: dict[str, int],
+        player_identifier: str,
+        other_identifier: str,
+        num_players: int,
+    ) -> int:
+        return (
+            non_relative_seat_by_identifier[other_identifier]
+            - non_relative_seat_by_identifier[player_identifier]
+        ) % num_players

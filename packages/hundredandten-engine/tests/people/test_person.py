@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from hundredandten.engine.constants import CardNumber, CardSuit, RoundRole
 from hundredandten.engine.deck import Card
-from hundredandten.engine.player import HumanPlayer, RoundPlayer
+from hundredandten.engine.player import Player, RoundPlayer
 
 
 class TestPlayer(TestCase):
@@ -21,4 +21,4 @@ class TestPlayer(TestCase):
                 hand=[Card(CardNumber.ACE, CardSuit.CLUBS)],
             ),
         )
-        self.assertNotEqual(HumanPlayer("one"), HumanPlayer("two"))
+        self.assertNotEqual(Player("one"), Player("two"))

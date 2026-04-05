@@ -15,31 +15,15 @@ from .constants import (
     RoundStatus,
     SelectableSuit,
 )
-from .decisions import trumps
-from .deck import Card, defined_cards
+from .trumps import trumps
 from .errors import HundredAndTenError
 from .player import (
-    AutomatedPlayer,
     Player,
-    RoundPlayer,
     player_after,
     player_by_identifier,
 )
 from .round import Round
-from .state import (
-    BiddingState,
-    BidEvent,
-    CardKnowledge,
-    CompletedTrick,
-    Discarded,
-    GameState,
-    InHand,
-    Played,
-    TableInfo,
-    TrickPlay,
-    TrickState,
-    Unknown,
-)
+
 from .trick import Score
 
 
@@ -63,9 +47,7 @@ class Game:
         self.__new_round(self.players[0].identifier)
 
         for action in initial_actions or []:
-            self.__act(action)  # don't trigger automation for already taken actions
-
-        self.__automated_act()
+            self.act(action)
 
     @property
     def status(self) -> AnyStatus:
@@ -164,170 +146,16 @@ class Game:
         """
         return self.__scores(len(self._rounds))
 
-    def act(self, action: Action) -> list[Action]:
+    def act(self, action: Action) -> None:
         """Perform an action as a player of the game"""
-        return [*self.__act(action), *self.__automated_act()]
+        self.__act(action)
 
-    def game_state_for(self, identifier: str) -> GameState:
-        """Build a GameState observation for the identified player.
-
-        All seats are rotated so that the requesting player is seat 0.
-        Cards the player cannot see are marked Unknown.
-        """
-        game_round = self.active_round
-        players = game_round.players
-        num_players = len(players)
-        non_relative_seat_by_identifier = {
-            round_player.identifier: index for index, round_player in enumerate(players)
-        }
-        player = player_by_identifier(players, identifier)
-        player_index = non_relative_seat_by_identifier[identifier]
-
-        current_scores = self.scores
-        table = TableInfo(
-            num_players=num_players,
-            dealer_seat=self.__relative_seat(
-                non_relative_seat_by_identifier,
-                player.identifier,
-                game_round.dealer.identifier,
-                num_players,
-            ),
-            bidder_seat=(
-                self.__relative_seat(
-                    non_relative_seat_by_identifier,
-                    player.identifier,
-                    game_round.active_bidder.identifier,
-                    num_players,
-                )
-                if game_round.active_bidder
-                else None
-            ),
-            scores=tuple(
-                current_scores.get(
-                    players[(player_index + i) % num_players].identifier, 0
-                )
-                for i in range(num_players)
-            ),
-        )
-        bidding = BiddingState(
-            bid_history=tuple(
-                BidEvent(
-                    seat=self.__relative_seat(
-                        non_relative_seat_by_identifier,
-                        player.identifier,
-                        bid.identifier,
-                        num_players,
-                    ),
-                    amount=bid.amount,
-                )
-                for bid in game_round.bids
-            ),
-            active_bid=game_round.active_bid,
-            trump=game_round.trump,
-        )
-
-        return GameState(
-            status=game_round.status,
-            table=table,
-            hand=tuple(player.hand),
-            bidding=bidding,
-            tricks=self.__build_trick_state(
-                game_round, player, non_relative_seat_by_identifier
-            ),
-            cards=self.__build_card_knowledge(
-                game_round, player, non_relative_seat_by_identifier
-            ),
-            available_actions=self.__build_available_actions(game_round, player),
-        )
-
-    def __build_card_knowledge(
+    def available_actions(
         self,
-        game_round: Round,
-        player: RoundPlayer,
-        non_relative_seat_by_identifier: dict[str, int],
-    ) -> tuple[CardKnowledge, ...]:
-        card_status_by_card: dict[Card, InHand | Played | Discarded] = {}
-        num_players = len(game_round.players)
-
-        for card in player.hand:
-            card_status_by_card[card] = InHand()
-
-        for trick_index, trick in enumerate(game_round.tricks):
-            for play in trick.plays:
-                card_status_by_card[play.card] = Played(
-                    trick_index=trick_index,
-                    seat=self.__relative_seat(
-                        non_relative_seat_by_identifier,
-                        player.identifier,
-                        play.identifier,
-                        num_players,
-                    ),
-                )
-
-        for discard in game_round.discards:
-            if discard.identifier == player.identifier:
-                for card in discard.cards:
-                    card_status_by_card[card] = Discarded(seat=0)
-
-        unknown = Unknown()
-        return tuple(
-            CardKnowledge(
-                card=card,
-                status=card_status_by_card.get(card, unknown),
-            )
-            for card in defined_cards
-        )
-
-    def __build_trick_state(
-        self,
-        game_round: Round,
-        player: RoundPlayer,
-        non_relative_seat_by_identifier: dict[str, int],
-    ) -> TrickState:
-        completed_tricks: list[CompletedTrick] = []
-        current_trick_plays: tuple[TrickPlay, ...] = ()
-        num_players = len(game_round.players)
-
-        for trick in game_round.tricks:
-            trick_plays = tuple(
-                TrickPlay(
-                    seat=self.__relative_seat(
-                        non_relative_seat_by_identifier,
-                        player.identifier,
-                        play.identifier,
-                        num_players,
-                    ),
-                    card=play.card,
-                )
-                for play in trick.plays
-            )
-            if len(trick.plays) == len(game_round.players):
-                winner_play = trick.winning_play
-                assert winner_play is not None
-                completed_tricks.append(
-                    CompletedTrick(
-                        plays=trick_plays,
-                        winner_seat=self.__relative_seat(
-                            non_relative_seat_by_identifier,
-                            player.identifier,
-                            winner_play.identifier,
-                            num_players,
-                        ),
-                    )
-                )
-            else:
-                current_trick_plays = trick_plays
-
-        return TrickState(
-            completed_tricks=tuple(completed_tricks),
-            current_trick_plays=current_trick_plays,
-        )
-
-    def __build_available_actions(
-        self,
-        game_round: Round,
-        player: RoundPlayer,
+        identifier: str,
     ) -> tuple[Action, ...]:
+        game_round = self.active_round
+        player = player_by_identifier(game_round.players, identifier)
         if (
             self.status == GameStatus.WON
             or game_round.active_player.identifier != player.identifier
@@ -361,32 +189,14 @@ class Game:
         )
         return tuple(Play(player.identifier, card) for card in playable)
 
-    def __automated_act(self) -> list[Action]:
-        resulting_actions = []
-        while (
-            isinstance(self.status, RoundStatus)
-            and isinstance(self.active_player, AutomatedPlayer)
-            and (
-                action := self.active_player.act(
-                    self.game_state_for(self.active_player.identifier)
-                )
-            )
-            is not None
-        ):
-            resulting_actions.extend(self.__act(action))
-
-        return resulting_actions
-
-    def __act(self, action: Action) -> list[Action]:
+    def __act(self, action: Action) -> None:
         """Perform an action as a player of the game"""
-        resulting_actions = self.active_round.act(action)
+        self.active_round.act(action)
         # handle creation of new round if appropriate
         if isinstance(action, Bid):
             self.__end_bid()
         if isinstance(action, Play):
             self.__end_play()
-
-        return resulting_actions
 
     def __end_bid(self):
         if self.status == RoundStatus.COMPLETED_NO_BIDDERS:
@@ -464,15 +274,3 @@ class Game:
                 scores[score.identifier] = scores.get(score.identifier, 0) + score.value
 
         return scores
-
-    def __relative_seat(
-        self,
-        non_relative_seat_by_identifier: dict[str, int],
-        player_identifier: str,
-        other_identifier: str,
-        num_players: int,
-    ) -> int:
-        return (
-            non_relative_seat_by_identifier[other_identifier]
-            - non_relative_seat_by_identifier[player_identifier]
-        ) % num_players

@@ -5,7 +5,7 @@ from typing import Callable, Optional
 
 from .actions import Play
 from .constants import CardSuit, SelectableSuit
-from .decisions import bleeds
+from .trumps import bleeds
 from .deck import Card
 
 

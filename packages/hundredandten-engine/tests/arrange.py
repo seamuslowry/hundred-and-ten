@@ -11,9 +11,9 @@ from hundredandten.engine.constants import (
     RoundStatus,
     SelectableSuit,
 )
-from hundredandten.engine.decisions import trumps
+from hundredandten.engine.trumps import trumps
 from hundredandten.engine.game import Game
-from hundredandten.engine.player import HumanPlayer
+from hundredandten.engine.player import Player
 
 
 def game(
@@ -115,7 +115,7 @@ def __get_bidding_game(seed: Optional[str]) -> Game:
     new_game = Game(
         players=list(
             map(
-                lambda identifier: HumanPlayer(str(identifier)),
+                lambda identifier: Player(str(identifier)),
                 range(4),
             )
         ),

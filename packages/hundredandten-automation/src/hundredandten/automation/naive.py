@@ -1,9 +1,83 @@
-"""A module to make machine decisions about how to act in a game"""
-
 from typing import Optional, Sequence
 
-from .constants import BidAmount, CardNumber, SelectableSuit
-from .deck import Card
+from hundredandten.engine.deck import Card
+from hundredandten.engine.trumps import bleeds, trumps
+from hundredandten.engine.errors import HundredAndTenError
+from hundredandten.engine.constants import BidAmount, CardNumber, RoundStatus, SelectableSuit
+
+from .state import AutomatedAction, AutomatedBid, AutomatedSelectTrump, AutomatedDiscard, AutomatedPlay, GameState
+
+
+def action(state: GameState) -> AutomatedAction:
+    """Return the suggested action given the game state"""
+    if state.status == RoundStatus.BIDDING:
+        return __suggested_bid(state)
+    if state.status == RoundStatus.TRUMP_SELECTION:
+        return __suggested_trump_selection(state)
+    if state.status == RoundStatus.DISCARD:
+        return __suggested_discard(state)
+    if state.status == RoundStatus.TRICKS:
+        return __suggested_play(state)
+    raise HundredAndTenError(
+        f"Cannot automate the action in status {state.status}"
+    )
+
+
+def __suggested_bid(game_state: GameState) -> AutomatedBid:
+    """Return the suggested bid for the current player"""
+
+    maximum_bid = max_bid(game_state.hand)
+    available_bids = map(lambda b: b.amount, game_state.available_bids)
+    willing_bids = list(filter(lambda b: b and b <= maximum_bid, available_bids))
+
+    return AutomatedBid(next(iter(willing_bids), BidAmount.PASS))
+
+
+def __suggested_trump_selection(game_state: GameState) -> AutomatedSelectTrump:
+    """Return the suggested trump selection for the current player"""
+
+    return AutomatedSelectTrump(desired_trump(game_state.hand))
+
+
+def __suggested_discard(game_state: GameState) -> AutomatedDiscard:
+    """Return the suggested dicard action for the current player"""
+
+    return AutomatedDiscard(
+        list(non_trumps(game_state.hand, game_state.trump)),
+    )
+
+
+def __suggested_play(game_state: GameState) -> AutomatedPlay:
+    """Return the suggested play action for the current player"""
+
+    playable_cards = game_state.hand
+    if (
+        len(game_state.tricks.current_trick_plays) > 0
+        and game_state.trump
+        and bleeds(game_state.current_trick_plays[0].card, game_state.trump)
+    ):
+        playable_cards = trumps(game_state.hand, game_state.trump) or playable_cards
+
+    best_played_card = next(
+        map(lambda p: p.card, game_state.tricks.current_trick_plays), None
+    )
+
+    if not best_played_card:
+        # if you are the bidder and you can bleed, do so
+        if game_state.is_bidder:
+            card = best_card(playable_cards, game_state.trump)
+        # otherwise, don't bleed if you can help it
+        else:
+            card = worst_card(playable_cards, game_state.trump)
+    else:
+        worst_winning_card = worst_card_beating(
+            playable_cards, best_played_card, game_state.trump
+        )
+        # if you can beat the current winning card, do it with the lowest card that will do it
+        # otherwise, play nothing
+        card = worst_winning_card or worst_card(playable_cards, game_state.trump)
+
+    return AutomatedPlay(card)
 
 
 def max_bid(cards: Sequence[Card]) -> BidAmount:
@@ -78,11 +152,6 @@ def __cards_beating(
     return list(filter(lambda c: c.trump_value > card_to_beat.trump_value, trump_cards))
 
 
-def trumps(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Sequence[Card]:
-    """Return all trump cards in the list"""
-    return [card for card in cards if card.suit == trump or card.always_trump]
-
-
 def non_trumps(
     cards: Sequence[Card], trump: Optional[SelectableSuit]
 ) -> Sequence[Card]:
@@ -122,11 +191,3 @@ def __cards_by_suit(cards: Sequence[Card]) -> dict[SelectableSuit, list[Card]]:
         suit: [card for card in cards if card.suit == suit or card.always_trump]
         for suit in list(SelectableSuit)
     }
-
-
-def bleeds(card: Card, trump: SelectableSuit) -> bool:
-    """
-    Return true if the card played causes a trick to bleed
-    if played under the provided trump
-    """
-    return card.suit == trump or card.always_trump

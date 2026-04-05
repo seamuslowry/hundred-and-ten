@@ -8,6 +8,7 @@ A python engine for playing the game Hundred and Ten, organized as a uv workspac
 ## Packages
 
 - [`hundredandten-engine`](packages/hundredandten-engine/): The core game engine package. See its README for game rules and API usage.
+- [`hundredandten-automation`](packages/hundredandten-automation/): Automated decision making built upon the engine package. See its README for API usage.
 
 ## Development
 
@@ -16,7 +17,7 @@ This project uses [uv](https://github.com/astral-sh/uv) for workspace management
 ### Installation
 
 ```bash
-uv sync --all-groups
+uv sync --all-groups --all-packages
 ```
 
 ### Run tests

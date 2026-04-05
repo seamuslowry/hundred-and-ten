@@ -3,12 +3,12 @@
 from unittest import TestCase
 
 from hundredandten.engine.constants import CardNumber, CardSuit, SelectableSuit
-from hundredandten.engine.decisions import desired_trump
+from hundredandten.automation.naive import desired_trump
 from hundredandten.engine.deck import Card
 
 
 class TestTrumpDecision(TestCase):
-    """Unit tests for deciding on bids"""
+    """Unit tests for deciding on trump"""
 
     def test_selects_highest_value(self):
         """Select trump with the highest value"""

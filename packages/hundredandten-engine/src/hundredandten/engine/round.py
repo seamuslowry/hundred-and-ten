@@ -21,7 +21,7 @@ from .constants import (
     RoundStatus,
     SelectableSuit,
 )
-from .decisions import (
+from .trumps import (
     trumps,
 )
 from .deck import Deck
@@ -288,7 +288,7 @@ class Round:
 
         return base_scores
 
-    def act(self, action: Action) -> list[Action]:
+    def act(self, action: Action) -> None:
         """Perform an action as a player of the game"""
         if isinstance(action, Bid):
             self.__bid(action)
@@ -305,7 +305,6 @@ class Round:
             self.__invalidate_cached_properties()
             self.__end_play()
         self.__invalidate_cached_properties()
-        return [action]
 
     def __bid(self, bid: Bid) -> None:
         """Record a bid from a player"""
