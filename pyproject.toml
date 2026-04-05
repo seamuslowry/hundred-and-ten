@@ -15,6 +15,10 @@ test = [
     "pytest-cov==7.1.0",
 ]
 
+[tool.pylint.design]
+# Allow Settings/Config classes to have no methods
+min-public-methods = 0
+
 [tool.ruff]
 target-version = "py314"
 line-length = 100
