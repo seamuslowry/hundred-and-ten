@@ -1,11 +1,23 @@
 from typing import Optional, Sequence
 
+from hundredandten.engine.constants import (
+    BidAmount,
+    CardNumber,
+    RoundStatus,
+    SelectableSuit,
+)
 from hundredandten.engine.deck import Card
-from hundredandten.engine.trumps import bleeds, trumps
 from hundredandten.engine.errors import HundredAndTenError
-from hundredandten.engine.constants import BidAmount, CardNumber, RoundStatus, SelectableSuit
+from hundredandten.engine.trumps import bleeds, trumps
 
-from .state import AutomatedAction, AutomatedBid, AutomatedSelectTrump, AutomatedDiscard, AutomatedPlay, GameState
+from .state import (
+    AutomatedAction,
+    AutomatedBid,
+    AutomatedDiscard,
+    AutomatedPlay,
+    AutomatedSelectTrump,
+    GameState,
+)
 
 
 def action(state: GameState) -> AutomatedAction:
@@ -18,9 +30,7 @@ def action(state: GameState) -> AutomatedAction:
         return __suggested_discard(state)
     if state.status == RoundStatus.TRICKS:
         return __suggested_play(state)
-    raise HundredAndTenError(
-        f"Cannot automate the action in status {state.status}"
-    )
+    raise HundredAndTenError(f"Cannot automate the action in status {state.status}")
 
 
 def __suggested_bid(game_state: GameState) -> AutomatedBid:

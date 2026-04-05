@@ -1,13 +1,20 @@
 """Represent the state of a game as observed by a single player"""
 
 from dataclasses import dataclass
-from typing import Optional, Union, Self
+from typing import Optional, Self, Union
 
-from hundredandten.engine.actions import Action, DetailedDiscard, Bid, Discard, Play, SelectTrump
+from hundredandten.engine import Game
+from hundredandten.engine.actions import (
+    Action,
+    Bid,
+    DetailedDiscard,
+    Discard,
+    Play,
+    SelectTrump,
+)
 from hundredandten.engine.constants import BidAmount, RoundStatus, SelectableSuit
 from hundredandten.engine.deck import Card, defined_cards
-from hundredandten.engine.player import player_by_identifier, RoundPlayer
-from hundredandten.engine import Game
+from hundredandten.engine.player import RoundPlayer, player_by_identifier
 from hundredandten.engine.round import Round
 
 
@@ -60,10 +67,7 @@ class AutomatedPlay:
 
 
 type AutomatedAction = Union[
-    AutomatedBid,
-    AutomatedSelectTrump,
-    AutomatedDiscard,
-    AutomatedPlay
+    AutomatedBid, AutomatedSelectTrump, AutomatedDiscard, AutomatedPlay
 ]
 
 
@@ -214,12 +218,16 @@ class GameState:
     @property
     def available_trump_selections(self) -> tuple[AutomatedSelectTrump, ...]:
         """Return only SelectTrump actions from available_actions"""
-        return tuple(a for a in self.available_actions if isinstance(a, AutomatedSelectTrump))
+        return tuple(
+            a for a in self.available_actions if isinstance(a, AutomatedSelectTrump)
+        )
 
     @property
     def available_discards(self) -> tuple[AutomatedDiscard, ...]:
         """Return only Discard actions from available_actions"""
-        return tuple(a for a in self.available_actions if isinstance(a, AutomatedDiscard))
+        return tuple(
+            a for a in self.available_actions if isinstance(a, AutomatedDiscard)
+        )
 
     @property
     def available_plays(self) -> tuple[AutomatedPlay, ...]:
@@ -340,13 +348,22 @@ class GameState:
             trump=game_round.trump,
         )
 
-        return cls(status=game_round.status, table=table, hand=tuple(player.hand),
-                   bidding=bidding, tricks=GameState.__build_trick_state(
-                       game_round, player, non_relative_seat_by_identifier),
-                   cards=GameState.__build_card_knowledge(
-                       game_round, player, non_relative_seat_by_identifier),
-                   available_actions=tuple(AutomatedActionFactory.from_engine(a)
-                                           for a in game.available_actions(identifier)),)
+        return cls(
+            status=game_round.status,
+            table=table,
+            hand=tuple(player.hand),
+            bidding=bidding,
+            tricks=GameState.__build_trick_state(
+                game_round, player, non_relative_seat_by_identifier
+            ),
+            cards=GameState.__build_card_knowledge(
+                game_round, player, non_relative_seat_by_identifier
+            ),
+            available_actions=tuple(
+                AutomatedActionFactory.from_engine(a)
+                for a in game.available_actions(identifier)
+            ),
+        )
 
     @staticmethod
     def __build_card_knowledge(

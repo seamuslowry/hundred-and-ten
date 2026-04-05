@@ -2,26 +2,25 @@
 
 from unittest import TestCase
 
+from hundredandten.automation.state import (
+    AutomatedBid,
+    AutomatedDiscard,
+    AutomatedPlay,
+    AutomatedSelectTrump,
+    CompletedTrick,
+    Discarded,
+    GameState,
+    InHand,
+    Played,
+    Unknown,
+)
 from hundredandten.engine.actions import Bid, Discard, Play
-
 from hundredandten.engine.constants import (
     HAND_SIZE,
     BidAmount,
     RoundStatus,
 )
 from hundredandten.engine.deck import defined_cards
-from hundredandten.automation.state import (
-    GameState,
-    CompletedTrick,
-    Discarded,
-    InHand,
-    Played,
-    Unknown,
-    AutomatedBid,
-    AutomatedDiscard,
-    AutomatedSelectTrump,
-    AutomatedPlay
-)
 from hundredandten.testing import arrange
 
 SEED = "test-game-state-seed"
@@ -88,8 +87,7 @@ class TestGameStateBidding(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        in_hand_cards = [
-            ck.card for ck in state.cards if isinstance(ck.status, InHand)]
+        in_hand_cards = [ck.card for ck in state.cards if isinstance(ck.status, InHand)]
         self.assertCountEqual(in_hand_cards, list(active.hand))
 
     def test_other_cards_are_unknown(self):
@@ -98,8 +96,7 @@ class TestGameStateBidding(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        unknown_cards = [
-            ck for ck in state.cards if isinstance(ck.status, Unknown)]
+        unknown_cards = [ck for ck in state.cards if isinstance(ck.status, Unknown)]
         self.assertEqual(len(unknown_cards), 53 - HAND_SIZE)
 
     def test_no_bidder_during_bidding(self):
@@ -150,8 +147,9 @@ class TestGameStateBidding(TestCase):
         state = GameState.from_game(game, active.identifier)
 
         self.assertTrue(len(state.available_actions) > 0)
-        self.assertTrue(all(isinstance(a, AutomatedBid)
-                        for a in state.available_actions))
+        self.assertTrue(
+            all(isinstance(a, AutomatedBid) for a in state.available_actions)
+        )
 
     def test_no_actions_for_inactive_player(self):
         """Inactive player has no available actions"""
@@ -237,8 +235,12 @@ class TestGameStateTrumpSelection(TestCase):
         state = GameState.from_game(game, bidder.identifier)
 
         self.assertEqual(len(state.available_trump_selections), 4)
-        self.assertTrue(all(isinstance(a, AutomatedSelectTrump)
-                        for a in state.available_trump_selections))
+        self.assertTrue(
+            all(
+                isinstance(a, AutomatedSelectTrump)
+                for a in state.available_trump_selections
+            )
+        )
 
     def test_no_actions_for_non_bidder(self):
         """Non-bidder has no actions during trump selection"""
@@ -293,8 +295,7 @@ class TestGameStateDiscard(TestCase):
         discard_actions = state.available_discards
         # 2^5 = 32 subsets for a 5-card hand
         self.assertEqual(len(discard_actions), 2**HAND_SIZE)
-        self.assertTrue(all(isinstance(a, AutomatedDiscard)
-                        for a in discard_actions))
+        self.assertTrue(all(isinstance(a, AutomatedDiscard) for a in discard_actions))
 
     def test_discard_includes_empty_set(self):
         """Discard options include keeping all cards (empty discard)"""
@@ -302,8 +303,7 @@ class TestGameStateDiscard(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        empty_discards = [
-            d for d in state.available_discards if len(d.cards) == 0]
+        empty_discards = [d for d in state.available_discards if len(d.cards) == 0]
         self.assertEqual(len(empty_discards), 1)
 
     def test_discard_includes_full_hand(self):
@@ -313,7 +313,8 @@ class TestGameStateDiscard(TestCase):
         state = GameState.from_game(game, active.identifier)
 
         full_discards = [
-            d for d in state.available_discards if len(d.cards) == HAND_SIZE]
+            d for d in state.available_discards if len(d.cards) == HAND_SIZE
+        ]
         self.assertEqual(len(full_discards), 1)
 
     def test_own_discards_visible_after_discard(self):
@@ -325,7 +326,8 @@ class TestGameStateDiscard(TestCase):
 
         state = GameState.from_game(game, active.identifier)
         discarded_in_state = [
-            ck.card for ck in state.cards if isinstance(ck.status, Discarded)]
+            ck.card for ck in state.cards if isinstance(ck.status, Discarded)
+        ]
         self.assertCountEqual(discarded_in_state, discarded_cards)
 
     def test_other_player_discards_not_visible(self):
@@ -363,8 +365,9 @@ class TestGameStateTricks(TestCase):
         state = GameState.from_game(game, active.identifier)
 
         self.assertTrue(len(state.available_plays) > 0)
-        self.assertTrue(all(isinstance(a, AutomatedPlay)
-                        for a in state.available_plays))
+        self.assertTrue(
+            all(isinstance(a, AutomatedPlay) for a in state.available_plays)
+        )
 
     def test_play_actions_match_hand(self):
         """Play actions correspond to cards in hand (when not bleeding)"""
@@ -511,7 +514,8 @@ class TestGameStateConvenienceProperties(TestCase):
         """is_dealer returns False for non-dealers"""
         game = arrange.game(RoundStatus.BIDDING, seed=SEED)
         non_dealer = next(
-            p for p in game.active_round.players if p != game.active_round.dealer)
+            p for p in game.active_round.players if p != game.active_round.dealer
+        )
         state = GameState.from_game(game, non_dealer.identifier)
 
         self.assertFalse(state.is_dealer)

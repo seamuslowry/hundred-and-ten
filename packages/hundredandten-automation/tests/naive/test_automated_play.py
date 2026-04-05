@@ -2,14 +2,12 @@
 
 from unittest import TestCase
 
+from hundredandten.automation import naive
 from hundredandten.automation.state import GameState
 from hundredandten.engine.constants import GameStatus
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.game import Game
 from hundredandten.engine.player import Player
-
-from hundredandten.automation import naive
-
 from hundredandten.testing import arrange
 
 AUTOMATED_SEED = "a92475b9-3df3-458d-b0df-486f9a305015"
@@ -32,8 +30,9 @@ class TestAutomatedPlay(TestCase):
 
         while game.status != GameStatus.WON:
             player_id = game.active_player.identifier
-            game.act(naive.action(GameState.from_game(game, player_id)).for_player(
-                player_id))
+            game.act(
+                naive.action(GameState.from_game(game, player_id)).for_player(player_id)
+            )
 
         self.assertIsNotNone(game.winner)
 
