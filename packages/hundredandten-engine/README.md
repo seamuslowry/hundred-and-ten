@@ -1,0 +1,522 @@
+[![Code Quality](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/lint.yaml)
+[![100% Coverage](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml/badge.svg?branch=main)](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml)
+
+# Hundred and Ten
+
+A python package to provide an engine for playing the game Hundred and Ten.
+
+```python
+from hundredandten import Game
+
+game = Game()
+```
+
+## How To Play
+
+Hundred and Ten is a trick-taking game structured into rounds of five tricks each that continue until one player has reached a score of 110 or above.
+
+The game is played with a normal 52 card deck and includes one Joker for a total deck of 53 cards.
+
+### Dealer
+
+For each round, one player is considered the dealer. In an over-the-table game, this player would be responsible for shuffling the deck and dealing out the cards. With this package, that is all handled. However, the dealer still retains some additional privileges that go along with the role:
+
+1. Bidding begins to the left of the dealer. This means that the dealer is always the last to place a bid and can make their decision with the context of other players' bids.
+
+2. Normally, to steal a bid, players must bid _above_ the current amount. The dealer, however, can steal a bid for the current amount.
+
+The position of dealer moves to the current dealer's left at the end of the round, except with conditions described in [passing](#passing).
+
+### Bidding
+
+Before the round begins, players are dealt a hand of five cards, which they will use to determine if they wish to "bid" any points. The highest bidder will decide which suit is trumps for the round. However, if the highest bidder fails to earn at least the amount of points they bid, they instead lose that amount (see [scoring](#scoring)).
+
+Bidding begins to the left of the [dealer](#dealer) and continues clockwise around the table until either all players have passed or a single bidder remains.
+
+#### Passing
+
+If players do not believe their hand is strong enough to bid, they can pass on their turn. If all players pass, the round ends.
+
+The same player will remain dealer after a round when all players pass, for a maximum of three rounds. If the current dealer has been the dealer for the last three rounds, then [dealer](#dealer) will pass to the left.
+
+#### Options
+
+Players may only bid one of the following options:
+
+- 15
+- 20
+- 25
+- 30
+- Shoot the Moon (see: [Scoring](#scoring))
+
+#### Stealing a Bid
+
+When a player places a bid, other players in the round must bid above this amount (unless they are the [dealer](#dealer)) or pass. Bidding above (or at, see: [dealer](#dealer)) the current highest bid is called Stealing the Bid and bidding continues around the table until all but one player has passed.
+
+#### Selecting Trump
+
+The highest bidder selects the trump suit for the round. Once the trump is selected, all players at the table may choose to discard any or all of their current hand and have their hand refilled from the deck. This begins with the dealer, and continues clockwise until all players have had the opportunity to discard.
+
+### Tricks
+
+Each round consists of five tricks. Each player contributes one card to a trick. When all players have played a card, the trick ends and a winner is determined (see [Winning a Trick](#winning-a-trick)).
+
+The first trick begins with the player to the left of the highest bidder; play continues clockwise until the trick is complete. Subsequent tricks will begin with the winner of the previous trick.
+
+#### Trump Cards
+
+A card is a trump card if it is the suit selected by the highest bidder.
+
+Additionally, the Ace of Hearts and the Joker are both considered trump cards regardless of the suit chosen by the bidder. This is important to remember for [winning a trick](#winning-a-trick) and [bleeding](#bleeding).
+
+#### Winning a Trick
+
+A trick is won by the highest value card in the trick. Trump cards will always beat non-trump cards.
+
+See below for the card hierarchy for each suit, when it is trump. Recall the additional [trump cards](#trump-cards) that will not necessarily be of the selected suit. Note that red suits and black suits follow the same trump hierarchy with the exception of their number cards. Lower value black number cards will beat higher value black number cards.
+
+<table align="center">
+  <tr>
+    <th>
+      Rank
+    </th>
+    <th>
+      Hearts
+    </th>
+    <th>
+      Diamonds
+    </th>
+    <th>
+      Spades
+    </th>
+    <th>
+      Clubs
+    </th>
+  </tr>
+  <tr>
+    <td align="center">
+      Highest
+    </td>
+    <td colspan=4 align="center">
+      5
+    </td>
+  </tr>
+  <tr>
+    <td  rowspan=13 align="center">
+      &nbsp
+    </td>
+    <td colspan=4 align="center">
+      Jack
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4 align="center">
+      Joker
+    </td>
+  </tr>
+  <tr>
+    <td colspan=1 rowspan=2 align="center">
+      Ace
+    </td>
+    <td colspan=3 align="center">
+      Ace of Hearts
+    </td>
+  </tr>
+  <tr>
+    <td colspan=3 align="center">
+      Ace
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4 align="center">
+      King
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4 align="center">
+      Queen
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      10
+    </td>
+    <td colspan=2 align="center">
+      2
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      9
+    </td>
+    <td colspan=2 align="center">
+      3
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      8
+    </td>
+    <td colspan=2 align="center">
+      4
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      7
+    </td>
+    <td colspan=2 align="center">
+      6
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      6
+    </td>
+    <td colspan=2 align="center">
+      7
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      4
+    </td>
+    <td colspan=2 align="center">
+      8
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      3
+    </td>
+    <td colspan=2 align="center">
+      9
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      Lowest
+    </td>
+    <td colspan=2 align="center">
+      2
+    </td>
+    <td colspan=2 align="center">
+      10
+    </td>
+  </tr>
+</table>
+
+If no trump card is played, the suit of the first played card is considered trump for the trick. It will not follow the trump order listed above, though. Instead, it will follow a normal Ace-high card hierarchy. The only exception is that lower value black number cards still beat higher value black number cards. The table below describes the full order.
+
+<table align="center">
+  <tr>
+    <th>
+      Rank
+    </th>
+    <th>
+      Hearts
+    </th>
+    <th>
+      Diamonds
+    </th>
+    <th>
+      Spades
+    </th>
+    <th>
+      Clubs
+    </th>
+  </tr>
+  <tr>
+    <td align="center">
+      Highest
+    </td>
+    <td colspan=4 align="center">
+      Ace
+    </td>
+  </tr>
+  <tr>
+    <td rowspan=11>
+      &nbsp
+    </td>
+    <td colspan=4 align="center">
+      King
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4 align="center">
+      Queen
+    </td>
+  </tr>
+  <tr>
+    <td colspan=4 align="center">
+      Jack
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      10
+    </td>
+    <td colspan=2 align="center">
+      2
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      9
+    </td>
+    <td colspan=2 align="center">
+      3
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      8
+    </td>
+    <td colspan=2 align="center">
+      4
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      7
+    </td>
+    <td colspan=2 align="center">
+      5
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      5
+    </td>
+    <td colspan=2 align="center">
+      6
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      6
+    </td>
+    <td colspan=2 align="center">
+      7
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      4
+    </td>
+    <td colspan=2 align="center">
+      8
+    </td>
+  </tr>
+  <tr>
+    <td colspan=2 align="center">
+      3
+    </td>
+    <td colspan=2 align="center">
+      9
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      Lowest
+    </td>
+    <td colspan=2 align="center">
+      2
+    </td>
+    <td colspan=2 align="center">
+      10
+    </td>
+  </tr>
+</table>
+
+#### Bleeding
+
+If the first card in a trick is a trump card, the trick is "bleeding". This means that all players _must_ play a trump card if they have one in their hand. If they do not have one in their hand, they may play whatever card they wish.
+
+#### Scoring
+
+Each round (which consists of five tricks) normally offers thirty points in total to be won by players. The trick that was won with the highest value card is worth ten points. The remaining four tricks are worth five points each.
+
+If the tricks won by the highest bidder do not equal or exceed the amount they bid, they will instead lose the amount of their bid. The tricks they won will not offset their loss. For example, if a player began the round at zero points, bid fifteen, and won ten points, that player will end the round at negative fifteen points.
+
+Additionally, if the highest bidder decided to [Shoot the Moon](#options), they will earn sixty points if they won every trick that round. Otherwise, they will lose sixty points.
+
+Only the highest bidder can lose points.
+
+### Winning
+
+The game ends if, after a round is scored, one or more players has a total score greater than or equal to 110.
+
+If multiple players are above 110, the winner is determined as follows:
+
+1. If the current highest bidder is among the players above 110, the highest bidder wins.
+2. Otherwise, the player who would have reached 110 first within the round wins.
+
+## Players
+
+All players in the game are represented by a class extending the base `Player` class. Each player must have a unique string identifier.
+
+### Player Types
+
+- `HumanPlayer`: Represents a person making manual decisions. The game will wait for these players to `act`.
+- `AutomatedPlayer`: An abstract base class for AI players. Subclasses must implement the `act(game_state)` method.
+- `NaiveAutomatedPlayer`: A built-in implementation of `AutomatedPlayer` that makes simple, rule-based decisions.
+
+### Custom Automated Players
+
+You can create custom AI by extending `AutomatedPlayer` and implementing the `act` method. This method receives a `GameState` object representing the game from that player's perspective.
+
+```python
+class MySmartPlayer(AutomatedPlayer):
+    def act(self, game_state: GameState) -> Optional[Action]:
+        # logic to determine the best action based on game_state
+        # for example, always play the first available card during tricks
+        if game_state.available_plays:
+            return game_state.available_plays[0]
+        # return None or another action for other phases
+```
+
+
+### Roles
+
+- `RoundRole.DEALER`: This player is acting as the dealer for the current round. This role is only attached to persons/players at the round level, not the game level. This role describes the individual as the dealer and does offer inherent play differences as described in the [rules](#how-to-play).
+
+## Starting a Game
+
+### `Game.start_game`
+
+Start a game by initializing a `Game` instance with a group of players. Use `HumanPlayer` for people and any subclass of `AutomatedPlayer` for machine play.
+
+```python
+game = Game([
+    HumanPlayer('player_1'),
+    HumanPlayer('player_2'),
+    HumanPlayer('player_3'),
+    NaiveAutomatedPlayer('player_4'),
+])
+```
+
+Automated players will act automatically as soon as it is their turn. If a human action triggers a sequence of automated turns, they will all be processed before the `act` call returns.
+
+## Determining the State of a Game
+
+### `Game.status`
+
+The status of the game can be one of the following values
+
+- `RoundStatus.BIDDING`: Players are bidding in the current round.
+- `RoundStatus.COMPLETED_NO_BIDDERS`: The current round is complete, but no player submitted a bid. This should be a transitionary state. Any game that reaches this state should immediately begin a new round and enter `RoundStatus.BIDDING`.
+- `RoundStatus.TRUMP_SELECTION`: The bidder in the current round is selecting their trump value.
+- `RoundStatus.DISCARD`: Players in the current round are discarding from their hard to refill.
+- `RoundStatus.COMPLETED`: The current round is complete with tricks won by the players. This should also be a transitionary state. Any game that reaches this state should either begin a new round and enter `RoundStatus.BIDDING` or determine a winner and enter `GameStatus.WON`
+- `GameStatus.WON`: The game is complete and a winner has been determined. No further actions are allowed.
+
+### `Game.active_round.active_player`
+
+This field will hold the current active player.
+
+### `Game.scores`
+
+This field will hold the current score values. In the form of a `dict[str, int]`.
+
+For example:
+
+```python
+{
+  'p1': 55,
+  'p2': 70,
+  'p3': -15,
+  'p4': 25
+}
+```
+
+### `Game.winner`
+
+This field will hold the winner of the game, if the game is in `GameStatus.WON`. Otherwise, it will be `None`.
+
+## Playing a Game
+
+Once a game has begun, the `Game` instance should only be interacted with through the `act` method. In this manner, players can bid, unpass, select trump, discard cards, or play a card.
+
+Each `act` can only be performed by the current active player. If another player attempts to act, it will result in an error.
+
+### `Game.act` to `Bid`
+
+To bid, call `act` with a `Bid` object.
+
+```python
+from hundredandten import Game, Bid, BidAmount
+
+# set up and start the game
+
+game.act(Bid('active_player_identifier', BidAmount.FIFTEEN))
+```
+
+### `Game.act` to `SelectTrump`
+
+Once a player has won the bid, that player must select the trump suit for that round.
+
+```python
+from hundredandten import Game, SelectTrump, SelectableSuit
+
+# set up and start the game
+# select a bidder
+
+# any of the four SelectableSuit value can be used
+game.act(SelectTrump('bidder', SelectableSuit.CLUBS))
+```
+
+### `Game.act` to `Discard`
+
+Once trump has been selected, each player will have the opportunity to discard a portion of their hand and refill with new cards.
+This must be done in player order.
+
+```python
+from hundredandten import Game, Discard
+
+# set up and start the game
+# select a bidder
+# select trump
+
+game.act(Discard('active_player', game.active_round.active_player.hand[1:3]))
+```
+
+### `Game.act` to `Play`
+
+Once bidding, trump selection, and discard have all occurred. Players will play through tricks.
+
+This action will enforce that played cards follow the rule relating to ["bleeding"](#bleeding).
+
+```python
+from hundredandten import Game, Play
+
+# set up and start the game
+# select a bidder
+# select trump
+# discard
+
+game.act(Play('active_player', game.active_round.active_player.hand[0]))
+```
+
+## Automated Play
+
+Automated players in Hundred and Ten are first-class citizens. Instead of a simple "suggested action" API, the engine uses an observation-based architecture where automated players receive a "slice" of the game state and return an action.
+
+The act method will return all actions that occured as a result of that action. When there are no automated players, this will always be only the input action. With automated players, this will include the actions those players took automatically in response to the action, if any.
+
+### GameState Observation
+
+When an `AutomatedPlayer` is asked to act, it receives a `GameState` object. This object is seat-relative: the player taking the action is always at seat 0, and other seats are numbered clockwise from there.
+
+The `GameState` provides:
+- `hand`: The player's current cards.
+- `status`: The current phase of the round (Bidding, Trump Selection, etc.).
+- `table`: Information about scores, dealer position, and bidder position.
+- `bidding`: History of bids and the selected trump suit.
+- `tricks`: Information about completed tricks and the current in-progress trick.
+- `cards`: Knowledge about all cards in the deck (whether they are in hand, played, discarded, or unknown).
+- `available_actions`: A list of all legal actions the player can take.
+
+### Built-in AI
+
+The `NaiveAutomatedPlayer` provides a baseline AI that follows basic game rules (like bleeding) and makes simple bidding decisions based on hand strength. It is useful for testing or filling out a table.

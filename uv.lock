@@ -6,6 +6,21 @@ resolution-markers = [
     "python_full_version < '3.12'",
 ]
 
+[manifest]
+members = [
+    "hundredandten-engine",
+]
+
+[manifest.dependency-groups]
+dev = [
+    { name = "black", specifier = "==26.3.1" },
+    { name = "coverage", specifier = "==7.13.5" },
+    { name = "pylint", specifier = "==4.0.5" },
+    { name = "pyright", specifier = "==1.1.408" },
+    { name = "pytest", specifier = "==9.0.2" },
+    { name = "ruff", specifier = "==0.15.9" },
+]
+
 [[package]]
 name = "astroid"
 version = "4.0.4"
@@ -182,35 +197,9 @@ wheels = [
 ]
 
 [[package]]
-name = "hundredandten"
-version = "5.0.0"
-source = { editable = "." }
-
-[package.dev-dependencies]
-lint = [
-    { name = "black" },
-    { name = "pylint" },
-    { name = "pyright" },
-    { name = "ruff" },
-]
-test = [
-    { name = "coverage" },
-    { name = "pytest" },
-]
-
-[package.metadata]
-
-[package.metadata.requires-dev]
-lint = [
-    { name = "black", specifier = "==26.3.1" },
-    { name = "pylint", specifier = "==4.0.5" },
-    { name = "pyright", specifier = "==1.1.408" },
-    { name = "ruff", specifier = "==0.15.9" },
-]
-test = [
-    { name = "coverage", specifier = "==7.13.5" },
-    { name = "pytest", specifier = "==9.0.2" },
-]
+name = "hundredandten-engine"
+version = "0.0.1"
+source = { editable = "packages/hundredandten-engine" }
 
 [[package]]
 name = "iniconfig"
