@@ -6,7 +6,7 @@
 A python package to provide an engine for playing the game Hundred and Ten.
 
 ```python
-from hundredandten import Game
+from hundredandten.engine import Game
 
 game = Game()
 ```
@@ -367,6 +367,11 @@ All players in the game are represented by a class extending the base `Player` c
 You can create custom AI by extending `AutomatedPlayer` and implementing the `act` method. This method receives a `GameState` object representing the game from that player's perspective.
 
 ```python
+from typing import Optional
+from hundredandten.engine.player import AutomatedPlayer
+from hundredandten.engine.state import GameState
+from hundredandten.engine.actions import Action
+
 class MySmartPlayer(AutomatedPlayer):
     def act(self, game_state: GameState) -> Optional[Action]:
         # logic to determine the best action based on game_state
@@ -388,6 +393,9 @@ class MySmartPlayer(AutomatedPlayer):
 Start a game by initializing a `Game` instance with a group of players. Use `HumanPlayer` for people and any subclass of `AutomatedPlayer` for machine play.
 
 ```python
+from hundredandten.engine import Game
+from hundredandten.engine.player import HumanPlayer, NaiveAutomatedPlayer
+
 game = Game([
     HumanPlayer('player_1'),
     HumanPlayer('player_2'),
@@ -445,7 +453,9 @@ Each `act` can only be performed by the current active player. If another player
 To bid, call `act` with a `Bid` object.
 
 ```python
-from hundredandten import Game, Bid, BidAmount
+from hundredandten.engine import Game
+from hundredandten.engine.actions import Bid
+from hundredandten.engine.constants import BidAmount
 
 # set up and start the game
 
@@ -457,7 +467,9 @@ game.act(Bid('active_player_identifier', BidAmount.FIFTEEN))
 Once a player has won the bid, that player must select the trump suit for that round.
 
 ```python
-from hundredandten import Game, SelectTrump, SelectableSuit
+from hundredandten.engine import Game
+from hundredandten.engine.actions import SelectTrump
+from hundredandten.engine.constants import SelectableSuit
 
 # set up and start the game
 # select a bidder
@@ -472,7 +484,8 @@ Once trump has been selected, each player will have the opportunity to discard a
 This must be done in player order.
 
 ```python
-from hundredandten import Game, Discard
+from hundredandten.engine import Game
+from hundredandten.engine.actions import Discard
 
 # set up and start the game
 # select a bidder
@@ -488,7 +501,8 @@ Once bidding, trump selection, and discard have all occurred. Players will play 
 This action will enforce that played cards follow the rule relating to ["bleeding"](#bleeding).
 
 ```python
-from hundredandten import Game, Play
+from hundredandten.engine import Game
+from hundredandten.engine.actions import Play
 
 # set up and start the game
 # select a bidder
