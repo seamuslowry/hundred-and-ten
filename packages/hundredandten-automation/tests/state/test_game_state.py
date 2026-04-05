@@ -3,10 +3,10 @@
 from unittest import TestCase
 
 from hundredandten.automation.state import (
-    AutomatedBid,
-    AutomatedDiscard,
-    AutomatedPlay,
-    AutomatedSelectTrump,
+    AvailableBid,
+    AvailableDiscard,
+    AvailablePlay,
+    AvailableSelectTrump,
     CompletedTrick,
     Discarded,
     GameState,
@@ -148,7 +148,7 @@ class TestGameStateBidding(TestCase):
 
         self.assertTrue(len(state.available_actions) > 0)
         self.assertTrue(
-            all(isinstance(a, AutomatedBid) for a in state.available_actions)
+            all(isinstance(a, AvailableBid) for a in state.available_actions)
         )
 
     def test_no_actions_for_inactive_player(self):
@@ -237,7 +237,7 @@ class TestGameStateTrumpSelection(TestCase):
         self.assertEqual(len(state.available_trump_selections), 4)
         self.assertTrue(
             all(
-                isinstance(a, AutomatedSelectTrump)
+                isinstance(a, AvailableSelectTrump)
                 for a in state.available_trump_selections
             )
         )
@@ -295,7 +295,7 @@ class TestGameStateDiscard(TestCase):
         discard_actions = state.available_discards
         # 2^5 = 32 subsets for a 5-card hand
         self.assertEqual(len(discard_actions), 2**HAND_SIZE)
-        self.assertTrue(all(isinstance(a, AutomatedDiscard) for a in discard_actions))
+        self.assertTrue(all(isinstance(a, AvailableDiscard) for a in discard_actions))
 
     def test_discard_includes_empty_set(self):
         """Discard options include keeping all cards (empty discard)"""
@@ -366,7 +366,7 @@ class TestGameStateTricks(TestCase):
 
         self.assertTrue(len(state.available_plays) > 0)
         self.assertTrue(
-            all(isinstance(a, AutomatedPlay) for a in state.available_plays)
+            all(isinstance(a, AvailablePlay) for a in state.available_plays)
         )
 
     def test_play_actions_match_hand(self):

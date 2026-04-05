@@ -19,73 +19,109 @@ from hundredandten.engine.round import Round
 
 
 @dataclass(frozen=True)
-class AutomatedBid:
+class AvailableBid:
+    """
+    An available bid action.
+    It is agnostic of the player since available actions are always for
+    the active player. And game state is more paramaterizable without
+    identifying player data.
+    """
+
     amount: BidAmount
 
     @classmethod
     def from_engine(cls, b: Bid) -> Self:
+        """Create a player-agnostic Bid representation from a player-aware representation"""
         return cls(b.amount)
 
     def for_player(self, identifier: str) -> Bid:
+        """Create a player-aware Bid representation from a player-agnostic representation"""
         return Bid(identifier=identifier, amount=self.amount)
 
 
 @dataclass(frozen=True)
-class AutomatedDiscard:
+class AvailableDiscard:
+    """
+    An available discard action.
+    It is agnostic of the player since available actions are always for
+    the active player. And game state is more paramaterizable without
+    identifying player data.
+    """
+
     cards: list[Card]
 
     @classmethod
     def from_engine(cls, d: Discard) -> Self:
+        """Create a player-agnostic Discard representation from a player-aware representation"""
         return cls(d.cards)
 
     def for_player(self, identifier: str) -> Discard:
+        """Create a player-aware Discard representation from a player-agnostic representation"""
         return Discard(identifier=identifier, cards=self.cards)
 
 
 @dataclass(frozen=True)
-class AutomatedSelectTrump:
+class AvailableSelectTrump:
+    """
+    An available trump selection action.
+    It is agnostic of the player since available actions are always for
+    the active player. And game state is more paramaterizable without
+    identifying player data.
+    """
+
     suit: SelectableSuit
 
     @classmethod
     def from_engine(cls, b: SelectTrump) -> Self:
+        """Create a player-agnostic SelectTrump representation from a player-aware representation"""
         return cls(b.suit)
 
     def for_player(self, identifier: str) -> SelectTrump:
+        """Create a player-aware SelectTrump representation from a player-agnostic representation"""
         return SelectTrump(identifier=identifier, suit=self.suit)
 
 
 @dataclass(frozen=True)
-class AutomatedPlay:
+class AvailablePlay:
+    """
+    An available play action.
+    It is agnostic of the player since available actions are always for
+    the active player. And game state is more paramaterizable without
+    identifying player data.
+    """
+
     card: Card
 
     @classmethod
     def from_engine(cls, b: Play) -> Self:
+        """Create a player-agnostic Play representation from a player-aware representation"""
         return cls(b.card)
 
     def for_player(self, identifier: str) -> Play:
+        """Create a player-aware Play representation from a player-agnostic representation"""
         return Play(identifier=identifier, card=self.card)
 
 
-type AutomatedAction = Union[
-    AutomatedBid, AutomatedSelectTrump, AutomatedDiscard, AutomatedPlay
+type AvailableAction = Union[
+    AvailableBid, AvailableSelectTrump, AvailableDiscard, AvailablePlay
 ]
 
 
-class AutomatedActionFactory:
-    """Factory class for creating automated actions from engine actions."""
+class AvailableActionFactory:
+    """Factory class for creating player-agnostic actions from player-aware actions."""
 
     @staticmethod
-    def from_engine(a: Action) -> AutomatedAction:
-        """Create an automated Action from an engine Action."""
+    def from_engine(a: Action) -> AvailableAction:
+        """Create a player-agnostic Action from a player-aware Action."""
         match a:
             case Bid():
-                return AutomatedBid.from_engine(a)
+                return AvailableBid.from_engine(a)
             case SelectTrump():
-                return AutomatedSelectTrump.from_engine(a)
+                return AvailableSelectTrump.from_engine(a)
             case Discard() | DetailedDiscard():
-                return AutomatedDiscard.from_engine(a)
+                return AvailableDiscard.from_engine(a)
             case Play():
-                return AutomatedPlay.from_engine(a)
+                return AvailablePlay.from_engine(a)
         raise ValueError(
             f"Could not convert engine action {a} to an internal action"
         )  # pragma: nocover
@@ -208,31 +244,31 @@ class GameState:
     cards: tuple[CardKnowledge, ...]
 
     # Legal actions for the active player
-    available_actions: tuple[AutomatedAction, ...]
+    available_actions: tuple[AvailableAction, ...]
 
     @property
-    def available_bids(self) -> tuple[AutomatedBid, ...]:
+    def available_bids(self) -> tuple[AvailableBid, ...]:
         """Return only Bid actions from available_actions"""
-        return tuple(a for a in self.available_actions if isinstance(a, AutomatedBid))
+        return tuple(a for a in self.available_actions if isinstance(a, AvailableBid))
 
     @property
-    def available_trump_selections(self) -> tuple[AutomatedSelectTrump, ...]:
+    def available_trump_selections(self) -> tuple[AvailableSelectTrump, ...]:
         """Return only SelectTrump actions from available_actions"""
         return tuple(
-            a for a in self.available_actions if isinstance(a, AutomatedSelectTrump)
+            a for a in self.available_actions if isinstance(a, AvailableSelectTrump)
         )
 
     @property
-    def available_discards(self) -> tuple[AutomatedDiscard, ...]:
+    def available_discards(self) -> tuple[AvailableDiscard, ...]:
         """Return only Discard actions from available_actions"""
         return tuple(
-            a for a in self.available_actions if isinstance(a, AutomatedDiscard)
+            a for a in self.available_actions if isinstance(a, AvailableDiscard)
         )
 
     @property
-    def available_plays(self) -> tuple[AutomatedPlay, ...]:
+    def available_plays(self) -> tuple[AvailablePlay, ...]:
         """Return only Play actions from available_actions"""
-        return tuple(a for a in self.available_actions if isinstance(a, AutomatedPlay))
+        return tuple(a for a in self.available_actions if isinstance(a, AvailablePlay))
 
     @property
     def is_bidder(self) -> bool:
@@ -360,7 +396,7 @@ class GameState:
                 game_round, player, non_relative_seat_by_identifier
             ),
             available_actions=tuple(
-                AutomatedActionFactory.from_engine(a)
+                AvailableActionFactory.from_engine(a)
                 for a in game.available_actions(identifier)
             ),
         )

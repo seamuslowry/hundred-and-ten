@@ -1,3 +1,5 @@
+"""A module providing naive decision making for hundred and ten games"""
+
 from typing import Optional, Sequence
 
 from hundredandten.engine.constants import (
@@ -11,16 +13,16 @@ from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.trumps import bleeds, trumps
 
 from .state import (
-    AutomatedAction,
-    AutomatedBid,
-    AutomatedDiscard,
-    AutomatedPlay,
-    AutomatedSelectTrump,
+    AvailableAction,
+    AvailableBid,
+    AvailableDiscard,
+    AvailablePlay,
+    AvailableSelectTrump,
     GameState,
 )
 
 
-def action(state: GameState) -> AutomatedAction:
+def action(state: GameState) -> AvailableAction:
     """Return the suggested action given the game state"""
     if state.status == RoundStatus.BIDDING:
         return __suggested_bid(state)
@@ -33,31 +35,31 @@ def action(state: GameState) -> AutomatedAction:
     raise HundredAndTenError(f"Cannot automate the action in status {state.status}")
 
 
-def __suggested_bid(game_state: GameState) -> AutomatedBid:
+def __suggested_bid(game_state: GameState) -> AvailableBid:
     """Return the suggested bid for the current player"""
 
     maximum_bid = max_bid(game_state.hand)
     available_bids = map(lambda b: b.amount, game_state.available_bids)
     willing_bids = list(filter(lambda b: b and b <= maximum_bid, available_bids))
 
-    return AutomatedBid(next(iter(willing_bids), BidAmount.PASS))
+    return AvailableBid(next(iter(willing_bids), BidAmount.PASS))
 
 
-def __suggested_trump_selection(game_state: GameState) -> AutomatedSelectTrump:
+def __suggested_trump_selection(game_state: GameState) -> AvailableSelectTrump:
     """Return the suggested trump selection for the current player"""
 
-    return AutomatedSelectTrump(desired_trump(game_state.hand))
+    return AvailableSelectTrump(desired_trump(game_state.hand))
 
 
-def __suggested_discard(game_state: GameState) -> AutomatedDiscard:
+def __suggested_discard(game_state: GameState) -> AvailableDiscard:
     """Return the suggested dicard action for the current player"""
 
-    return AutomatedDiscard(
+    return AvailableDiscard(
         list(non_trumps(game_state.hand, game_state.trump)),
     )
 
 
-def __suggested_play(game_state: GameState) -> AutomatedPlay:
+def __suggested_play(game_state: GameState) -> AvailablePlay:
     """Return the suggested play action for the current player"""
 
     playable_cards = game_state.hand
@@ -87,7 +89,7 @@ def __suggested_play(game_state: GameState) -> AutomatedPlay:
         # otherwise, play nothing
         card = worst_winning_card or worst_card(playable_cards, game_state.trump)
 
-    return AutomatedPlay(card)
+    return AvailablePlay(card)
 
 
 def max_bid(cards: Sequence[Card]) -> BidAmount:
