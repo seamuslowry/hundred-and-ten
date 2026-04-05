@@ -167,3 +167,47 @@ class TestPlayCard(TestCase):
 
         self.assertEqual(2, len(game.rounds))
         self.assertTrue(game.rounds[-2].completed)
+
+    def test_all_cards_available_when_not_bleeding(self):
+        """Any card can be played when not bleeding"""
+
+        game = arrange.game(RoundStatus.TRICKS)
+
+        self.assertEqual(5, len(game.available_actions(game.active_player.identifier)))
+        self.assertTrue(
+            all(
+                isinstance(a, Play)
+                for a in game.available_actions(game.active_player.identifier)
+            )
+        )
+
+    def test_only_trumps_when_bleeding(self):
+        """Only trump cards can be played while the trick is bleeding"""
+
+        game = arrange.game(RoundStatus.TRICKS)
+        assert game.active_round.trump
+
+        non_trump = next(
+            s for s in iter(SelectableSuit) if s != game.active_round.trump
+        )
+
+        active_player = game.active_round.active_player
+        next_player = player_after(game.active_round.players, active_player.identifier)
+
+        # overwrite to ensure this trick will bleed
+        active_player.hand[0] = Card(
+            CardNumber.TEN, CardSuit[game.active_round.trump.value]
+        )
+        # overwrite to ensure next player breaks rules
+        next_player.hand = [
+            Card(CardNumber.TWO, CardSuit[non_trump.value]),
+            Card(CardNumber.THREE, CardSuit[non_trump.value]),
+            Card(CardNumber.FOUR, CardSuit[non_trump.value]),
+            Card(CardNumber.SEVEN, CardSuit[game.active_round.trump.value]),
+            Card(CardNumber.EIGHT, CardSuit[game.active_round.trump.value]),
+        ]
+
+        game.act(Play(active_player.identifier, active_player.hand[0]))
+        self.assertTrue(game.active_round.active_trick.bleeding)
+
+        self.assertEqual(2, len(game.available_actions(game.active_player.identifier)))
