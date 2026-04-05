@@ -11,9 +11,9 @@ from hundredandten.engine.constants import (
     RoundStatus,
     SelectableSuit,
 )
-from hundredandten.engine.trumps import trumps
 from hundredandten.engine.game import Game
 from hundredandten.engine.player import Player
+from hundredandten.engine.trumps import trumps
 
 
 def game(

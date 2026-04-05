@@ -10,6 +10,7 @@ resolution-markers = [
 members = [
     "hundredandten-automation",
     "hundredandten-engine",
+    "hundredandten-testing",
 ]
 
 [manifest.dependency-groups]
@@ -21,6 +22,7 @@ lint = [
 ]
 test = [
     { name = "coverage", specifier = "==7.13.5" },
+    { name = "hundredandten-testing", editable = "packages/hundredandten-testing" },
     { name = "pytest", specifier = "==9.0.2" },
     { name = "pytest-cov", specifier = "==7.1.0" },
 ]
@@ -220,6 +222,17 @@ requires-dist = [{ name = "hundredandten-engine", editable = "packages/hundredan
 name = "hundredandten-engine"
 version = "0.0.0"
 source = { editable = "packages/hundredandten-engine" }
+
+[[package]]
+name = "hundredandten-testing"
+version = "0.0.0"
+source = { editable = "packages/hundredandten-testing" }
+dependencies = [
+    { name = "hundredandten-engine" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "hundredandten-engine", editable = "packages/hundredandten-engine" }]
 
 [[package]]
 name = "iniconfig"

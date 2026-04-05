@@ -5,8 +5,7 @@ from unittest import TestCase
 from hundredandten.engine.actions import Discard
 from hundredandten.engine.constants import HAND_SIZE, RoundStatus
 from hundredandten.engine.errors import HundredAndTenError
-
-from tests import arrange
+from hundredandten.testing import arrange
 
 
 class TestDiscard(TestCase):

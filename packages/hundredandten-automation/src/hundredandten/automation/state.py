@@ -19,6 +19,9 @@ class AutomatedBid:
     def from_engine(cls, b: Bid) -> Self:
         return cls(b.amount)
 
+    def for_player(self, identifier: str) -> Bid:
+        return Bid(identifier=identifier, amount=self.amount)
+
 
 @dataclass(frozen=True)
 class AutomatedDiscard:
@@ -27,6 +30,9 @@ class AutomatedDiscard:
     @classmethod
     def from_engine(cls, d: Discard) -> Self:
         return cls(d.cards)
+
+    def for_player(self, identifier: str) -> Discard:
+        return Discard(identifier=identifier, cards=self.cards)
 
 
 @dataclass(frozen=True)
@@ -37,6 +43,9 @@ class AutomatedSelectTrump:
     def from_engine(cls, b: SelectTrump) -> Self:
         return cls(b.suit)
 
+    def for_player(self, identifier: str) -> SelectTrump:
+        return SelectTrump(identifier=identifier, suit=self.suit)
+
 
 @dataclass(frozen=True)
 class AutomatedPlay:
@@ -45,6 +54,9 @@ class AutomatedPlay:
     @classmethod
     def from_engine(cls, b: Play) -> Self:
         return cls(b.card)
+
+    def for_player(self, identifier: str) -> Play:
+        return Play(identifier=identifier, card=self.card)
 
 
 type AutomatedAction = Union[
@@ -195,24 +207,24 @@ class GameState:
     available_actions: tuple[AutomatedAction, ...]
 
     @property
-    def available_bids(self) -> tuple[Bid, ...]:
+    def available_bids(self) -> tuple[AutomatedBid, ...]:
         """Return only Bid actions from available_actions"""
-        return tuple(a for a in self.available_actions if isinstance(a, Bid))
+        return tuple(a for a in self.available_actions if isinstance(a, AutomatedBid))
 
     @property
-    def available_trump_selections(self) -> tuple[SelectTrump, ...]:
+    def available_trump_selections(self) -> tuple[AutomatedSelectTrump, ...]:
         """Return only SelectTrump actions from available_actions"""
-        return tuple(a for a in self.available_actions if isinstance(a, SelectTrump))
+        return tuple(a for a in self.available_actions if isinstance(a, AutomatedSelectTrump))
 
     @property
-    def available_discards(self) -> tuple[Discard, ...]:
+    def available_discards(self) -> tuple[AutomatedDiscard, ...]:
         """Return only Discard actions from available_actions"""
-        return tuple(a for a in self.available_actions if isinstance(a, Discard))
+        return tuple(a for a in self.available_actions if isinstance(a, AutomatedDiscard))
 
     @property
-    def available_plays(self) -> tuple[Play, ...]:
+    def available_plays(self) -> tuple[AutomatedPlay, ...]:
         """Return only Play actions from available_actions"""
-        return tuple(a for a in self.available_actions if isinstance(a, Play))
+        return tuple(a for a in self.available_actions if isinstance(a, AutomatedPlay))
 
     @property
     def is_bidder(self) -> bool:

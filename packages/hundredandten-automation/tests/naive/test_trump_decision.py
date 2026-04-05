@@ -2,8 +2,8 @@
 
 from unittest import TestCase
 
-from hundredandten.engine.constants import CardNumber, CardSuit, SelectableSuit
 from hundredandten.automation.naive import desired_trump
+from hundredandten.engine.constants import CardNumber, CardSuit, SelectableSuit
 from hundredandten.engine.deck import Card
 
 

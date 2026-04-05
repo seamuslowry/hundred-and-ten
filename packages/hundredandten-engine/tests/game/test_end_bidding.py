@@ -5,8 +5,7 @@ from unittest import TestCase
 from hundredandten.engine.actions import Bid
 from hundredandten.engine.constants import BidAmount, RoundStatus
 from hundredandten.engine.errors import HundredAndTenError
-
-from tests import arrange
+from hundredandten.testing import arrange
 
 
 class TestEndBidding(TestCase):
@@ -25,9 +24,7 @@ class TestEndBidding(TestCase):
         game = arrange.game(RoundStatus.TRUMP_SELECTION)
 
         self.assertEqual(game.status, RoundStatus.TRUMP_SELECTION)
-        self.assertEqual(
-            game.active_round.active_player, game.active_round.active_bidder
-        )
+        self.assertEqual(game.active_round.active_player, game.active_round.active_bidder)
 
     def test_cannot_bid_after_bidding_stage(self):
         """Bidding can only occur in the bidding stage"""

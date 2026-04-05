@@ -6,8 +6,7 @@ from hundredandten.engine.actions import Bid
 from hundredandten.engine.constants import BidAmount, RoundRole, RoundStatus
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.player import remove_player_role
-
-from tests import arrange
+from hundredandten.testing import arrange
 
 
 class TestBidding(TestCase):
@@ -104,9 +103,7 @@ class TestBidding(TestCase):
         once_active_player = game.active_round.active_player.identifier
         game.act(Bid(once_active_player, BidAmount.PASS))
 
-        self.assertRaises(
-            HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN)
-        )
+        self.assertRaises(HundredAndTenError, game.act, Bid(once_active_player, BidAmount.FIFTEEN))
 
     def test_bid_from_inactive_player(self):
         """Inactive player cannot place a bid"""

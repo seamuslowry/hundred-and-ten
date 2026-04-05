@@ -10,6 +10,7 @@ lint = [
 ]
 test = [
     "coverage==7.13.5",
+    "hundredandten-testing",
     "pytest==9.0.2",
     "pytest-cov==7.1.0",
 ]
@@ -28,6 +29,7 @@ check-url = "https://pypi.org/simple/"
 [tool.uv.sources]
 hundredandten-engine = { workspace = true }
 hundredandten-automation = { workspace = true }
+hundredandten-testing = { workspace = true }
 
 [[tool.uv.index]]
 name = "testpypi"

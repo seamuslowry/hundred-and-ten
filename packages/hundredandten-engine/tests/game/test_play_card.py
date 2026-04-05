@@ -13,8 +13,7 @@ from hundredandten.engine.constants import (
 from hundredandten.engine.deck import Card
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.player import player_after
-
-from tests import arrange
+from hundredandten.testing import arrange
 
 
 class TestPlayCard(TestCase):
@@ -35,9 +34,7 @@ class TestPlayCard(TestCase):
         assert game.active_round.active_bidder
         self.assertEqual(
             game.active_round.active_player,
-            player_after(
-                game.active_round.players, game.active_round.active_bidder.identifier
-            ),
+            player_after(game.active_round.players, game.active_round.active_bidder.identifier),
         )
 
         original_active_player = game.active_round.active_player
@@ -80,17 +77,13 @@ class TestPlayCard(TestCase):
         game = arrange.game(RoundStatus.TRICKS)
         assert game.active_round.trump
 
-        non_trump = next(
-            s for s in iter(SelectableSuit) if s != game.active_round.trump
-        )
+        non_trump = next(s for s in iter(SelectableSuit) if s != game.active_round.trump)
 
         active_player = game.active_round.active_player
         next_player = player_after(game.active_round.players, active_player.identifier)
 
         # overwrite to ensure this trick will bleed
-        active_player.hand[0] = Card(
-            CardNumber.TEN, CardSuit[game.active_round.trump.value]
-        )
+        active_player.hand[0] = Card(CardNumber.TEN, CardSuit[game.active_round.trump.value])
         # overwrite to ensure next player breaks rules
         next_player.hand = [Card(CardNumber.TWO, CardSuit[non_trump.value])] * 4 + [
             Card(CardNumber.NINE, CardSuit[game.active_round.trump.value])
@@ -117,17 +110,13 @@ class TestPlayCard(TestCase):
         game = arrange.game(RoundStatus.TRICKS)
         assert game.active_round.trump
 
-        non_trump = next(
-            s for s in iter(SelectableSuit) if s != game.active_round.trump
-        )
+        non_trump = next(s for s in iter(SelectableSuit) if s != game.active_round.trump)
 
         active_player = game.active_round.active_player
         next_player = player_after(game.active_round.players, active_player.identifier)
 
         # overwrite to ensure this trick will bleed
-        active_player.hand[0] = Card(
-            CardNumber.TEN, CardSuit[game.active_round.trump.value]
-        )
+        active_player.hand[0] = Card(CardNumber.TEN, CardSuit[game.active_round.trump.value])
         # overwrite to ensure next player breaks rules
         next_player.hand = [Card(CardNumber.TWO, CardSuit[non_trump.value])] * 5
 
@@ -156,9 +145,7 @@ class TestPlayCard(TestCase):
         assert winning_play
 
         self.assertEqual(2, len(game.active_round.tricks))
-        self.assertEqual(
-            winning_play.identifier, game.active_round.active_player.identifier
-        )
+        self.assertEqual(winning_play.identifier, game.active_round.active_player.identifier)
 
     def test_play_through_round(self):
         """A new round is created after all tricks are played"""

@@ -3,8 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.engine.constants import WINNING_SCORE, GameStatus, RoundStatus
-
-from tests import arrange
+from hundredandten.testing import arrange
 
 # tests in this file run off of seeded games to avoid setting up everything necessary for the tests
 # seeds and their expected values in different situations are recorded here
@@ -29,9 +28,7 @@ class TestGameScoring(TestCase):
         game = arrange.game(RoundStatus.BIDDING)
 
         self.assertEqual([0] * len(game.players), list(game.scores.values()))
-        self.assertEqual(
-            [0] * len(game.players), list(game.scores_by_round[-1].values())
-        )
+        self.assertEqual([0] * len(game.players), list(game.scores_by_round[-1].values()))
 
     def test_win_at_winning_score(self):
         """At the end of the game, the winner has 110"""
@@ -48,12 +45,9 @@ class TestGameScoring(TestCase):
 
         assert game.winner
         assert game.active_round.active_bidder
-        self.assertEqual(
-            game.winner.identifier, game.active_round.active_bidder.identifier
-        )
+        self.assertEqual(game.winner.identifier, game.active_round.active_bidder.identifier)
         self.assertTrue(
-            len([score for score in game.scores.values() if score >= WINNING_SCORE])
-            == 2
+            len([score for score in game.scores.values() if score >= WINNING_SCORE]) == 2
         )
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores)
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores_by_round[-1])
@@ -72,13 +66,9 @@ class TestGameScoring(TestCase):
 
         assert game.winner
         assert game.active_round.active_bidder
-        self.assertNotEqual(
-            game.winner.identifier, game.active_round.active_bidder.identifier
-        )
+        self.assertNotEqual(game.winner.identifier, game.active_round.active_bidder.identifier)
         self.assertEqual(winning_scores[0].identifier, game.winner.identifier)
-        self.assertLess(
-            game.scores[game.active_round.active_bidder.identifier], WINNING_SCORE
-        )
+        self.assertLess(game.scores[game.active_round.active_bidder.identifier], WINNING_SCORE)
         self.assertTrue(len(winners) > 1)
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores)
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores_by_round[-1])

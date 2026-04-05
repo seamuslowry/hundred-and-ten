@@ -5,8 +5,7 @@ from unittest import TestCase
 from hundredandten.engine.actions import Bid
 from hundredandten.engine.constants import BidAmount, RoundStatus
 from hundredandten.engine.trick import Score
-
-from tests import arrange
+from hundredandten.testing import arrange
 
 # tests in this file run off of seeded games to avoid setting up everything necessary for the tests
 # seeds and their expected values in different situations are recorded here
