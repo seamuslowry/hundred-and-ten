@@ -1,22 +1,11 @@
-[build-system]
-requires = ["uv_build>=0.11.2,<0.12"]
-build-backend = "uv_build"
-
 [project]
 name = "hundredandten"
-version = "5.0.0"
-description = "An engine to play the game Hundred and Ten"
-readme = "README.md"
+version = "0.0.0"
+description = "Packages relating to the game Hundred and Ten"
 requires-python = ">=3.11"
-license = {text = "MIT"}
-authors = [
-    { name = "Seamus Lowry" },
-]
-classifiers = [
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-]
-dependencies = []
+
+[tool.uv.workspace]
+members = ["packages/*"]
 
 [dependency-groups]
 lint = [
@@ -31,8 +20,9 @@ test = [
 ]
 
 [tool.coverage.run]
+source = ["hundredandten.engine"]
 omit = [
-    "tests/*",
+    "packages/*/tests/*",
 ]
 
 [tool.ruff]
@@ -43,8 +33,9 @@ lint.extend-select = ["I"]
 [tool.black]
 target-version = ["py314"]
 
-[tool.uv.build-backend]
-module-root = "."
+[tool.uv]
+package = false  # the project itself is not a package
+check-url = "https://pypi.org/simple/"
 
 [[tool.uv.index]]
 name = "testpypi"

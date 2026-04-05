@@ -11,7 +11,7 @@
     "--experimental"
   ],
   "python.testing.pytestArgs": [
-    "tests"
+    "packages/hundredandten-engine/tests"
   ],
   "python.testing.unittestEnabled": false,
   "python.testing.pytestEnabled": true

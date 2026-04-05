@@ -20,5 +20,5 @@ jobs:
 
       - name: Build and Publish to PyPI
         run: |
-          uv build
+          uv build --all-packages
           uv publish

@@ -6,6 +6,12 @@ resolution-markers = [
     "python_full_version < '3.12'",
 ]
 
+[manifest]
+members = [
+    "hundredandten",
+    "hundredandten-engine",
+]
+
 [[package]]
 name = "astroid"
 version = "4.0.4"
@@ -183,8 +189,8 @@ wheels = [
 
 [[package]]
 name = "hundredandten"
-version = "5.0.0"
-source = { editable = "." }
+version = "0.0.0"
+source = { virtual = "." }
 
 [package.dev-dependencies]
 lint = [
@@ -211,6 +217,11 @@ test = [
     { name = "coverage", specifier = "==7.13.5" },
     { name = "pytest", specifier = "==9.0.2" },
 ]
+
+[[package]]
+name = "hundredandten-engine"
+version = "0.0.0"
+source = { editable = "packages/hundredandten-engine" }
 
 [[package]]
 name = "iniconfig"
