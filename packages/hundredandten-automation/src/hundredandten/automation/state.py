@@ -123,7 +123,7 @@ class AvailableActionFactory:
                 return AvailablePlay.from_engine(a)
         raise ValueError(
             f"Could not convert engine action {a} to an internal action"
-        )  # pragma: nocover
+        )  # pragma: no cover
 
 
 @dataclass(frozen=True)
