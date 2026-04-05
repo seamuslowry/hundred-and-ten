@@ -13,7 +13,7 @@ jobs:
         with:
           enable-cache: true
 
-      - run: uv sync --group test
+      - run: uv sync --locked --group test
 
       - name: Run tests with coverage
         run: uv run --package hundredandten-engine coverage run --branch --source=hundredandten.engine -m pytest
