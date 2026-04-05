@@ -35,6 +35,7 @@ target-version = ["py314"]
 
 [tool.uv]
 package = false  # the project itself is not a package
+check-url = "https://pypi.org/simple/"
 
 [[tool.uv.index]]
 name = "testpypi"
