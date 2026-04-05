@@ -74,3 +74,19 @@ class TestDiscard(TestCase):
         self.assertTrue(all(card in player.hand for card in remaining_in_hand))
         self.assertFalse(any(card in player.hand for card in discard.cards))
         self.assertEqual(discard, game.actions[-1])
+
+    def test_no_restrictions_on_discards(self):
+        """Can discard any subset of hand"""
+
+        game = arrange.game(RoundStatus.DISCARD)
+
+        self.assertEqual(
+            32, len(game.available_actions(game.active_player.identifier)))
+
+    def test_cant_discard_on_other_turn(self):
+        """Can't discard when not your turn"""
+
+        game = arrange.game(RoundStatus.DISCARD)
+
+        self.assertEqual(
+            0, len(game.available_actions(game.active_round.inactive_players[0].identifier)))
