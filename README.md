@@ -1,14 +1,12 @@
-[![Code Quality](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/lint.yaml)
-[![100% Coverage](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml/badge.svg?branch=main)](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml)
-
 # Hundred and Ten
 
-A python engine for playing the game Hundred and Ten, organized as a uv workspace monorepo.
+Python packages used for playing the game Hundred and Ten, organized as a uv workspace monorepo.
 
 ## Packages
 
 - [`hundredandten-engine`](packages/hundredandten-engine/): The core game engine package. See its README for game rules and API usage.
 - [`hundredandten-automation`](packages/hundredandten-automation/): Automated decision making built upon the engine package. See its README for API usage.
+- [`hundredandten-testing`](packages/hundredandten-testing/): An internal testing package used to share testing code.
 
 ## Development
 
