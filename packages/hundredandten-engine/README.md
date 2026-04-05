@@ -1,12 +1,9 @@
-[![Code Quality](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/lint.yaml)
-[![100% Coverage](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml/badge.svg?branch=main)](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml)
-
 # Hundred and Ten
 
 A python package to provide an engine for playing the game Hundred and Ten.
 
 ```python
-from hundredandten import Game
+from hundredandten.engine import Game
 
 game = Game()
 ```
@@ -445,7 +442,7 @@ Each `act` can only be performed by the current active player. If another player
 To bid, call `act` with a `Bid` object.
 
 ```python
-from hundredandten import Game, Bid, BidAmount
+from hundredandten.engine import Game, Bid, BidAmount
 
 # set up and start the game
 
@@ -457,7 +454,7 @@ game.act(Bid('active_player_identifier', BidAmount.FIFTEEN))
 Once a player has won the bid, that player must select the trump suit for that round.
 
 ```python
-from hundredandten import Game, SelectTrump, SelectableSuit
+from hundredandten.engine import Game, SelectTrump, SelectableSuit
 
 # set up and start the game
 # select a bidder
@@ -472,7 +469,7 @@ Once trump has been selected, each player will have the opportunity to discard a
 This must be done in player order.
 
 ```python
-from hundredandten import Game, Discard
+from hundredandten.engine import Game, Discard
 
 # set up and start the game
 # select a bidder
@@ -488,7 +485,7 @@ Once bidding, trump selection, and discard have all occurred. Players will play 
 This action will enforce that played cards follow the rule relating to ["bleeding"](#bleeding).
 
 ```python
-from hundredandten import Game, Play
+from hundredandten.engine import Game, Play
 
 # set up and start the game
 # select a bidder
