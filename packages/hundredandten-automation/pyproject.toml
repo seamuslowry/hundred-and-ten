@@ -22,13 +22,3 @@ dependencies = [
 
 [tool.uv.build-backend]
 module-name = "hundredandten.automation"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-
-[tool.coverage.run]
-source = ["hundredandten.automation"]
-branch = true
-
-[tool.coverage.report]
-fail_under = 100

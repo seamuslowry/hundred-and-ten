@@ -26,6 +26,17 @@ lint.extend-select = ["I"]
 [tool.black]
 target-version = ["py314"]
 
+[tool.pytest.ini_options]
+testpaths = ["packages/hundredandten-engine", "packages/hundredandten-automation"]
+
+[tool.coverage.run]
+source = ["hundredandten.engine", "hundredandten.automation"]
+omit = ["*/tests/*", "*/hundredandten/testing/*", "*/hundredandten-testing/*"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 100
+
 [tool.uv]
 check-url = "https://pypi.org/simple/"
 
