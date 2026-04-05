@@ -53,3 +53,11 @@ class TestTrumpSelection(TestCase):
         self.assertEqual(select.suit, game.active_round.trump)
         self.assertEqual(RoundStatus.DISCARD, game.status)
         self.assertEqual(select, game.actions[-1])
+
+    def test_no_restrictions_on_trump_selection(self):
+        """Can select any selectable suit"""
+
+        game = arrange.game(RoundStatus.TRUMP_SELECTION)
+
+        self.assertEqual(
+            4, len(game.available_actions(game.active_player.identifier)))
