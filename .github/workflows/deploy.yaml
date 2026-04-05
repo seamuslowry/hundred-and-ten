@@ -1,4 +1,4 @@
-name: Tag and Publish
+name: Publish
 
 on:
   push:
