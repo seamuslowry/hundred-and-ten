@@ -3,6 +3,9 @@
 
 # Hundred and Ten
 
+> **Note**: This repository is organized as a uv workspace monorepo containing multiple packages.
+> The main package is `hundredandten-engine` - see [`packages/hundredandten-engine/`](packages/hundredandten-engine/) for package-specific documentation.
+
 A python package to provide an engine for playing the game Hundred and Ten.
 
 ```python
