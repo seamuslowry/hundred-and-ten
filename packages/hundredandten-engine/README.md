@@ -1,4 +1,4 @@
-# Hundred and Ten
+# Hundred and Ten Engine
 
 A python package to provide an engine for playing the game Hundred and Ten.
 
