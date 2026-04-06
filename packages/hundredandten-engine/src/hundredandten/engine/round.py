@@ -17,8 +17,8 @@ from .constants import (
     TRICK_VALUE,
     BidAmount,
     RoundRole,
-    RoundStatus,
     SelectableSuit,
+    Status,
 )
 from .deck import Deck
 from .errors import HundredAndTenError
@@ -103,7 +103,7 @@ class Round:
     def active_player(self) -> RoundPlayer:
         """The current active player."""
         # while bidding, the active player is the one after the last bidder that can place a bid
-        if self.status == RoundStatus.BIDDING:
+        if self.status == Status.BIDDING:
             # before anyone has bid, treat the dealer as the last bidder
             last_bidder = (
                 self.dealer.identifier if not self.bids else self.bids[-1].identifier
@@ -116,10 +116,10 @@ class Round:
 
             return player_after(active_and_last_bidders, last_bidder)
         # when in trump selection, the active bidder is the active player
-        if self.status == RoundStatus.TRUMP_SELECTION:
+        if self.status == Status.TRUMP_SELECTION:
             assert self.active_bidder
             return self.active_bidder
-        if self.status == RoundStatus.DISCARD:
+        if self.status == Status.DISCARD:
             assert self.active_bidder
             last_discarder = (
                 self.dealer.identifier
@@ -129,7 +129,7 @@ class Round:
             return player_after(self.players, last_discarder)
         # while playing tricks, active player needs to consider
         # trick number, trick status, and winner of last trick
-        if self.status == RoundStatus.TRICKS:
+        if self.status == Status.TRICKS:
             assert self.active_bidder
             # when we're starting a new trick
             if not self.active_trick.plays:
@@ -194,22 +194,22 @@ class Round:
     @property
     def completed(self) -> bool:
         """True if the round is complete, False otherwise"""
-        return self.status in [RoundStatus.COMPLETED, RoundStatus.COMPLETED_NO_BIDDERS]
+        return self.status in [Status.COMPLETED, Status.COMPLETED_NO_BIDDERS]
 
     @cached_property
-    def status(self) -> RoundStatus:
+    def status(self) -> Status:
         """The status property."""
         if self.tricks and all(not player.hand for player in self.players):
-            return RoundStatus.COMPLETED
+            return Status.COMPLETED
         if len(self.discards) == len(self.players):
-            return RoundStatus.TRICKS
+            return Status.TRICKS
         if self.selection:
-            return RoundStatus.DISCARD
+            return Status.DISCARD
         if self.active_bidder:
-            return RoundStatus.TRUMP_SELECTION
+            return Status.TRUMP_SELECTION
         if not self.bidders:
-            return RoundStatus.COMPLETED_NO_BIDDERS
-        return RoundStatus.BIDDING
+            return Status.COMPLETED_NO_BIDDERS
+        return Status.BIDDING
 
     @cached_property
     def actions(self) -> list[Action]:
@@ -308,7 +308,7 @@ class Round:
         identifier = bid.identifier
         amount = bid.amount
         if (
-            self.status == RoundStatus.BIDDING
+            self.status == Status.BIDDING
             and self.active_player == player_by_identifier(self.players, identifier)
         ):
             self.__handle_bid(identifier, amount)
@@ -317,7 +317,7 @@ class Round:
 
     def __select_trump(self, select_trump: SelectTrump) -> None:
         """Select the passed suit as trump"""
-        if self.status != RoundStatus.TRUMP_SELECTION:
+        if self.status != Status.TRUMP_SELECTION:
             raise HundredAndTenError(
                 "Cannot select trump outside of the trump selection phase."
             )
@@ -333,7 +333,7 @@ class Round:
         """
         Discard the selected cards from the identified player's hand and replace them
         """
-        if self.status != RoundStatus.DISCARD:
+        if self.status != Status.DISCARD:
             raise HundredAndTenError("Cannot discard outside of the discard phase.")
         if discard.identifier != self.active_player.identifier:
             raise HundredAndTenError("Only the active player can discard.")
@@ -417,11 +417,11 @@ class Round:
         return self.bids[loc_index] if loc_index is not None else None
 
     def __end_discard(self) -> None:
-        if self.status == RoundStatus.TRICKS:
+        if self.status == Status.TRICKS:
             self.__new_trick()
 
     def __end_play(self) -> None:
-        if self.status == RoundStatus.TRICKS and len(self.active_trick.plays) == len(
+        if self.status == Status.TRICKS and len(self.active_trick.plays) == len(
             self.players
         ):
             self.__new_trick()

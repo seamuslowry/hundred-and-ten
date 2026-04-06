@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.automation import naive
-from hundredandten.engine.constants import GameStatus
+from hundredandten.engine.constants import Status
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.game import Game
 from hundredandten.engine.player import Player
@@ -27,7 +27,7 @@ class TestAutomatedPlay(TestCase):
             ),
         )
 
-        while game.status != GameStatus.WON:
+        while game.status != Status.WON:
             player_id = game.active_player.identifier
             game.act(naive.action_for(game, player_id))
 
@@ -35,7 +35,7 @@ class TestAutomatedPlay(TestCase):
 
     def test_no_actions_after_completion(self):
         """When playing with all automated players, the game will complete"""
-        game = arrange.game(GameStatus.WON, seed=AUTOMATED_SEED)
+        game = arrange.game(Status.WON, seed=AUTOMATED_SEED)
 
         self.assertRaises(
             HundredAndTenError,

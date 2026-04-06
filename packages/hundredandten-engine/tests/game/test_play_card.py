@@ -7,8 +7,8 @@ from hundredandten.engine.constants import (
     HAND_SIZE,
     CardNumber,
     CardSuit,
-    RoundStatus,
     SelectableSuit,
+    Status,
 )
 from hundredandten.engine.deck import Card
 from hundredandten.engine.errors import HundredAndTenError
@@ -22,14 +22,14 @@ class TestPlayCard(TestCase):
     def test_non_trick_game(self):
         """A game not ready for tricks has no active trick"""
 
-        game = arrange.game(RoundStatus.BIDDING)
+        game = arrange.game(Status.BIDDING)
 
         self.assertRaises(HundredAndTenError, lambda: game.active_round.active_trick)
 
     def test_play_first_card_of_round(self):
         """The player after the bidder plays the first card of the round"""
 
-        game = arrange.game(RoundStatus.TRICKS)
+        game = arrange.game(Status.TRICKS)
 
         assert game.active_round.active_bidder
         self.assertEqual(
@@ -52,7 +52,7 @@ class TestPlayCard(TestCase):
     def test_cannot_play_twice_in_a_trick(self):
         """Each person can only play once per trick"""
 
-        game = arrange.game(RoundStatus.TRICKS)
+        game = arrange.game(Status.TRICKS)
 
         active_player = game.active_round.active_player
         play = Play(active_player.identifier, active_player.hand[0])
@@ -63,7 +63,7 @@ class TestPlayCard(TestCase):
     def test_cannot_play_other_players_card(self):
         """A player can only play their own cards"""
 
-        game = arrange.game(RoundStatus.TRICKS)
+        game = arrange.game(Status.TRICKS)
 
         self.assertRaises(
             HundredAndTenError,
@@ -77,7 +77,7 @@ class TestPlayCard(TestCase):
     def test_cannot_play_non_trump_when_bleeding(self):
         """A player can only play trumps while the trick is bleeding"""
 
-        game = arrange.game(RoundStatus.TRICKS)
+        game = arrange.game(Status.TRICKS)
         assert game.active_round.trump
 
         non_trump = next(
@@ -114,7 +114,7 @@ class TestPlayCard(TestCase):
     def test_can_play_non_trump_when_bleeding(self):
         """A player can play non-trumps while the trick is bleeding if they have no trumps"""
 
-        game = arrange.game(RoundStatus.TRICKS)
+        game = arrange.game(Status.TRICKS)
         assert game.active_round.trump
 
         non_trump = next(
@@ -150,7 +150,7 @@ class TestPlayCard(TestCase):
     def test_play_through_trick(self):
         """A new trick is created after all players have played"""
 
-        game = arrange.game(RoundStatus.TRICKS, arrange.play_trick)
+        game = arrange.game(Status.TRICKS, arrange.play_trick)
 
         winning_play = game.active_round.tricks[-2].winning_play
         assert winning_play
@@ -163,7 +163,7 @@ class TestPlayCard(TestCase):
     def test_play_through_round(self):
         """A new round is created after all tricks are played"""
 
-        game = arrange.game(RoundStatus.TRICKS, arrange.play_round)
+        game = arrange.game(Status.TRICKS, arrange.play_round)
 
         self.assertEqual(2, len(game.rounds))
         self.assertTrue(game.rounds[-2].completed)
@@ -171,7 +171,7 @@ class TestPlayCard(TestCase):
     def test_all_cards_available_when_not_bleeding(self):
         """Any card can be played when not bleeding"""
 
-        game = arrange.game(RoundStatus.TRICKS)
+        game = arrange.game(Status.TRICKS)
 
         self.assertEqual(5, len(game.available_actions(game.active_player.identifier)))
         self.assertTrue(
@@ -184,7 +184,7 @@ class TestPlayCard(TestCase):
     def test_only_trumps_when_bleeding(self):
         """Only trump cards can be played while the trick is bleeding"""
 
-        game = arrange.game(RoundStatus.TRICKS)
+        game = arrange.game(Status.TRICKS)
         assert game.active_round.trump
 
         non_trump = next(

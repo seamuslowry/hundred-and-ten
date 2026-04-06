@@ -10,8 +10,6 @@ from uuid import UUID, uuid4
 from .actions import Action, Bid, Discard, Play, SelectTrump
 from .constants import (
     WINNING_SCORE,
-    GameStatus,
-    RoundStatus,
     SelectableSuit,
     Status,
 )
@@ -47,7 +45,7 @@ class Game:
     def status(self) -> Status:
         """The status property."""
         if self.winner:
-            return GameStatus.WON
+            return Status.WON
         return self.active_round.status
 
     @property
@@ -76,7 +74,7 @@ class Game:
         The winner of the game
         """
         # if a round is in progress, don't attempt the computation
-        if not self._rounds or self.active_round.status != RoundStatus.COMPLETED:
+        if not self._rounds or self.active_round.status != Status.COMPLETED:
             return None
 
         winning_scores = [
@@ -126,7 +124,7 @@ class Game:
             for round_num in range(
                 len(self._rounds)
                 # get the score "after" the round if it is completed
-                + (self.active_round.status == RoundStatus.COMPLETED)
+                + (self.active_round.status == Status.COMPLETED)
             )
         ]
 
@@ -152,23 +150,23 @@ class Game:
         game_round = self.active_round
         player = player_by_identifier(game_round.players, identifier)
         if (
-            self.status == GameStatus.WON
+            self.status == Status.WON
             or game_round.active_player.identifier != player.identifier
         ):
             return ()
 
-        if game_round.status == RoundStatus.BIDDING:
+        if game_round.status == Status.BIDDING:
             return tuple(
                 Bid(player.identifier, amount)
                 for amount in game_round.available_bids(player.identifier)
             )
 
-        if game_round.status == RoundStatus.TRUMP_SELECTION:
+        if game_round.status == Status.TRUMP_SELECTION:
             return tuple(
                 SelectTrump(player.identifier, suit) for suit in SelectableSuit
             )
 
-        if game_round.status == RoundStatus.DISCARD:
+        if game_round.status == Status.DISCARD:
             hand_list = list(player.hand)
             return tuple(
                 Discard(player.identifier, list(subset))
@@ -194,7 +192,7 @@ class Game:
             self.__end_play()
 
     def __end_bid(self):
-        if self.status == RoundStatus.COMPLETED_NO_BIDDERS:
+        if self.status == Status.COMPLETED_NO_BIDDERS:
             current_dealer = self.active_round.dealer.identifier
             # dealer doesn't rotate on a round with no bidders
             # unless the current dealer has been dealer 3x in a row
@@ -209,7 +207,7 @@ class Game:
             self.__new_round(next_dealer)
 
     def __end_play(self):
-        if self.status == RoundStatus.COMPLETED:
+        if self.status == Status.COMPLETED:
             self.__new_round(
                 player_after(
                     self.active_round.players, self.active_round.dealer.identifier
@@ -241,7 +239,7 @@ class Game:
             score
             for game_round in self._rounds[:to_round]
             for score in game_round.scores
-            if game_round.status == RoundStatus.COMPLETED
+            if game_round.status == Status.COMPLETED
         ]
 
         for score in all_final_scores:
@@ -262,7 +260,7 @@ class Game:
         scores = {player.identifier: 0 for player in self.players}
 
         for game_round in self._rounds[:to_round]:
-            if game_round.status != RoundStatus.COMPLETED:
+            if game_round.status != Status.COMPLETED:
                 continue
 
             for score in game_round.scores:

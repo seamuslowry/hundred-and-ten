@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.engine.constants import WINNING_SCORE, GameStatus, RoundStatus
+from hundredandten.engine.constants import WINNING_SCORE, Status
 from hundredandten.testing import arrange
 
 # tests in this file run off of seeded games to avoid setting up everything necessary for the tests
@@ -25,7 +25,7 @@ class TestGameScoring(TestCase):
 
     def test_start_at_zeroes(self):
         """At game start, scores are all zeroes"""
-        game = arrange.game(RoundStatus.BIDDING)
+        game = arrange.game(Status.BIDDING)
 
         self.assertEqual([0] * len(game.players), list(game.scores.values()))
         self.assertEqual(
@@ -35,7 +35,7 @@ class TestGameScoring(TestCase):
     def test_win_at_winning_score(self):
         """At the end of the game, the winner has 110"""
         seed = PLAYER_0_WIN_SEED
-        game = arrange.game(GameStatus.WON, seed=seed)
+        game = arrange.game(Status.WON, seed=seed)
 
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores)
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores_by_round[-1])
@@ -43,7 +43,7 @@ class TestGameScoring(TestCase):
     def test_bidder_wins_when_sharing(self):
         """If multiple players including the bidder reach 110, the bidder wins"""
         seed = BIDDER_WINS_IN_DISPUTE_SEED
-        game = arrange.game(GameStatus.WON, seed=seed)
+        game = arrange.game(Status.WON, seed=seed)
 
         assert game.winner
         assert game.active_round.active_bidder
@@ -60,7 +60,7 @@ class TestGameScoring(TestCase):
     def test_first_to_score_wins_when_sharing(self):
         """If multiple players NOT including the bidder reach 110, the first to 110 wins"""
         seed = FIRST_TO_SCORE_WINS_IN_DISPUTE_SEED
-        game = arrange.game(GameStatus.WON, seed=seed)
+        game = arrange.game(Status.WON, seed=seed)
 
         winners = [key for key, value in game.scores.items() if value >= WINNING_SCORE]
         winning_scores = [

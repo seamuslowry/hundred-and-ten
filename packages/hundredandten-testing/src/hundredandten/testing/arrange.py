@@ -6,8 +6,6 @@ from uuid import uuid4
 from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
     BidAmount,
-    GameStatus,
-    RoundStatus,
     SelectableSuit,
     Status,
 )
@@ -41,12 +39,12 @@ def __game(
     """
 
     new_game = {
-        RoundStatus.BIDDING: __get_bidding_game,
-        RoundStatus.COMPLETED_NO_BIDDERS: __get_completed_no_bidders_game,
-        RoundStatus.TRUMP_SELECTION: __get_trump_selection_game,
-        RoundStatus.DISCARD: __get_discard_game,
-        RoundStatus.TRICKS: __get_tricks_game,
-        GameStatus.WON: __get_won_game,
+        Status.BIDDING: __get_bidding_game,
+        Status.COMPLETED_NO_BIDDERS: __get_completed_no_bidders_game,
+        Status.TRUMP_SELECTION: __get_trump_selection_game,
+        Status.DISCARD: __get_discard_game,
+        Status.TRICKS: __get_tricks_game,
+        Status.WON: __get_won_game,
     }[status](seed)
     massage(new_game)
     return new_game
@@ -72,7 +70,7 @@ def bid(game_to_bid: Game) -> None:
         Bid(game_to_bid.active_round.active_player.identifier, BidAmount.FIFTEEN)
     )
 
-    while game_to_bid.status != RoundStatus.TRUMP_SELECTION:
+    while game_to_bid.status != Status.TRUMP_SELECTION:
         game_to_bid.act(Bid(game_to_bid.active_player.identifier, BidAmount.PASS))
 
 
@@ -87,7 +85,7 @@ def select_trump(game_to_select: Game) -> None:
 
 def discard(game_to_discard: Game) -> None:
     """Have all players discard"""
-    while game_to_discard.status == RoundStatus.DISCARD:
+    while game_to_discard.status == Status.DISCARD:
         game_to_discard.act(
             Discard(game_to_discard.active_round.active_player.identifier, [])
         )
@@ -106,7 +104,7 @@ def play_trick(game_to_play: Game) -> None:
 
 def play_round(game_to_play: Game) -> None:
     """Play through the current round of tricks of the provided game"""
-    while game_to_play.status == RoundStatus.TRICKS:
+    while game_to_play.status == Status.TRICKS:
         play_trick(game_to_play)
 
 
@@ -156,7 +154,7 @@ def __get_tricks_game(seed: Optional[str]) -> Game:
 def __get_won_game(seed: Optional[str]) -> Game:
     """Return a game in the won status"""
     new_game = __get_bidding_game(seed)
-    while new_game.status != GameStatus.WON:
+    while new_game.status != Status.WON:
         bid(new_game)
         select_trump(new_game)
         discard(new_game)

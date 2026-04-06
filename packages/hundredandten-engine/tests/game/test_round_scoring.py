@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.engine.actions import Bid
-from hundredandten.engine.constants import BidAmount, RoundStatus
+from hundredandten.engine.constants import BidAmount, Status
 from hundredandten.engine.trick import Score
 from hundredandten.testing import arrange
 
@@ -63,7 +63,7 @@ class TestRoundScoring(TestCase):
     def test_bidder_goes_back(self):
         """Score a round where the bidder bids fifteen and loses the points"""
         seed = BIDDER_GOES_BACK_SEED
-        game = arrange.game(RoundStatus.TRICKS, arrange.play_round, seed=seed)
+        game = arrange.game(Status.TRICKS, arrange.play_round, seed=seed)
 
         old_round = game.rounds[-2]
 
@@ -82,7 +82,7 @@ class TestRoundScoring(TestCase):
     def test_share_fifteen(self):
         """Score a round where the bidder and one other player wins fifteen"""
         seed = TWO_FIFTEENS_SEED
-        game = arrange.game(RoundStatus.TRICKS, arrange.play_round, seed=seed)
+        game = arrange.game(Status.TRICKS, arrange.play_round, seed=seed)
 
         old_round = game.rounds[-2]
 
@@ -104,7 +104,7 @@ class TestRoundScoring(TestCase):
     def test_lose_twenty(self):
         """Score a round where the bidder bids twenty and loses"""
         seed = TWO_FIFTEENS_SEED
-        game = arrange.game(RoundStatus.BIDDING, seed=seed)
+        game = arrange.game(Status.BIDDING, seed=seed)
 
         game.act(
             Bid(
@@ -138,7 +138,7 @@ class TestRoundScoring(TestCase):
     def test_shoot_the_moon(self):
         """Score a round where the bidder shoots the moon and wins"""
         seed = SHOOT_THE_MOON_SEED
-        game = arrange.game(RoundStatus.BIDDING, seed=seed)
+        game = arrange.game(Status.BIDDING, seed=seed)
 
         game.act(
             Bid(
@@ -172,7 +172,7 @@ class TestRoundScoring(TestCase):
     def test_thirty(self):
         """Score a round where the bidder wins all tricks without shooting the moon"""
         seed = SHOOT_THE_MOON_SEED
-        game = arrange.game(RoundStatus.TRICKS, arrange.play_round, seed=seed)
+        game = arrange.game(Status.TRICKS, arrange.play_round, seed=seed)
 
         old_round = game.rounds[-2]
 
@@ -184,7 +184,7 @@ class TestRoundScoring(TestCase):
     def test_lose_shoot_the_moon(self):
         """Score a round where the bidder shoots the moon and loses"""
         seed = TWO_FIFTEENS_SEED
-        game = arrange.game(RoundStatus.BIDDING, seed=seed)
+        game = arrange.game(Status.BIDDING, seed=seed)
 
         game.act(
             Bid(

@@ -11,7 +11,7 @@ from hundredandten.engine.actions import (
     Play,
     SelectTrump,
 )
-from hundredandten.engine.constants import BidAmount, RoundStatus, SelectableSuit
+from hundredandten.engine.constants import BidAmount, SelectableSuit, Status
 from hundredandten.engine.deck import Card, defined_cards
 from hundredandten.engine.player import RoundPlayer, player_by_identifier
 from hundredandten.engine.round import Round
@@ -225,7 +225,7 @@ class GameState:
     """
 
     # Phase
-    status: RoundStatus
+    status: Status
 
     # Table shape and relative positions/scores
     table: TableInfo

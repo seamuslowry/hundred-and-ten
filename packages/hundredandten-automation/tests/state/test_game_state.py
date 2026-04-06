@@ -18,7 +18,7 @@ from hundredandten.engine.actions import Bid, Discard, Play
 from hundredandten.engine.constants import (
     HAND_SIZE,
     BidAmount,
-    RoundStatus,
+    Status,
 )
 from hundredandten.engine.deck import defined_cards
 from hundredandten.testing import arrange
@@ -31,15 +31,15 @@ class TestGameStateBidding(TestCase):
 
     def test_status_is_bidding(self):
         """State reflects bidding status"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertEqual(state.status, RoundStatus.BIDDING)
+        self.assertEqual(state.status, Status.BIDDING)
 
     def test_num_players(self):
         """State reflects the number of players"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -47,7 +47,7 @@ class TestGameStateBidding(TestCase):
 
     def test_self_is_seat_zero(self):
         """The requesting player is always seat 0"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         for player in game.active_round.players:
             state = GameState.from_game(game, player.identifier)
             # self is always seat 0 — verified through hand matching
@@ -55,7 +55,7 @@ class TestGameStateBidding(TestCase):
 
     def test_dealer_seat_relative(self):
         """Dealer seat is relative to the requesting player"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         dealer = game.active_round.dealer
         players = game.active_round.players
         dealer_index = players.index(dealer)
@@ -67,7 +67,7 @@ class TestGameStateBidding(TestCase):
 
     def test_hand_matches_player(self):
         """Hand in state matches the requesting player's actual hand"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         for player in game.active_round.players:
             state = GameState.from_game(game, player.identifier)
             self.assertEqual(state.hand, tuple(player.hand))
@@ -75,7 +75,7 @@ class TestGameStateBidding(TestCase):
 
     def test_cards_has_53_entries(self):
         """Card knowledge always has 53 entries"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -83,7 +83,7 @@ class TestGameStateBidding(TestCase):
 
     def test_own_hand_cards_are_in_hand(self):
         """Player's own cards show as InHand"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -92,7 +92,7 @@ class TestGameStateBidding(TestCase):
 
     def test_other_cards_are_unknown(self):
         """Cards not in player's hand are Unknown"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -101,7 +101,7 @@ class TestGameStateBidding(TestCase):
 
     def test_no_bidder_during_bidding(self):
         """bidder_seat is None during bidding"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -109,7 +109,7 @@ class TestGameStateBidding(TestCase):
 
     def test_bid_history_empty_at_start(self):
         """No bids placed yet"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -117,7 +117,7 @@ class TestGameStateBidding(TestCase):
 
     def test_active_bid_none_at_start(self):
         """No active bid yet"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -125,7 +125,7 @@ class TestGameStateBidding(TestCase):
 
     def test_trump_none_during_bidding(self):
         """Trump is not yet selected"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -133,7 +133,7 @@ class TestGameStateBidding(TestCase):
 
     def test_no_tricks_during_bidding(self):
         """No tricks have been played"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -142,7 +142,7 @@ class TestGameStateBidding(TestCase):
 
     def test_available_actions_for_active_player(self):
         """Active player has bid actions available"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -153,7 +153,7 @@ class TestGameStateBidding(TestCase):
 
     def test_no_actions_for_inactive_player(self):
         """Inactive player has no available actions"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         inactive = game.active_round.inactive_players[0]
         state = GameState.from_game(game, inactive.identifier)
 
@@ -161,7 +161,7 @@ class TestGameStateBidding(TestCase):
 
     def test_available_bids_convenience(self):
         """available_bids property returns only Bid actions"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -169,7 +169,7 @@ class TestGameStateBidding(TestCase):
 
     def test_bid_history_after_bids(self):
         """Bid history records bids with relative seats"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         game.act(Bid(active.identifier, BidAmount.PASS))
 
@@ -182,7 +182,7 @@ class TestGameStateBidding(TestCase):
 
     def test_scores_start_at_zero(self):
         """All scores start at 0"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -190,7 +190,7 @@ class TestGameStateBidding(TestCase):
 
     def test_is_bidder_false_during_bidding(self):
         """is_bidder is False when no bidder determined yet"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -202,15 +202,15 @@ class TestGameStateTrumpSelection(TestCase):
 
     def test_status_is_trump_selection(self):
         """State reflects trump selection status"""
-        game = arrange.game(RoundStatus.TRUMP_SELECTION, seed=SEED)
+        game = arrange.game(Status.TRUMP_SELECTION, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertEqual(state.status, RoundStatus.TRUMP_SELECTION)
+        self.assertEqual(state.status, Status.TRUMP_SELECTION)
 
     def test_bidder_seat_is_zero_for_bidder(self):
         """The bidder sees themselves as seat 0"""
-        game = arrange.game(RoundStatus.TRUMP_SELECTION, seed=SEED)
+        game = arrange.game(Status.TRUMP_SELECTION, seed=SEED)
         bidder = game.active_round.active_bidder
         assert bidder is not None
         state = GameState.from_game(game, bidder.identifier)
@@ -220,7 +220,7 @@ class TestGameStateTrumpSelection(TestCase):
 
     def test_bidder_seat_nonzero_for_non_bidder(self):
         """Non-bidder sees the bidder at a non-zero seat"""
-        game = arrange.game(RoundStatus.TRUMP_SELECTION, seed=SEED)
+        game = arrange.game(Status.TRUMP_SELECTION, seed=SEED)
         non_bidder = game.active_round.inactive_players[0]
         state = GameState.from_game(game, non_bidder.identifier)
 
@@ -229,7 +229,7 @@ class TestGameStateTrumpSelection(TestCase):
 
     def test_available_trump_selections(self):
         """Bidder has 4 trump selection options"""
-        game = arrange.game(RoundStatus.TRUMP_SELECTION, seed=SEED)
+        game = arrange.game(Status.TRUMP_SELECTION, seed=SEED)
         bidder = game.active_round.active_bidder
         assert bidder is not None
         state = GameState.from_game(game, bidder.identifier)
@@ -244,7 +244,7 @@ class TestGameStateTrumpSelection(TestCase):
 
     def test_no_actions_for_non_bidder(self):
         """Non-bidder has no actions during trump selection"""
-        game = arrange.game(RoundStatus.TRUMP_SELECTION, seed=SEED)
+        game = arrange.game(Status.TRUMP_SELECTION, seed=SEED)
         non_bidder = game.active_round.inactive_players[0]
         state = GameState.from_game(game, non_bidder.identifier)
 
@@ -252,7 +252,7 @@ class TestGameStateTrumpSelection(TestCase):
 
     def test_bid_history_recorded(self):
         """Bid history has entries from the bidding phase"""
-        game = arrange.game(RoundStatus.TRUMP_SELECTION, seed=SEED)
+        game = arrange.game(Status.TRUMP_SELECTION, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -260,7 +260,7 @@ class TestGameStateTrumpSelection(TestCase):
 
     def test_active_bid_set(self):
         """Active bid is set after bidding is complete"""
-        game = arrange.game(RoundStatus.TRUMP_SELECTION, seed=SEED)
+        game = arrange.game(Status.TRUMP_SELECTION, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -272,15 +272,15 @@ class TestGameStateDiscard(TestCase):
 
     def test_status_is_discard(self):
         """State reflects discard status"""
-        game = arrange.game(RoundStatus.DISCARD, seed=SEED)
+        game = arrange.game(Status.DISCARD, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertEqual(state.status, RoundStatus.DISCARD)
+        self.assertEqual(state.status, Status.DISCARD)
 
     def test_trump_is_set(self):
         """Trump has been selected"""
-        game = arrange.game(RoundStatus.DISCARD, seed=SEED)
+        game = arrange.game(Status.DISCARD, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -288,7 +288,7 @@ class TestGameStateDiscard(TestCase):
 
     def test_available_discards_for_active_player(self):
         """Active player has discard options (2^hand_size subsets)"""
-        game = arrange.game(RoundStatus.DISCARD, seed=SEED)
+        game = arrange.game(Status.DISCARD, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -299,7 +299,7 @@ class TestGameStateDiscard(TestCase):
 
     def test_discard_includes_empty_set(self):
         """Discard options include keeping all cards (empty discard)"""
-        game = arrange.game(RoundStatus.DISCARD, seed=SEED)
+        game = arrange.game(Status.DISCARD, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -308,7 +308,7 @@ class TestGameStateDiscard(TestCase):
 
     def test_discard_includes_full_hand(self):
         """Discard options include discarding entire hand"""
-        game = arrange.game(RoundStatus.DISCARD, seed=SEED)
+        game = arrange.game(Status.DISCARD, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -319,7 +319,7 @@ class TestGameStateDiscard(TestCase):
 
     def test_own_discards_visible_after_discard(self):
         """After discarding, own discarded cards show as Discarded"""
-        game = arrange.game(RoundStatus.DISCARD, seed=SEED)
+        game = arrange.game(Status.DISCARD, seed=SEED)
         active = game.active_round.active_player
         discarded_cards = [active.hand[0], active.hand[1]]
         game.act(Discard(active.identifier, discarded_cards))
@@ -332,7 +332,7 @@ class TestGameStateDiscard(TestCase):
 
     def test_other_player_discards_not_visible(self):
         """Other players' discards appear as Unknown, not Discarded"""
-        game = arrange.game(RoundStatus.DISCARD, seed=SEED)
+        game = arrange.game(Status.DISCARD, seed=SEED)
         # First player discards
         first_active = game.active_round.active_player
         first_discarded = list(first_active.hand[:2])
@@ -352,15 +352,15 @@ class TestGameStateTricks(TestCase):
 
     def test_status_is_tricks(self):
         """State reflects tricks status"""
-        game = arrange.game(RoundStatus.TRICKS, seed=SEED)
+        game = arrange.game(Status.TRICKS, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertEqual(state.status, RoundStatus.TRICKS)
+        self.assertEqual(state.status, Status.TRICKS)
 
     def test_available_plays(self):
         """Active player has play actions available"""
-        game = arrange.game(RoundStatus.TRICKS, seed=SEED)
+        game = arrange.game(Status.TRICKS, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -371,7 +371,7 @@ class TestGameStateTricks(TestCase):
 
     def test_play_actions_match_hand(self):
         """Play actions correspond to cards in hand (when not bleeding)"""
-        game = arrange.game(RoundStatus.TRICKS, seed=SEED)
+        game = arrange.game(Status.TRICKS, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -381,7 +381,7 @@ class TestGameStateTricks(TestCase):
 
     def test_played_cards_tracked(self):
         """After a card is played, it appears as Played in card knowledge"""
-        game = arrange.game(RoundStatus.TRICKS, seed=SEED)
+        game = arrange.game(Status.TRICKS, seed=SEED)
         active = game.active_round.active_player
         card_to_play = active.hand[0]
         game.act(Play(active.identifier, card_to_play))
@@ -397,7 +397,7 @@ class TestGameStateTricks(TestCase):
 
     def test_current_trick_plays_tracked(self):
         """Current trick plays show in-progress plays"""
-        game = arrange.game(RoundStatus.TRICKS, seed=SEED)
+        game = arrange.game(Status.TRICKS, seed=SEED)
         active = game.active_round.active_player
         game.act(Play(active.identifier, active.hand[0]))
 
@@ -408,7 +408,7 @@ class TestGameStateTricks(TestCase):
 
     def test_completed_trick_after_full_trick(self):
         """After all players play, trick moves to completed_tricks"""
-        game = arrange.game(RoundStatus.TRICKS, seed=SEED)
+        game = arrange.game(Status.TRICKS, seed=SEED)
         arrange.play_trick(game)
 
         active = game.active_round.active_player
@@ -420,7 +420,7 @@ class TestGameStateTricks(TestCase):
 
     def test_completed_trick_has_winner(self):
         """Completed trick records the winner's relative seat"""
-        game = arrange.game(RoundStatus.TRICKS, seed=SEED)
+        game = arrange.game(Status.TRICKS, seed=SEED)
         arrange.play_trick(game)
 
         active = game.active_round.active_player
@@ -436,7 +436,7 @@ class TestGameStateSeatNormalization(TestCase):
 
     def test_all_players_see_self_as_seat_zero(self):
         """Every player, when requesting their state, is seat 0"""
-        game = arrange.game(RoundStatus.TRICKS, seed=SEED)
+        game = arrange.game(Status.TRICKS, seed=SEED)
         arrange.play_trick(game)
 
         for player in game.active_round.players:
@@ -446,7 +446,7 @@ class TestGameStateSeatNormalization(TestCase):
 
     def test_dealer_seat_sums_correctly(self):
         """Different players see dealer at different relative seats that are consistent"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         players = game.active_round.players
         dealer = game.active_round.dealer
         dealer_abs = players.index(dealer)
@@ -462,7 +462,7 @@ class TestGameStateSeatNormalization(TestCase):
 
     def test_bid_events_have_relative_seats(self):
         """Bid events use relative seats from the requesting player's perspective"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         game.act(Bid(active.identifier, BidAmount.PASS))
 
@@ -482,16 +482,16 @@ class TestGameStateImmutability(TestCase):
 
     def test_frozen_dataclass(self):
         """GameState cannot be mutated"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
         with self.assertRaises(AttributeError):
-            state.status = RoundStatus.TRICKS  # type: ignore[misc]
+            state.status = Status.TRICKS  # type: ignore[misc]
 
     def test_cards_all_53(self):
         """Verify all 53 defined cards are represented"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -504,7 +504,7 @@ class TestGameStateConvenienceProperties(TestCase):
 
     def test_is_dealer_true_for_dealer(self):
         """is_dealer returns True for the dealer"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         dealer = game.active_round.dealer
         state = GameState.from_game(game, dealer.identifier)
 
@@ -512,7 +512,7 @@ class TestGameStateConvenienceProperties(TestCase):
 
     def test_is_dealer_false_for_non_dealer(self):
         """is_dealer returns False for non-dealers"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         non_dealer = next(
             p for p in game.active_round.players if p != game.active_round.dealer
         )
@@ -522,7 +522,7 @@ class TestGameStateConvenienceProperties(TestCase):
 
     def test_available_plays_empty_during_bidding(self):
         """available_plays returns empty during bidding"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
@@ -530,7 +530,7 @@ class TestGameStateConvenienceProperties(TestCase):
 
     def test_available_discards_empty_during_bidding(self):
         """available_discards returns empty during bidding"""
-        game = arrange.game(RoundStatus.BIDDING, seed=SEED)
+        game = arrange.game(Status.BIDDING, seed=SEED)
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 

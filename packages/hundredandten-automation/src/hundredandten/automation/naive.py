@@ -6,8 +6,8 @@ from hundredandten.engine.actions import Action
 from hundredandten.engine.constants import (
     BidAmount,
     CardNumber,
-    RoundStatus,
     SelectableSuit,
+    Status,
 )
 from hundredandten.engine.deck import Card
 from hundredandten.engine.errors import HundredAndTenError
@@ -31,13 +31,13 @@ def action_for(game: Game, player: str) -> Action:
 
 def action(state: GameState) -> AvailableAction:
     """Return the suggested action given the game state"""
-    if state.status == RoundStatus.BIDDING:
+    if state.status == Status.BIDDING:
         return __suggested_bid(state)
-    if state.status == RoundStatus.TRUMP_SELECTION:
+    if state.status == Status.TRUMP_SELECTION:
         return __suggested_trump_selection(state)
-    if state.status == RoundStatus.DISCARD:
+    if state.status == Status.DISCARD:
         return __suggested_discard(state)
-    if state.status == RoundStatus.TRICKS:
+    if state.status == Status.TRICKS:
         return __suggested_play(state)
     raise HundredAndTenError(f"Cannot automate the action in status {state.status}")
 

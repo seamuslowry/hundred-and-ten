@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.engine.actions import Bid
-from hundredandten.engine.constants import BidAmount, RoundStatus
+from hundredandten.engine.constants import BidAmount, Status
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.testing import arrange
 
@@ -14,16 +14,16 @@ class TestEndBidding(TestCase):
     def test_no_active_player_when_completed_no_bidders(self):
         """Round will have no active player when complete"""
 
-        game = arrange.game(RoundStatus.COMPLETED_NO_BIDDERS)
+        game = arrange.game(Status.COMPLETED_NO_BIDDERS)
 
         self.assertRaises(HundredAndTenError, lambda: game.rounds[-2].active_player)
 
     def test_end_bidding_with_bids(self):
         """Bidding ends when there is only one bidder with an active bid"""
 
-        game = arrange.game(RoundStatus.TRUMP_SELECTION)
+        game = arrange.game(Status.TRUMP_SELECTION)
 
-        self.assertEqual(game.status, RoundStatus.TRUMP_SELECTION)
+        self.assertEqual(game.status, Status.TRUMP_SELECTION)
         self.assertEqual(
             game.active_round.active_player, game.active_round.active_bidder
         )
@@ -31,9 +31,9 @@ class TestEndBidding(TestCase):
     def test_cannot_bid_after_bidding_stage(self):
         """Bidding can only occur in the bidding stage"""
 
-        game = arrange.game(RoundStatus.TRUMP_SELECTION)
+        game = arrange.game(Status.TRUMP_SELECTION)
 
-        self.assertNotEqual(game.status, RoundStatus.BIDDING)
+        self.assertNotEqual(game.status, Status.BIDDING)
         self.assertRaises(
             HundredAndTenError,
             game.act,
@@ -43,13 +43,13 @@ class TestEndBidding(TestCase):
     def test_end_bidding_with_pass(self):
         """Bidding ends when everyone has passed"""
 
-        game = arrange.game(RoundStatus.COMPLETED_NO_BIDDERS)
+        game = arrange.game(Status.COMPLETED_NO_BIDDERS)
 
         # old round ended as completed no bidders
-        self.assertEqual(game.rounds[-2].status, RoundStatus.COMPLETED_NO_BIDDERS)
+        self.assertEqual(game.rounds[-2].status, Status.COMPLETED_NO_BIDDERS)
         self.assertTrue(game.rounds[-2].completed)
         # new round in bidding
-        self.assertEqual(game.status, RoundStatus.BIDDING)
+        self.assertEqual(game.status, Status.BIDDING)
 
     def test_end_bidding_with_same_dealer(self):
         """
@@ -58,7 +58,7 @@ class TestEndBidding(TestCase):
         otherwise, it passes to the next player
         """
 
-        game = arrange.game(RoundStatus.BIDDING)
+        game = arrange.game(Status.BIDDING)
 
         # first round as dealer
         arrange.pass_round(game)

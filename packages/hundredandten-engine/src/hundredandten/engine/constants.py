@@ -1,21 +1,14 @@
 """Constant values for Hundred and Ten games"""
 
 from enum import Enum, IntEnum
-from typing import Union
 
 HAND_SIZE = 5
 TRICK_VALUE = 5
 WINNING_SCORE = 110
 
 
-class GameStatus(Enum):
-    """The statuses the game can be in"""
-
-    WON = 1
-
-
-class RoundStatus(Enum):
-    """The statuses the round can be in"""
+class Status(Enum):
+    """The statuses a game can be in"""
 
     BIDDING = 1
     TRUMP_SELECTION = 2
@@ -23,9 +16,7 @@ class RoundStatus(Enum):
     TRICKS = 4
     DISCARD = 5
     COMPLETED = 6
-
-
-Status = Union[GameStatus, RoundStatus]
+    WON = 7
 
 
 class RoundRole(Enum):

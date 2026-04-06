@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.engine.constants import HAND_SIZE, RoundStatus
+from hundredandten.engine.constants import HAND_SIZE, Status
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.game import Game
 from hundredandten.engine.player import Player
@@ -14,7 +14,7 @@ class TestStartOfGame(TestCase):
 
     def test_start_game(self):
         """Adds the first round when starting a game"""
-        game = arrange.game(RoundStatus.BIDDING)
+        game = arrange.game(Status.BIDDING)
 
         self.assertEqual(1, len(game.rounds))
         self.assertIsNotNone(game.active_round.deck.seed)
@@ -30,8 +30,8 @@ class TestStartOfGame(TestCase):
 
     def test_games_dont_have_same_seed(self):
         """Two different games' decks will have different seeds"""
-        game_1 = arrange.game(RoundStatus.BIDDING)
-        game_2 = arrange.game(RoundStatus.BIDDING)
+        game_1 = arrange.game(Status.BIDDING)
+        game_2 = arrange.game(Status.BIDDING)
 
         self.assertIsNotNone(game_1.active_round.deck.seed)
         self.assertIsNotNone(game_2.active_round.deck.seed)

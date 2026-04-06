@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.engine.actions import SelectTrump
-from hundredandten.engine.constants import RoundStatus, SelectableSuit
+from hundredandten.engine.constants import SelectableSuit, Status
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.testing import arrange
 
@@ -14,7 +14,7 @@ class TestTrumpSelection(TestCase):
     def test_selecting_trump_outside_status(self):
         """Can only select trump during the trump selection phase"""
 
-        game = arrange.game(RoundStatus.BIDDING)
+        game = arrange.game(Status.BIDDING)
 
         self.assertRaises(
             HundredAndTenError,
@@ -28,7 +28,7 @@ class TestTrumpSelection(TestCase):
     def test_selecting_trump_as_inactive_player(self):
         """Only the active bidder can select trump"""
 
-        game = arrange.game(RoundStatus.TRUMP_SELECTION)
+        game = arrange.game(Status.TRUMP_SELECTION)
 
         self.assertRaises(
             HundredAndTenError,
@@ -42,7 +42,7 @@ class TestTrumpSelection(TestCase):
     def test_selecting_trump(self):
         """The active bidder can select trump"""
 
-        game = arrange.game(RoundStatus.TRUMP_SELECTION)
+        game = arrange.game(Status.TRUMP_SELECTION)
 
         select = SelectTrump(
             game.active_round.active_player.identifier, SelectableSuit.DIAMONDS
@@ -51,12 +51,12 @@ class TestTrumpSelection(TestCase):
         game.act(select)
 
         self.assertEqual(select.suit, game.active_round.trump)
-        self.assertEqual(RoundStatus.DISCARD, game.status)
+        self.assertEqual(Status.DISCARD, game.status)
         self.assertEqual(select, game.actions[-1])
 
     def test_no_restrictions_on_trump_selection(self):
         """Can select any selectable suit"""
 
-        game = arrange.game(RoundStatus.TRUMP_SELECTION)
+        game = arrange.game(Status.TRUMP_SELECTION)
 
         self.assertEqual(4, len(game.available_actions(game.active_player.identifier)))

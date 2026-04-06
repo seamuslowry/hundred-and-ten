@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.engine.actions import Discard
-from hundredandten.engine.constants import HAND_SIZE, RoundStatus
+from hundredandten.engine.constants import HAND_SIZE, Status
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.testing import arrange
 
@@ -14,14 +14,14 @@ class TestDiscard(TestCase):
     def test_error_when_not_discarding(self):
         """Can't discard if not in discard status"""
 
-        game = arrange.game(RoundStatus.BIDDING)
+        game = arrange.game(Status.BIDDING)
 
         self.assertRaises(HundredAndTenError, game.act, Discard("", []))
 
     def test_cant_discard_when_not_active(self):
         """Can't discard if not the active player"""
 
-        game = arrange.game(RoundStatus.DISCARD)
+        game = arrange.game(Status.DISCARD)
         inactive_player = game.active_round.inactive_players[0]
 
         self.assertRaises(
@@ -33,7 +33,7 @@ class TestDiscard(TestCase):
     def test_cant_discard_other_players_cards(self):
         """Can't discard cards that aren't your own"""
 
-        game = arrange.game(RoundStatus.DISCARD)
+        game = arrange.game(Status.DISCARD)
 
         self.assertRaises(
             HundredAndTenError,
@@ -47,7 +47,7 @@ class TestDiscard(TestCase):
     def test_discard_whole_hand(self):
         """Can discard your whole hand"""
 
-        game = arrange.game(RoundStatus.DISCARD)
+        game = arrange.game(Status.DISCARD)
 
         player = game.active_round.active_player
         initial_hand = list(player.hand)
@@ -62,7 +62,7 @@ class TestDiscard(TestCase):
     def test_discard_part_of_hand(self):
         """Can discard a part of your hand"""
 
-        game = arrange.game(RoundStatus.DISCARD)
+        game = arrange.game(Status.DISCARD)
 
         player = game.active_round.active_player
         discard = Discard(player.identifier, [player.hand[1], player.hand[3]])
@@ -78,14 +78,14 @@ class TestDiscard(TestCase):
     def test_no_restrictions_on_discards(self):
         """Can discard any subset of hand"""
 
-        game = arrange.game(RoundStatus.DISCARD)
+        game = arrange.game(Status.DISCARD)
 
         self.assertEqual(32, len(game.available_actions(game.active_player.identifier)))
 
     def test_cant_discard_on_other_turn(self):
         """Can't discard when not your turn"""
 
-        game = arrange.game(RoundStatus.DISCARD)
+        game = arrange.game(Status.DISCARD)
 
         self.assertEqual(
             0,
