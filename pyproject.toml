@@ -28,6 +28,9 @@ target-version = ["py314"]
 
 [tool.pytest.ini_options]
 testpaths = ["packages/hundredandten-engine", "packages/hundredandten-automation"]
+addopts = [
+    "--import-mode=importlib",
+]
 
 [tool.coverage.run]
 source = ["hundredandten.engine", "hundredandten.automation"]
