@@ -2,6 +2,7 @@
 
 from typing import Optional, Sequence
 
+from hundredandten.engine.actions import Action
 from hundredandten.engine.constants import (
     BidAmount,
     CardNumber,
@@ -10,6 +11,7 @@ from hundredandten.engine.constants import (
 )
 from hundredandten.engine.deck import Card
 from hundredandten.engine.errors import HundredAndTenError
+from hundredandten.engine.game import Game
 from hundredandten.engine.trumps import bleeds, trumps
 
 from .state import (
@@ -20,6 +22,11 @@ from .state import (
     AvailableSelectTrump,
     GameState,
 )
+
+
+def action_for(game: Game, player: str) -> Action:
+    """Return the naive action for the given player in this game"""
+    return action(GameState.from_game(game, player)).for_player(player)
 
 
 def action(state: GameState) -> AvailableAction:
@@ -55,7 +62,7 @@ def __suggested_discard(game_state: GameState) -> AvailableDiscard:
     """Return the suggested dicard action for the current player"""
 
     return AvailableDiscard(
-        list(non_trumps(game_state.hand, game_state.trump)),
+        list(__non_trumps(game_state.hand, game_state.trump)),
     )
 
 
@@ -125,7 +132,7 @@ def best_card(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Card:
 def worst_card(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Card:
     """Return the worst card in the list of cards"""
     worst_non_trump = min(
-        non_trumps(cards, trump), key=lambda c: c.weak_trump_value, default=None
+        __non_trumps(cards, trump), key=lambda c: c.weak_trump_value, default=None
     )
     worst_trump = min(
         trumps(cards, trump), key=lambda c: c.trump_value, default=cards[0]
@@ -157,14 +164,14 @@ def __cards_beating(
                     c.suit == card_to_beat.suit
                     and c.weak_trump_value > card_to_beat.weak_trump_value
                 ),
-                non_trumps(cards, trump),
+                __non_trumps(cards, trump),
             ),
         ]
 
     return list(filter(lambda c: c.trump_value > card_to_beat.trump_value, trump_cards))
 
 
-def non_trumps(
+def __non_trumps(
     cards: Sequence[Card], trump: Optional[SelectableSuit]
 ) -> Sequence[Card]:
     """Return all non trump cards in the list"""

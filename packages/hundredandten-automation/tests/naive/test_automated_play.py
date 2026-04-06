@@ -3,7 +3,6 @@
 from unittest import TestCase
 
 from hundredandten.automation import naive
-from hundredandten.automation.state import GameState
 from hundredandten.engine.constants import GameStatus
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.game import Game
@@ -30,9 +29,7 @@ class TestAutomatedPlay(TestCase):
 
         while game.status != GameStatus.WON:
             player_id = game.active_player.identifier
-            game.act(
-                naive.action(GameState.from_game(game, player_id)).for_player(player_id)
-            )
+            game.act(naive.action_for(game, player_id))
 
         self.assertIsNotNone(game.winner)
 
@@ -42,6 +39,7 @@ class TestAutomatedPlay(TestCase):
 
         self.assertRaises(
             HundredAndTenError,
-            naive.action,
-            GameState.from_game(game, game.players[0].identifier),
+            naive.action_for,
+            game,
+            game.players[0].identifier,
         )

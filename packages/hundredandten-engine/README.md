@@ -351,28 +351,7 @@ If multiple players are above 110, the winner is determined as follows:
 
 ## Players
 
-All players in the game are represented by a class extending the base `Player` class. Each player must have a unique string identifier.
-
-### Player Types
-
-- `HumanPlayer`: Represents a person making manual decisions. The game will wait for these players to `act`.
-- `AutomatedPlayer`: An abstract base class for AI players. Subclasses must implement the `act(game_state)` method.
-- `NaiveAutomatedPlayer`: A built-in implementation of `AutomatedPlayer` that makes simple, rule-based decisions.
-
-### Custom Automated Players
-
-You can create custom AI by extending `AutomatedPlayer` and implementing the `act` method. This method receives a `GameState` object representing the game from that player's perspective.
-
-```python
-class MySmartPlayer(AutomatedPlayer):
-    def act(self, game_state: GameState) -> Optional[Action]:
-        # logic to determine the best action based on game_state
-        # for example, always play the first available card during tricks
-        if game_state.available_plays:
-            return game_state.available_plays[0]
-        # return None or another action for other phases
-```
-
+All players in the game are represented by a class extending an instance of the `Player` class. Each player must have a unique string identifier.
 
 ### Roles
 
@@ -380,20 +359,18 @@ class MySmartPlayer(AutomatedPlayer):
 
 ## Starting a Game
 
-### `Game.start_game`
+### `Game`
 
 Start a game by initializing a `Game` instance with a group of players. Use `HumanPlayer` for people and any subclass of `AutomatedPlayer` for machine play.
 
 ```python
 game = Game([
-    HumanPlayer('player_1'),
-    HumanPlayer('player_2'),
-    HumanPlayer('player_3'),
-    NaiveAutomatedPlayer('player_4'),
+    Player('player_1'),
+    Player('player_2'),
+    Player('player_3'),
+    Player('player_4'),
 ])
 ```
-
-Automated players will act automatically as soon as it is their turn. If a human action triggers a sequence of automated turns, they will all be processed before the `act` call returns.
 
 ## Determining the State of a Game
 
@@ -408,7 +385,7 @@ The status of the game can be one of the following values
 - `RoundStatus.COMPLETED`: The current round is complete with tricks won by the players. This should also be a transitionary state. Any game that reaches this state should either begin a new round and enter `RoundStatus.BIDDING` or determine a winner and enter `GameStatus.WON`
 - `GameStatus.WON`: The game is complete and a winner has been determined. No further actions are allowed.
 
-### `Game.active_round.active_player`
+### `Game.active_player`
 
 This field will hold the current active player.
 
@@ -459,7 +436,7 @@ from hundredandten.engine import Game, SelectTrump, SelectableSuit
 # set up and start the game
 # select a bidder
 
-# any of the four SelectableSuit value can be used
+# any of the four SelectableSuit values can be used
 game.act(SelectTrump('bidder', SelectableSuit.CLUBS))
 ```
 
@@ -494,26 +471,3 @@ from hundredandten.engine import Game, Play
 
 game.act(Play('active_player', game.active_round.active_player.hand[0]))
 ```
-
-## Automated Play
-
-Automated players in Hundred and Ten are first-class citizens. Instead of a simple "suggested action" API, the engine uses an observation-based architecture where automated players receive a "slice" of the game state and return an action.
-
-The act method will return all actions that occured as a result of that action. When there are no automated players, this will always be only the input action. With automated players, this will include the actions those players took automatically in response to the action, if any.
-
-### GameState Observation
-
-When an `AutomatedPlayer` is asked to act, it receives a `GameState` object. This object is seat-relative: the player taking the action is always at seat 0, and other seats are numbered clockwise from there.
-
-The `GameState` provides:
-- `hand`: The player's current cards.
-- `status`: The current phase of the round (Bidding, Trump Selection, etc.).
-- `table`: Information about scores, dealer position, and bidder position.
-- `bidding`: History of bids and the selected trump suit.
-- `tricks`: Information about completed tricks and the current in-progress trick.
-- `cards`: Knowledge about all cards in the deck (whether they are in hand, played, discarded, or unknown).
-- `available_actions`: A list of all legal actions the player can take.
-
-### Built-in AI
-
-The `NaiveAutomatedPlayer` provides a baseline AI that follows basic game rules (like bleeding) and makes simple bidding decisions based on hand strength. It is useful for testing or filling out a table.
