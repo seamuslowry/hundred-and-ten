@@ -5,11 +5,11 @@ from uuid import uuid4
 
 from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
-    AnyStatus,
     BidAmount,
     GameStatus,
     RoundStatus,
     SelectableSuit,
+    Status,
 )
 from hundredandten.engine.game import Game
 from hundredandten.engine.player import Player
@@ -17,7 +17,7 @@ from hundredandten.engine.trumps import trumps
 
 
 def game(
-    status: AnyStatus,
+    status: Status,
     massage: Callable[[Game], None] = lambda f_game: None,
     seed: Optional[str] = None,
 ) -> Game:
@@ -30,7 +30,7 @@ def game(
 
 
 def __game(
-    status: AnyStatus,
+    status: Status,
     massage: Callable[[Game], None] = lambda f_game: None,
     seed: Optional[str] = None,
 ) -> Game:

@@ -10,10 +10,10 @@ from uuid import UUID, uuid4
 from .actions import Action, Bid, Discard, Play, SelectTrump
 from .constants import (
     WINNING_SCORE,
-    AnyStatus,
     GameStatus,
     RoundStatus,
     SelectableSuit,
+    Status,
 )
 from .errors import HundredAndTenError
 from .player import (
@@ -44,7 +44,7 @@ class Game:
         self.__new_round(self.players[0].identifier)
 
     @property
-    def status(self) -> AnyStatus:
+    def status(self) -> Status:
         """The status property."""
         if self.winner:
             return GameStatus.WON

@@ -25,7 +25,7 @@ class RoundStatus(Enum):
     COMPLETED = 6
 
 
-AnyStatus = Union[GameStatus, RoundStatus]
+Status = Union[GameStatus, RoundStatus]
 
 
 class RoundRole(Enum):
