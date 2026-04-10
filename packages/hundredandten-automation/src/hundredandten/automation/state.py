@@ -47,16 +47,16 @@ class AvailableDiscard:
     identifying player data.
     """
 
-    cards: list[Card]
+    cards: tuple[Card, ...]
 
     @classmethod
     def from_engine(cls, d: Discard) -> Self:
         """Create a player-agnostic Discard representation from a player-aware representation"""
-        return cls(d.cards)
+        return cls(tuple(d.cards))
 
     def for_player(self, identifier: str) -> Discard:
         """Create a player-aware Discard representation from a player-agnostic representation"""
-        return Discard(identifier=identifier, cards=self.cards)
+        return Discard(identifier=identifier, cards=list(self.cards))
 
 
 @dataclass(frozen=True)
@@ -372,7 +372,7 @@ class GameState:
         )
 
         return cls(
-            status=game_round.status,
+            status=game.status,
             table=table,
             hand=tuple(player.hand),
             bidding=bidding,

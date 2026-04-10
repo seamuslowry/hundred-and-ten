@@ -62,7 +62,7 @@ def __suggested_discard(game_state: GameState) -> AvailableDiscard:
     """Return the suggested dicard action for the current player"""
 
     return AvailableDiscard(
-        list(__non_trumps(game_state.hand, game_state.trump)),
+        tuple(__non_trumps(game_state.hand, game_state.trump)),
     )
 
 
@@ -77,7 +77,14 @@ def __suggested_play(game_state: GameState) -> AvailablePlay:
     ):
         playable_cards = trumps(game_state.hand, game_state.trump) or playable_cards
 
-    best_played_card = next(map(lambda p: p.card, game_state.current_trick_plays), None)
+    # Find the current winning card (not just the lead card)
+    best_played_card = None
+    if game_state.current_trick_plays:
+        best_played_card = game_state.current_trick_plays[0].card
+        for play in game_state.current_trick_plays[1:]:
+            # Check if this card beats the current best
+            if __cards_beating([play.card], best_played_card, game_state.trump):
+                best_played_card = play.card
 
     if not best_played_card:
         # if you are the bidder and you can bleed, do so
