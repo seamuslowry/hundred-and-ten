@@ -26,10 +26,10 @@ from .state import (
 
 def action_for(game: Game, player: str) -> Action:
     """Return the naive action for the given player in this game"""
-    return action(GameState.from_game(game, player)).for_player(player)
+    return _action(GameState.from_game(game, player)).for_player(player)
 
 
-def action(state: GameState) -> AvailableAction:
+def _action(state: GameState) -> AvailableAction:
     """Return the suggested action given the game state"""
     if state.status == Status.BIDDING:
         return __suggested_bid(state)

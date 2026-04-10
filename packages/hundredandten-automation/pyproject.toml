@@ -7,7 +7,7 @@ name = "hundredandten-automation"
 version = "0.0.0"
 description = "Automated decision making for the game Hundred and Ten"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 authors = [
     { name = "Seamus Lowry" },
