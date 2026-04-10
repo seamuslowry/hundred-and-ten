@@ -1,7 +1,7 @@
 """Init the hundredandten module"""
 
 from .actions import Action, Bid, Discard, Play, SelectTrump
-from .constants import BidAmount, CardNumber, CardSuit, Status
+from .constants import BidAmount, CardNumber, CardSuit, SelectableSuit, Status
 from .deck import Card
 from .game import Game
 from .player import Player
@@ -17,6 +17,7 @@ __all__ = [
     "Bid",
     "BidAmount",
     "SelectTrump",
+    "SelectableSuit",
     "Discard",
     "Play",
     # Cards

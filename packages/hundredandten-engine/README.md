@@ -406,7 +406,7 @@ For example:
 
 ### `Game.winner`
 
-This field will hold the winner of the game, if the game is in `GameStatus.WON`. Otherwise, it will be `None`.
+This field will hold the winner of the game, if the game is in `Status.WON`. Otherwise, it will be `None`.
 
 ## Playing a Game
 

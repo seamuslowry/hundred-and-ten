@@ -101,29 +101,23 @@ class AvailablePlay:
         return Play(identifier=identifier, card=self.card)
 
 
-type AvailableAction = Union[
-    AvailableBid, AvailableSelectTrump, AvailableDiscard, AvailablePlay
-]
+type AvailableAction = Union[AvailableBid, AvailableSelectTrump, AvailableDiscard, AvailablePlay]
 
 
-class AvailableActionFactory:
-    """Factory class for creating player-agnostic actions from player-aware actions."""
-
-    @staticmethod
-    def from_engine(a: Action) -> AvailableAction:
-        """Create a player-agnostic Action from a player-aware Action."""
-        match a:
-            case Bid():
-                return AvailableBid.from_engine(a)
-            case SelectTrump():
-                return AvailableSelectTrump.from_engine(a)
-            case Discard():
-                return AvailableDiscard.from_engine(a)
-            case Play():
-                return AvailablePlay.from_engine(a)
-        raise ValueError(
-            f"Could not convert engine action {a} to an internal action"
-        )  # pragma: no cover
+def _available_action_from_engine(a: Action) -> AvailableAction:
+    """Create a player-agnostic Action from a player-aware Action."""
+    match a:
+        case Bid():
+            return AvailableBid.from_engine(a)
+        case SelectTrump():
+            return AvailableSelectTrump.from_engine(a)
+        case Discard():
+            return AvailableDiscard.from_engine(a)
+        case Play():
+            return AvailablePlay.from_engine(a)
+    raise ValueError(
+        f"Could not convert engine action {a} to an internal action"
+    )  # pragma: no cover
 
 
 @dataclass(frozen=True)
@@ -253,16 +247,12 @@ class GameState:
     @property
     def available_trump_selections(self) -> tuple[AvailableSelectTrump, ...]:
         """Return only SelectTrump actions from available_actions"""
-        return tuple(
-            a for a in self.available_actions if isinstance(a, AvailableSelectTrump)
-        )
+        return tuple(a for a in self.available_actions if isinstance(a, AvailableSelectTrump))
 
     @property
     def available_discards(self) -> tuple[AvailableDiscard, ...]:
         """Return only Discard actions from available_actions"""
-        return tuple(
-            a for a in self.available_actions if isinstance(a, AvailableDiscard)
-        )
+        return tuple(a for a in self.available_actions if isinstance(a, AvailableDiscard))
 
     @property
     def available_plays(self) -> tuple[AvailablePlay, ...]:
@@ -360,9 +350,7 @@ class GameState:
                 else None
             ),
             scores=tuple(
-                current_scores.get(
-                    players[(player_index + i) % num_players].identifier, 0
-                )
+                current_scores.get(players[(player_index + i) % num_players].identifier, 0)
                 for i in range(num_players)
             ),
         )
@@ -395,8 +383,7 @@ class GameState:
                 game_round, player, non_relative_seat_by_identifier
             ),
             available_actions=tuple(
-                AvailableActionFactory.from_engine(a)
-                for a in game.available_actions(identifier)
+                _available_action_from_engine(a) for a in game.available_actions(identifier)
             ),
         )
 

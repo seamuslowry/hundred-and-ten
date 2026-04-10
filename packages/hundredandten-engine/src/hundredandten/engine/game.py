@@ -63,9 +63,7 @@ class Game:
     def active_player(self) -> Player:
         """The active player"""
         return next(
-            p
-            for p in self.players
-            if p.identifier == self.active_round.active_player.identifier
+            p for p in self.players if p.identifier == self.active_round.active_player.identifier
         )
 
     @property
@@ -77,14 +75,10 @@ class Game:
         if not self._rounds or self.active_round.status != Status.COMPLETED:
             return None
 
-        winning_scores = [
-            score for score in self.score_history if score.value >= WINNING_SCORE
-        ]
+        winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
         ordered_winning_players = list(
             map(
-                lambda score: player_by_identifier(
-                    self.active_round.players, score.identifier
-                ),
+                lambda score: player_by_identifier(self.active_round.players, score.identifier),
                 winning_scores,
             )
         )
@@ -149,10 +143,7 @@ class Game:
         """Return all actions available to the player currently"""
         game_round = self.active_round
         player = player_by_identifier(game_round.players, identifier)
-        if (
-            self.status == Status.WON
-            or game_round.active_player.identifier != player.identifier
-        ):
+        if self.status == Status.WON or game_round.active_player.identifier != player.identifier:
             return ()
 
         if game_round.status == Status.BIDDING:
@@ -162,9 +153,7 @@ class Game:
             )
 
         if game_round.status == Status.TRUMP_SELECTION:
-            return tuple(
-                SelectTrump(player.identifier, suit) for suit in SelectableSuit
-            )
+            return tuple(SelectTrump(player.identifier, suit) for suit in SelectableSuit)
 
         if game_round.status == Status.DISCARD:
             hand_list = list(player.hand)
@@ -184,6 +173,8 @@ class Game:
 
     def __act(self, action: Action) -> None:
         """Perform an action as a player of the game"""
+        if self.status == Status.WON:
+            return
         self.active_round.act(action)
         # handle creation of new round if appropriate
         if isinstance(action, Bid):
@@ -249,7 +240,7 @@ class Game:
 
         return score_history
 
-    def __scores(self, to_round) -> dict[str, int]:
+    def __scores(self, to_round: int) -> dict[str, int]:
         """
         The scores each player earned for this game up to the provided round
         A dictionary in the form
