@@ -47,11 +47,15 @@ def players_by_role(players: list[RoundPlayer], role: RoundRole) -> list[RoundPl
     return [p for p in players if role in p.roles]
 
 
-def add_player_role(players: list[RoundPlayer], identifier: str, role: RoundRole) -> None:
+def add_player_role(
+    players: list[RoundPlayer], identifier: str, role: RoundRole
+) -> None:
     """Add the provided role to the player with the given identifier."""
     player_by_identifier(players, identifier).roles.add(role)
 
 
-def remove_player_role(players: list[RoundPlayer], identifier: str, role: RoundRole) -> None:
+def remove_player_role(
+    players: list[RoundPlayer], identifier: str, role: RoundRole
+) -> None:
     """Remove the provided role from the player with the given identifier."""
     player_by_identifier(players, identifier).roles.discard(role)

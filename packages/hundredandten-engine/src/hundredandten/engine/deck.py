@@ -34,7 +34,9 @@ card_info = {
         CardNumber.JACK: CardInfo(trump_value=13, weak_trump_value=9),
         CardNumber.QUEEN: CardInfo(trump_value=8, weak_trump_value=10),
         CardNumber.KING: CardInfo(trump_value=9, weak_trump_value=11),
-        CardNumber.ACE: CardInfo(trump_value=11, weak_trump_value=12, always_trump=True),
+        CardNumber.ACE: CardInfo(
+            trump_value=11, weak_trump_value=12, always_trump=True
+        ),
     },
     CardSuit.DIAMONDS: {
         CardNumber.TWO: CardInfo(trump_value=0, weak_trump_value=0),
@@ -82,7 +84,9 @@ card_info = {
         CardNumber.ACE: CardInfo(trump_value=10, weak_trump_value=12),
     },
     CardSuit.JOKER: {
-        CardNumber.JOKER: CardInfo(trump_value=12, weak_trump_value=12, always_trump=True)
+        CardNumber.JOKER: CardInfo(
+            trump_value=12, weak_trump_value=12, always_trump=True
+        )
     },
 }
 
@@ -114,7 +118,9 @@ class Card:
 
 
 defined_cards = [
-    Card(number, suit) for (suit, number_dict) in card_info.items() for number in number_dict
+    Card(number, suit)
+    for (suit, number_dict) in card_info.items()
+    for number in number_dict
 ]
 
 

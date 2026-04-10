@@ -147,7 +147,9 @@ class TestGameStateBidding(TestCase):
         state = GameState.from_game(game, active.identifier)
 
         self.assertTrue(len(state.available_actions) > 0)
-        self.assertTrue(all(isinstance(a, AvailableBid) for a in state.available_actions))
+        self.assertTrue(
+            all(isinstance(a, AvailableBid) for a in state.available_actions)
+        )
 
     def test_no_actions_for_inactive_player(self):
         """Inactive player has no available actions"""
@@ -234,7 +236,10 @@ class TestGameStateTrumpSelection(TestCase):
 
         self.assertEqual(len(state.available_trump_selections), 4)
         self.assertTrue(
-            all(isinstance(a, AvailableSelectTrump) for a in state.available_trump_selections)
+            all(
+                isinstance(a, AvailableSelectTrump)
+                for a in state.available_trump_selections
+            )
         )
 
     def test_no_actions_for_non_bidder(self):
@@ -307,7 +312,9 @@ class TestGameStateDiscard(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        full_discards = [d for d in state.available_discards if len(d.cards) == HAND_SIZE]
+        full_discards = [
+            d for d in state.available_discards if len(d.cards) == HAND_SIZE
+        ]
         self.assertEqual(len(full_discards), 1)
 
     def test_own_discards_visible_after_discard(self):
@@ -318,7 +325,9 @@ class TestGameStateDiscard(TestCase):
         game.act(Discard(active.identifier, discarded_cards))
 
         state = GameState.from_game(game, active.identifier)
-        discarded_in_state = [ck.card for ck in state.cards if isinstance(ck.status, Discarded)]
+        discarded_in_state = [
+            ck.card for ck in state.cards if isinstance(ck.status, Discarded)
+        ]
         self.assertCountEqual(discarded_in_state, discarded_cards)
         # Verify all discarded cards show seat=0 (own seat)
         for ck in state.cards:
@@ -360,7 +369,9 @@ class TestGameStateTricks(TestCase):
         state = GameState.from_game(game, active.identifier)
 
         self.assertTrue(len(state.available_plays) > 0)
-        self.assertTrue(all(isinstance(a, AvailablePlay) for a in state.available_plays))
+        self.assertTrue(
+            all(isinstance(a, AvailablePlay) for a in state.available_plays)
+        )
 
     def test_play_actions_match_hand(self):
         """Play actions correspond to cards in hand (when not bleeding)"""
@@ -506,7 +517,9 @@ class TestGameStateConvenienceProperties(TestCase):
     def test_is_dealer_false_for_non_dealer(self):
         """is_dealer returns False for non-dealers"""
         game = arrange.game(Status.BIDDING, seed=SEED)
-        non_dealer = next(p for p in game.active_round.players if p != game.active_round.dealer)
+        non_dealer = next(
+            p for p in game.active_round.players if p != game.active_round.dealer
+        )
         state = GameState.from_game(game, non_dealer.identifier)
 
         self.assertFalse(state.is_dealer)

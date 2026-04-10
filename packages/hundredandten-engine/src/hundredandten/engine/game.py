@@ -63,7 +63,9 @@ class Game:
     def active_player(self) -> Player:
         """The active player"""
         return next(
-            p for p in self.players if p.identifier == self.active_round.active_player.identifier
+            p
+            for p in self.players
+            if p.identifier == self.active_round.active_player.identifier
         )
 
     @property
@@ -75,10 +77,14 @@ class Game:
         if not self._rounds or self.active_round.status != Status.COMPLETED:
             return None
 
-        winning_scores = [score for score in self.score_history if score.value >= WINNING_SCORE]
+        winning_scores = [
+            score for score in self.score_history if score.value >= WINNING_SCORE
+        ]
         ordered_winning_players = list(
             map(
-                lambda score: player_by_identifier(self.active_round.players, score.identifier),
+                lambda score: player_by_identifier(
+                    self.active_round.players, score.identifier
+                ),
                 winning_scores,
             )
         )
@@ -143,7 +149,10 @@ class Game:
         """Return all actions available to the player currently"""
         game_round = self.active_round
         player = player_by_identifier(game_round.players, identifier)
-        if self.status == Status.WON or game_round.active_player.identifier != player.identifier:
+        if (
+            self.status == Status.WON
+            or game_round.active_player.identifier != player.identifier
+        ):
             return ()
 
         if game_round.status == Status.BIDDING:
@@ -153,7 +162,9 @@ class Game:
             )
 
         if game_round.status == Status.TRUMP_SELECTION:
-            return tuple(SelectTrump(player.identifier, suit) for suit in SelectableSuit)
+            return tuple(
+                SelectTrump(player.identifier, suit) for suit in SelectableSuit
+            )
 
         if game_round.status == Status.DISCARD:
             hand_list = list(player.hand)
