@@ -43,7 +43,7 @@ class TestGameStateBidding(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertEqual(state.num_players, 4)
+        self.assertEqual(state.table.num_players, 4)
 
     def test_self_is_seat_zero(self):
         """The requesting player is always seat 0"""
@@ -63,7 +63,7 @@ class TestGameStateBidding(TestCase):
         for i, player in enumerate(players):
             state = GameState.from_game(game, player.identifier)
             expected_dealer_seat = (dealer_index - i) % len(players)
-            self.assertEqual(state.dealer_seat, expected_dealer_seat)
+            self.assertEqual(state.table.dealer_seat, expected_dealer_seat)
 
     def test_hand_matches_player(self):
         """Hand in state matches the requesting player's actual hand"""
@@ -105,7 +105,7 @@ class TestGameStateBidding(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertIsNone(state.bidder_seat)
+        self.assertIsNone(state.table.bidder_seat)
 
     def test_bid_history_empty_at_start(self):
         """No bids placed yet"""
@@ -113,7 +113,7 @@ class TestGameStateBidding(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertEqual(len(state.bid_history), 0)
+        self.assertEqual(len(state.bidding.bid_history), 0)
 
     def test_active_bid_none_at_start(self):
         """No active bid yet"""
@@ -121,7 +121,7 @@ class TestGameStateBidding(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertIsNone(state.active_bid)
+        self.assertIsNone(state.bidding.active_bid)
 
     def test_trump_none_during_bidding(self):
         """Trump is not yet selected"""
@@ -129,7 +129,7 @@ class TestGameStateBidding(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertIsNone(state.trump)
+        self.assertIsNone(state.bidding.trump)
 
     def test_no_tricks_during_bidding(self):
         """No tricks have been played"""
@@ -137,8 +137,8 @@ class TestGameStateBidding(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertEqual(len(state.completed_tricks), 0)
-        self.assertEqual(len(state.current_trick_plays), 0)
+        self.assertEqual(len(state.tricks.completed_tricks), 0)
+        self.assertEqual(len(state.tricks.current_trick_plays), 0)
 
     def test_available_actions_for_active_player(self):
         """Active player has bid actions available"""
@@ -175,8 +175,8 @@ class TestGameStateBidding(TestCase):
         new_active = game.active_round.active_player
         state = GameState.from_game(game, new_active.identifier)
 
-        self.assertEqual(len(state.bid_history), 1)
-        self.assertEqual(state.bid_history[0].amount, BidAmount.PASS)
+        self.assertEqual(len(state.bidding.bid_history), 1)
+        self.assertEqual(state.bidding.bid_history[0].amount, BidAmount.PASS)
 
     def test_scores_start_at_zero(self):
         """All scores start at 0"""
@@ -184,7 +184,7 @@ class TestGameStateBidding(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertEqual(state.scores, (0, 0, 0, 0))
+        self.assertEqual(state.table.scores, (0, 0, 0, 0))
 
     def test_is_bidder_false_during_bidding(self):
         """is_bidder is False when no bidder determined yet"""
@@ -213,7 +213,7 @@ class TestGameStateTrumpSelection(TestCase):
         assert bidder is not None
         state = GameState.from_game(game, bidder.identifier)
 
-        self.assertEqual(state.bidder_seat, 0)
+        self.assertEqual(state.table.bidder_seat, 0)
         self.assertTrue(state.is_bidder)
 
     def test_bidder_seat_nonzero_for_non_bidder(self):
@@ -222,7 +222,7 @@ class TestGameStateTrumpSelection(TestCase):
         non_bidder = game.active_round.inactive_players[0]
         state = GameState.from_game(game, non_bidder.identifier)
 
-        self.assertNotEqual(state.bidder_seat, 0)
+        self.assertNotEqual(state.table.bidder_seat, 0)
         self.assertFalse(state.is_bidder)
 
     def test_available_trump_selections(self):
@@ -251,7 +251,7 @@ class TestGameStateTrumpSelection(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertTrue(len(state.bid_history) > 0)
+        self.assertTrue(len(state.bidding.bid_history) > 0)
 
     def test_active_bid_set(self):
         """Active bid is set after bidding is complete"""
@@ -259,7 +259,7 @@ class TestGameStateTrumpSelection(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertIsNotNone(state.active_bid)
+        self.assertIsNotNone(state.bidding.active_bid)
 
 
 class TestGameStateDiscard(TestCase):
@@ -279,7 +279,7 @@ class TestGameStateDiscard(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertIsNotNone(state.trump)
+        self.assertIsNotNone(state.bidding.trump)
 
     def test_available_discards_for_active_player(self):
         """Active player has discard options (2^hand_size subsets)"""
@@ -397,7 +397,7 @@ class TestGameStateTricks(TestCase):
         next_active = game.active_round.active_player
         state = GameState.from_game(game, next_active.identifier)
 
-        self.assertEqual(len(state.current_trick_plays), 1)
+        self.assertEqual(len(state.tricks.current_trick_plays), 1)
 
     def test_completed_trick_after_full_trick(self):
         """After all players play, trick moves to completed_tricks"""
@@ -407,9 +407,9 @@ class TestGameStateTricks(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        self.assertEqual(len(state.completed_tricks), 1)
-        self.assertIsInstance(state.completed_tricks[0], CompletedTrick)
-        self.assertEqual(len(state.completed_tricks[0].plays), 4)
+        self.assertEqual(len(state.tricks.completed_tricks), 1)
+        self.assertIsInstance(state.tricks.completed_tricks[0], CompletedTrick)
+        self.assertEqual(len(state.tricks.completed_tricks[0].plays), 4)
 
     def test_completed_trick_has_winner(self):
         """Completed trick records the winner's relative seat"""
@@ -419,7 +419,7 @@ class TestGameStateTricks(TestCase):
         active = game.active_round.active_player
         state = GameState.from_game(game, active.identifier)
 
-        winner_seat = state.completed_tricks[0].winner_seat
+        winner_seat = state.tricks.completed_tricks[0].winner_seat
         self.assertGreaterEqual(winner_seat, 0)
         self.assertLess(winner_seat, 4)
 
@@ -448,7 +448,7 @@ class TestGameStateSeatNormalization(TestCase):
             state = GameState.from_game(game, player.identifier)
             expected = (dealer_abs - i) % len(players)
             self.assertEqual(
-                state.dealer_seat,
+                state.table.dealer_seat,
                 expected,
                 f"Player {i} should see dealer at seat {expected}",
             )
@@ -461,13 +461,13 @@ class TestGameStateSeatNormalization(TestCase):
 
         # The player who just bid sees themselves as seat 0
         state_self = GameState.from_game(game, active.identifier)
-        self.assertEqual(state_self.bid_history[0].seat, 0)
+        self.assertEqual(state_self.bidding.bid_history[0].seat, 0)
 
         # A different player sees the bidder at a non-zero seat
         other = game.active_round.inactive_players[-1]
         if other.identifier != active.identifier:
             state_other = GameState.from_game(game, other.identifier)
-            self.assertNotEqual(state_other.bid_history[0].seat, 0)
+            self.assertNotEqual(state_other.bidding.bid_history[0].seat, 0)
 
 
 class TestGameStateImmutability(TestCase):

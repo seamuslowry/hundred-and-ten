@@ -269,51 +269,6 @@ class GameState:
         """Return True if the active player is the dealer"""
         return self.table.dealer_seat == 0
 
-    @property
-    def num_players(self) -> int:
-        """Return the number of players at the table"""
-        return self.table.num_players
-
-    @property
-    def dealer_seat(self) -> int:
-        """Return the dealer seat relative to the active player"""
-        return self.table.dealer_seat
-
-    @property
-    def bidder_seat(self) -> Optional[int]:
-        """Return the bidder seat relative to the active player"""
-        return self.table.bidder_seat
-
-    @property
-    def scores(self) -> tuple[int, ...]:
-        """Return scores ordered by relative seat (index 0 = self, increasing clockwise)"""
-        return self.table.scores
-
-    @property
-    def bid_history(self) -> tuple[BidEvent, ...]:
-        """Return bids placed so far in relative-seat order"""
-        return self.bidding.bid_history
-
-    @property
-    def active_bid(self) -> Optional[BidAmount]:
-        """Return the current high bid"""
-        return self.bidding.active_bid
-
-    @property
-    def trump(self) -> Optional[SelectableSuit]:
-        """Return the selected trump suit"""
-        return self.bidding.trump
-
-    @property
-    def completed_tricks(self) -> tuple[CompletedTrick, ...]:
-        """Return completed tricks with relative winner seats"""
-        return self.tricks.completed_tricks
-
-    @property
-    def current_trick_plays(self) -> tuple[TrickPlay, ...]:
-        """Return plays in the current in-progress trick"""
-        return self.tricks.current_trick_plays
-
     @classmethod
     def from_game(cls, game: Game, identifier: str) -> Self:
         """Build a GameState observation for the identified player.
