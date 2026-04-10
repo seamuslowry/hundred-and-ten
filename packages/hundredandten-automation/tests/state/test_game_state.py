@@ -526,3 +526,21 @@ class TestGameStateConvenienceProperties(TestCase):
         state = GameState.from_game(game, active.identifier)
 
         self.assertEqual(len(state.available_discards), 0)
+
+
+class TestGameStateWon(TestCase):
+    """Test GameState when game is won"""
+
+    def test_status_is_won(self):
+        """GameState.status reflects game WON status"""
+        game = arrange.game(Status.WON, seed=SEED)
+        state = GameState.from_game(game, game.players[0].identifier)
+
+        self.assertEqual(state.status, Status.WON)
+
+    def test_available_actions_empty_when_won(self):
+        """No actions available when game is won"""
+        game = arrange.game(Status.WON, seed=SEED)
+        state = GameState.from_game(game, game.players[0].identifier)
+
+        self.assertEqual(len(state.available_actions), 0)
