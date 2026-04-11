@@ -1,6 +1,7 @@
 """Represent the state of a game as observed by a single player"""
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import Self
 
 from hundredandten.deck import Card, SelectableSuit, defined_cards
@@ -12,9 +13,28 @@ from hundredandten.engine.actions import (
     Play,
     SelectTrump,
 )
-from hundredandten.engine.constants import BidAmount, Status
+from hundredandten.engine.constants import BidAmount as EngineBidAmount
 from hundredandten.engine.player import RoundPlayer, player_by_identifier
 from hundredandten.engine.round import Round
+
+
+class StateError(Exception):
+    """Raised when a state operation cannot be completed"""
+
+
+class Status(Enum):
+    """Game status as observed by a player"""
+
+    BIDDING = 1
+    TRUMP_SELECTION = 2
+    COMPLETED_NO_BIDDERS = 3
+    TRICKS = 4
+    DISCARD = 5
+    COMPLETED = 6
+    WON = 7
+
+
+type BidAmount = int
 
 
 @dataclass(frozen=True)
@@ -31,11 +51,11 @@ class AvailableBid:
     @classmethod
     def from_engine(cls, b: Bid) -> Self:
         """Create a player-agnostic Bid representation from a player-aware representation"""
-        return cls(b.amount)
+        return cls(int(b.amount))
 
     def for_player(self, identifier: str) -> Bid:
         """Create a player-aware Bid representation from a player-agnostic representation"""
-        return Bid(identifier=identifier, amount=self.amount)
+        return Bid(identifier=identifier, amount=EngineBidAmount(self.amount))
 
 
 @dataclass(frozen=True)
@@ -324,16 +344,20 @@ class GameState:
                         bid.identifier,
                         num_players,
                     ),
-                    amount=bid.amount,
+                    amount=int(bid.amount),
                 )
                 for bid in game_round.bids
             ),
-            active_bid=game_round.active_bid,
+            active_bid=(
+                int(game_round.active_bid)
+                if game_round.active_bid is not None
+                else None
+            ),
             trump=game_round.trump,
         )
 
         return cls(
-            status=game.status,
+            status=Status(game.status.value),
             table=table,
             hand=tuple(player.hand),
             bidding=bidding,

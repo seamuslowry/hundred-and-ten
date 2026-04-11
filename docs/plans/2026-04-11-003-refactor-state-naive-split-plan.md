@@ -1,7 +1,7 @@
 ---
 title: "refactor: Extract hundredandten-state and hundredandten-automation-naive from hundredandten-automation"
 type: refactor
-status: active
+status: completed
 date: 2026-04-11
 origin: docs/brainstorms/2026-04-11-package-restructure-for-gym-requirements.md
 depends_on: docs/plans/2026-04-11-002-refactor-deck-extraction-plan.md
@@ -212,7 +212,7 @@ Dependency graph (post both plans):
 
 ## Implementation Units
 
-- [ ] **Unit 1: Create `hundredandten-state` package**
+- [x] **Unit 1: Create `hundredandten-state` package**
 
 **Goal:** Stand up the `hundredandten-state` package: `pyproject.toml`, `README.md`, `__init__.py`, and a revised `state.py` that owns `BidAmount`, `Status`, `StateError` and imports card types from deck.
 
@@ -260,7 +260,7 @@ Dependency graph (post both plans):
 
 ---
 
-- [ ] **Unit 2: Create `hundredandten-automation-naive` package**
+- [x] **Unit 2: Create `hundredandten-automation-naive` package**
 
 **Goal:** Stand up `hundredandten-automation-naive`: `pyproject.toml`, `README.md`, and a revised `naive.py` that imports only deck and state in strategy logic.
 
@@ -313,7 +313,7 @@ Other changes:
 
 ---
 
-- [ ] **Unit 3: Update root config and `uv sync`**
+- [x] **Unit 3: Update root config and `uv sync`**
 
 **Goal:** Register the two new packages in root `pyproject.toml`, deregister `hundredandten-automation`, and sync the environment.
 
@@ -347,7 +347,7 @@ Then `uv sync --all-groups --all-packages`. Commit updated `uv.lock`.
 
 ---
 
-- [ ] **Unit 4: Migrate state tests**
+- [x] **Unit 4: Migrate state tests**
 
 **Goal:** Move `tests/state/` from `hundredandten-automation` to `hundredandten-state` and update imports.
 
@@ -374,7 +374,7 @@ Do NOT create a top-level `tests/__init__.py`.
 
 ---
 
-- [ ] **Unit 5: Migrate naive tests**
+- [x] **Unit 5: Migrate naive tests**
 
 **Goal:** Move `tests/naive/` from `hundredandten-automation` to `hundredandten-automation-naive` and update any `BidAmount` references.
 
@@ -400,7 +400,7 @@ Do NOT create a top-level `tests/__init__.py`.
 
 ---
 
-- [ ] **Unit 6: Delete `hundredandten-automation` package**
+- [x] **Unit 6: Delete `hundredandten-automation` package**
 
 **Goal:** Remove the old package directory.
 
@@ -418,7 +418,7 @@ Do NOT create a top-level `tests/__init__.py`.
 
 ---
 
-- [ ] **Unit 7: Update CI workflows, AGENTS.md, and clean up workspace root**
+- [x] **Unit 7: Update CI workflows, AGENTS.md, and clean up workspace root**
 
 **Goal:** Update deploy workflows for three new packages, update AGENTS.md, remove stray pycache.
 
@@ -444,7 +444,7 @@ Do NOT create a top-level `tests/__init__.py`.
 
 ---
 
-- [ ] **Unit 8: Full verification pass**
+- [x] **Unit 8: Full verification pass**
 
 **Goal:** All tests, coverage, type checking, and builds pass.
 

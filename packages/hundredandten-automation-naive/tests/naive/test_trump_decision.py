@@ -3,8 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.automation.naive import desired_trump
-from hundredandten.deck import CardNumber, CardSuit, SelectableSuit
-from hundredandten.engine.deck import Card
+from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit
 
 
 class TestTrumpDecision(TestCase):

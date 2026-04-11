@@ -3,9 +3,9 @@ requires = ["uv_build>=0.11.2,<0.12"]
 build-backend = "uv_build"
 
 [project]
-name = "hundredandten-automation"
+name = "hundredandten-automation-naive"
 version = "0.0.0"
-description = "Automated decision making for the game Hundred and Ten"
+description = "Naive strategy player for the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.12"
 license = {text = "MIT"}
@@ -16,10 +16,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
 ]
-dependencies = [
-    "hundredandten-deck>=0.0.0,<1.0.0",
-    "hundredandten-engine>=0.0.0,<1.0.0"
-]
+dependencies = ["hundredandten-state>=0.0.0,<1.0.0", "hundredandten-deck>=0.0.0,<1.0.0"]
 
 [tool.uv.build-backend]
-module-name = "hundredandten.automation"
+module-name = "hundredandten.automation.naive"

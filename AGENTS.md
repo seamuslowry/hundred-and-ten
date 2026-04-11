@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Hundred and Ten is a Python implementation of the trick-taking card game "Hundred and Ten", organized as a **uv workspace monorepo** with four packages. The project targets **Python 3.12+** and uses PEP 695 type alias syntax.
+Hundred and Ten is a Python implementation of the trick-taking card game "Hundred and Ten", organized as a **uv workspace monorepo** with five packages. The project targets **Python 3.12+** and uses PEP 695 type alias syntax.
 
 ## Repository Structure
 
@@ -35,13 +35,17 @@ Hundred and Ten is a Python implementation of the trick-taking card game "Hundre
 │   │       ├── trick/              # Trick resolution tests
 │   │       └── people/             # Player model tests
 │   │
-│   ├── hundredandten-automation/   # AI players and game state
-│   │   ├── src/hundredandten/automation/
-│   │   │   ├── __init__.py         # Public API (GameState, naive_action_for)
-│   │   │   ├── state.py            # GameState: player-agnostic observation
-│   │   │   └── naive.py            # Naive AI decision making
+│   ├── hundredandten-state/        # Player observation layer
+│   │   ├── src/hundredandten/state/
+│   │   │   ├── __init__.py         # Public API exports
+│   │   │   └── state.py            # GameState, Status, BidAmount, StateError, AvailableAction types
 │   │   └── tests/
-│   │       ├── state/              # GameState construction tests
+│   │       └── state/              # GameState construction tests
+│   │
+│   ├── hundredandten-automation-naive/  # Naive AI strategy
+│   │   ├── src/hundredandten/automation/naive/
+│   │   │   └── __init__.py         # action_for, max_bid, desired_trump, best_card, worst_card
+│   │   └── tests/
 │   │       └── naive/              # AI decision tests
 │   │
 │   └── hundredandten-testing/      # Shared test utilities (internal)
@@ -75,7 +79,7 @@ BIDDING → TRUMP_SELECTION → DISCARD → TRICKS → (COMPLETED → BIDDING...
 
 All game mutations go through `Game.act(action)` where `action` is one of: `Bid`, `SelectTrump`, `Discard`, `Play`.
 
-### GameState (Automation Package)
+### GameState (State Package)
 
 `GameState.from_game(game, player_id)` produces a player-agnostic observation:
 - All seats are **relative** (requesting player is always seat 0)
@@ -130,15 +134,16 @@ uv build --all-packages
 
 ### Testing
 - Framework: pytest with `--import-mode=importlib`
-- Test paths: `packages/hundredandten-deck/tests/`, `packages/hundredandten-engine/tests/`, `packages/hundredandten-automation/tests/`
+- Test paths: `packages/hundredandten-deck/tests/`, `packages/hundredandten-engine/tests/`, `packages/hundredandten-state/tests/`, `packages/hundredandten-automation-naive/tests/`
 - Shared fixtures: `hundredandten.testing.arrange` (use `arrange.game(Status.X, seed=...)` to set up games at any phase)
 - Coverage: 100% required (configured in pyproject.toml)
 
 ### Architecture
 - Deck package has **no dependencies**
 - Engine depends on deck
-- Automation depends on engine (and transitively on deck)
-- Testing depends on engine (used by both engine and automation test suites)
+- State depends on deck and engine (engine only for `from_game` bridge)
+- Automation-naive depends on state and deck (no direct engine dep)
+- Testing depends on engine (used by both engine and automation-naive test suites)
 - Frozen dataclasses throughout -- use `field(default_factory=...)` for mutable defaults
 - GameState nested structure: `table` (TableInfo), `bidding` (BiddingState), `tricks` (TrickState)
 - Convenience properties `is_bidder` and `is_dealer` exist on GameState; all other fields accessed via nested objects
@@ -159,4 +164,4 @@ Reference material, external documentation, and supporting artifacts.
 
 ## Future Direction
 
-The automation package's `GameState` is designed as the source of truth for a future **ML training gym**. The player-agnostic, identity-stripped representation with full card tracking is intentional -- it will serve as the observation space for reinforcement learning agents. The `naive` module is the first baseline strategy; future strategies will build on the same `GameState` interface.
+The state package's `GameState` is designed as the source of truth for a future **ML training gym**. The player-agnostic, identity-stripped representation with full card tracking is intentional -- it will serve as the observation space for reinforcement learning agents. The `naive` module is the first baseline strategy; future strategies will build on the same `GameState` interface.

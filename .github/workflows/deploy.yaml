@@ -22,5 +22,6 @@ jobs:
         run: |
           uv build --package hundredandten-deck
           uv build --package hundredandten-engine
-          uv build --package hundredandten-automation
+          uv build --package hundredandten-state
+          uv build --package hundredandten-automation-naive
           uv publish

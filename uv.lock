@@ -4,9 +4,10 @@ requires-python = ">=3.12"
 
 [manifest]
 members = [
-    "hundredandten-automation",
+    "hundredandten-automation-naive",
     "hundredandten-deck",
     "hundredandten-engine",
+    "hundredandten-state",
     "hundredandten-testing",
 ]
 
@@ -179,18 +180,18 @@ wheels = [
 ]
 
 [[package]]
-name = "hundredandten-automation"
+name = "hundredandten-automation-naive"
 version = "0.0.0"
-source = { editable = "packages/hundredandten-automation" }
+source = { editable = "packages/hundredandten-automation-naive" }
 dependencies = [
     { name = "hundredandten-deck" },
-    { name = "hundredandten-engine" },
+    { name = "hundredandten-state" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "hundredandten-deck", editable = "packages/hundredandten-deck" },
-    { name = "hundredandten-engine", editable = "packages/hundredandten-engine" },
+    { name = "hundredandten-state", editable = "packages/hundredandten-state" },
 ]
 
 [[package]]
@@ -208,6 +209,21 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [{ name = "hundredandten-deck", editable = "packages/hundredandten-deck" }]
+
+[[package]]
+name = "hundredandten-state"
+version = "0.0.0"
+source = { editable = "packages/hundredandten-state" }
+dependencies = [
+    { name = "hundredandten-deck" },
+    { name = "hundredandten-engine" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "hundredandten-deck", editable = "packages/hundredandten-deck" },
+    { name = "hundredandten-engine", editable = "packages/hundredandten-engine" },
+]
 
 [[package]]
 name = "hundredandten-testing"

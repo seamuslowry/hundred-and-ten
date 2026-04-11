@@ -4,20 +4,17 @@ from collections.abc import Sequence
 
 from hundredandten.deck import Card, CardNumber, SelectableSuit, bleeds, trumps
 from hundredandten.engine.actions import Action
-from hundredandten.engine.constants import (
-    BidAmount,
-    Status,
-)
-from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.game import Game
-
-from .state import (
+from hundredandten.state import (
     AvailableAction,
     AvailableBid,
     AvailableDiscard,
     AvailablePlay,
     AvailableSelectTrump,
+    BidAmount,
     GameState,
+    StateError,
+    Status,
 )
 
 
@@ -36,7 +33,7 @@ def _action(state: GameState) -> AvailableAction:
         return __suggested_discard(state)
     if state.status == Status.TRICKS:
         return __suggested_play(state)
-    raise HundredAndTenError(f"Cannot automate the action in status {state.status}")
+    raise StateError(f"Cannot automate the action in status {state.status}")
 
 
 def __suggested_bid(game_state: GameState) -> AvailableBid:
@@ -46,7 +43,7 @@ def __suggested_bid(game_state: GameState) -> AvailableBid:
     available_bids = [b.amount for b in game_state.available_bids]
     willing_bids = [b for b in available_bids if b and b <= maximum_bid]
 
-    return AvailableBid(next(iter(willing_bids), BidAmount.PASS))
+    return AvailableBid(next(iter(willing_bids), 0))
 
 
 def __suggested_trump_selection(game_state: GameState) -> AvailableSelectTrump:
@@ -113,17 +110,17 @@ def max_bid(cards: Sequence[Card]) -> BidAmount:
     best_value = __most_valuable_suit(cards)[1]
 
     if best_value > 50:
-        return BidAmount.SHOOT_THE_MOON
+        return 60
     if best_value > 40:
-        return BidAmount.THIRTY
+        return 30
     if best_value > 30:
-        return BidAmount.TWENTY_FIVE
+        return 25
     if best_value > 25:
-        return BidAmount.TWENTY
+        return 20
     if best_value > 20:
-        return BidAmount.FIFTEEN
+        return 15
 
-    return BidAmount.PASS
+    return 0
 
 
 def desired_trump(cards: Sequence[Card]) -> SelectableSuit:
