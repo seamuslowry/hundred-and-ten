@@ -2,8 +2,8 @@
 
 from unittest import TestCase
 
+from hundredandten.deck import CardNumber, CardSuit, SelectableSuit
 from hundredandten.engine.actions import Play
-from hundredandten.engine.constants import CardNumber, CardSuit, SelectableSuit
 from hundredandten.engine.deck import Card
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.trick import Trick

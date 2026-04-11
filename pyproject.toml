@@ -27,13 +27,13 @@ lint.extend-select = ["I"]
 target-version = ["py314"]
 
 [tool.pytest.ini_options]
-testpaths = ["packages/hundredandten-engine", "packages/hundredandten-automation"]
+testpaths = ["packages/hundredandten-engine", "packages/hundredandten-automation", "packages/hundredandten-deck"]
 addopts = [
     "--import-mode=importlib",
 ]
 
 [tool.coverage.run]
-source = ["hundredandten.engine", "hundredandten.automation"]
+source = ["hundredandten.engine", "hundredandten.automation", "hundredandten.deck"]
 omit = ["*/tests/*", "*/hundredandten/testing/*", "*/hundredandten-testing/*"]
 branch = true
 
@@ -47,6 +47,7 @@ check-url = "https://pypi.org/simple/"
 hundredandten-engine = { workspace = true }
 hundredandten-automation = { workspace = true }
 hundredandten-testing = { workspace = true }
+hundredandten-deck = { workspace = true }
 
 [[tool.uv.index]]
 name = "testpypi"

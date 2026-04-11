@@ -3,7 +3,6 @@
 from unittest import TestCase
 
 from hundredandten.engine.deck import Deck
-from hundredandten.engine.errors import HundredAndTenError
 
 
 class TestDeck(TestCase):
@@ -61,7 +60,7 @@ class TestDeck(TestCase):
 
         deck = Deck()
 
-        self.assertRaises(HundredAndTenError, deck.draw, 54)
+        self.assertRaises(ValueError, deck.draw, 54)
 
     def test_overdraw(self):
         """Drawing past the whole deck returns an error"""
@@ -69,11 +68,11 @@ class TestDeck(TestCase):
         deck = Deck()
 
         deck.draw(53)
-        self.assertRaises(HundredAndTenError, deck.draw, 1)
+        self.assertRaises(ValueError, deck.draw, 1)
 
     def test_underdraw(self):
         """Trying to draw drawn cards returns an error"""
 
         deck = Deck()
 
-        self.assertRaises(HundredAndTenError, deck.draw, -1)
+        self.assertRaises(ValueError, deck.draw, -1)

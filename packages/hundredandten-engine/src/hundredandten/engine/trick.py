@@ -3,10 +3,10 @@
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
+from hundredandten.deck import CardSuit, SelectableSuit
 from hundredandten.engine.errors import HundredAndTenError
 
 from .actions import Play
-from .constants import CardSuit, SelectableSuit
 from .deck import Card
 from .trumps import bleeds
 

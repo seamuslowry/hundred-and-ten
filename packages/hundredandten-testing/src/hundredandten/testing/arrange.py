@@ -3,10 +3,10 @@
 from typing import Callable, Optional
 from uuid import uuid4
 
+from hundredandten.deck import SelectableSuit
 from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
     BidAmount,
-    SelectableSuit,
     Status,
 )
 from hundredandten.engine.game import Game

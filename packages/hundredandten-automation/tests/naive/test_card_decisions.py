@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.automation.naive import best_card, worst_card, worst_card_beating
-from hundredandten.engine.constants import CardNumber, CardSuit, SelectableSuit
+from hundredandten.deck import CardNumber, CardSuit, SelectableSuit
 from hundredandten.engine.deck import Card
 
 

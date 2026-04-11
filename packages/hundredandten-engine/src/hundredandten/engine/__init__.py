@@ -1,8 +1,9 @@
 """Init the hundredandten module"""
 
+from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit
+
 from .actions import Action, Bid, Discard, Play, SelectTrump
-from .constants import BidAmount, CardNumber, CardSuit, SelectableSuit, Status
-from .deck import Card
+from .constants import BidAmount, Status
 from .game import Game
 from .player import Player
 

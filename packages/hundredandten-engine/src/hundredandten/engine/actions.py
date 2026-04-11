@@ -3,7 +3,9 @@
 from dataclasses import dataclass, field
 from typing import Union
 
-from .constants import BidAmount, SelectableSuit
+from hundredandten.deck import SelectableSuit
+
+from .constants import BidAmount
 from .deck import Card
 
 

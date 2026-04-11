@@ -2,11 +2,10 @@
 
 from typing import Optional, Sequence
 
+from hundredandten.deck import CardNumber, SelectableSuit
 from hundredandten.engine.actions import Action
 from hundredandten.engine.constants import (
     BidAmount,
-    CardNumber,
-    SelectableSuit,
     Status,
 )
 from hundredandten.engine.deck import Card

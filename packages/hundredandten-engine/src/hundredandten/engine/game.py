@@ -7,10 +7,11 @@ from random import Random
 from typing import Optional, Sequence
 from uuid import UUID, uuid4
 
+from hundredandten.deck import SelectableSuit
+
 from .actions import Action, Bid, Discard, Play, SelectTrump
 from .constants import (
     WINNING_SCORE,
-    SelectableSuit,
     Status,
 )
 from .errors import HundredAndTenError

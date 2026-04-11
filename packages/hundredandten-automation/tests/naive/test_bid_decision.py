@@ -3,7 +3,8 @@
 from unittest import TestCase
 
 from hundredandten.automation.naive import max_bid
-from hundredandten.engine.constants import BidAmount, CardNumber, CardSuit
+from hundredandten.deck import CardNumber, CardSuit
+from hundredandten.engine.constants import BidAmount
 from hundredandten.engine.deck import Card
 
 

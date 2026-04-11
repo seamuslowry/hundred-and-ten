@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from typing import Optional, Self, Union
 
+from hundredandten.deck import SelectableSuit
 from hundredandten.engine import Game
 from hundredandten.engine.actions import (
     Action,
@@ -11,7 +12,7 @@ from hundredandten.engine.actions import (
     Play,
     SelectTrump,
 )
-from hundredandten.engine.constants import BidAmount, SelectableSuit, Status
+from hundredandten.engine.constants import BidAmount, Status
 from hundredandten.engine.deck import Card, defined_cards
 from hundredandten.engine.player import RoundPlayer, player_by_identifier
 from hundredandten.engine.round import Round

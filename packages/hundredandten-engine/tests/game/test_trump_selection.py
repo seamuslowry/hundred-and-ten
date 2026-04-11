@@ -2,8 +2,9 @@
 
 from unittest import TestCase
 
+from hundredandten.deck import SelectableSuit
 from hundredandten.engine.actions import SelectTrump
-from hundredandten.engine.constants import SelectableSuit, Status
+from hundredandten.engine.constants import Status
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.testing import arrange
 

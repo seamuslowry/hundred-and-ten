@@ -5,6 +5,8 @@ from functools import cached_property
 from itertools import chain
 from typing import Optional
 
+from hundredandten.deck import SelectableSuit
+
 from .actions import (
     Action,
     Bid,
@@ -17,7 +19,6 @@ from .constants import (
     TRICK_VALUE,
     BidAmount,
     RoundRole,
-    SelectableSuit,
     Status,
 )
 from .deck import Deck

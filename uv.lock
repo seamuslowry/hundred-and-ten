@@ -5,6 +5,7 @@ requires-python = ">=3.12"
 [manifest]
 members = [
     "hundredandten-automation",
+    "hundredandten-deck",
     "hundredandten-engine",
     "hundredandten-testing",
 ]
@@ -189,9 +190,20 @@ dependencies = [
 requires-dist = [{ name = "hundredandten-engine", editable = "packages/hundredandten-engine" }]
 
 [[package]]
+name = "hundredandten-deck"
+version = "0.0.0"
+source = { editable = "packages/hundredandten-deck" }
+
+[[package]]
 name = "hundredandten-engine"
 version = "0.0.0"
 source = { editable = "packages/hundredandten-engine" }
+dependencies = [
+    { name = "hundredandten-deck" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "hundredandten-deck", editable = "packages/hundredandten-deck" }]
 
 [[package]]
 name = "hundredandten-testing"

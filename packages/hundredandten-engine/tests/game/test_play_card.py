@@ -2,12 +2,10 @@
 
 from unittest import TestCase
 
+from hundredandten.deck import CardNumber, CardSuit, SelectableSuit
 from hundredandten.engine.actions import Play
 from hundredandten.engine.constants import (
     HAND_SIZE,
-    CardNumber,
-    CardSuit,
-    SelectableSuit,
     Status,
 )
 from hundredandten.engine.deck import Card
