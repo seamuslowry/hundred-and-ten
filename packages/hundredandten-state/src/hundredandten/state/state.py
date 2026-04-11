@@ -25,13 +25,11 @@ class StateError(Exception):
 class Status(Enum):
     """Game status as observed by a player"""
 
-    BIDDING = 1
-    TRUMP_SELECTION = 2
-    COMPLETED_NO_BIDDERS = 3
-    TRICKS = 4
-    DISCARD = 5
-    COMPLETED = 6
-    WON = 7
+    BIDDING = "BIDDING"
+    TRUMP_SELECTION = "TRUMP_SELECTION"
+    TRICKS = "TRICKS"
+    DISCARD = "DISCARD"
+    WON = "WON"
 
 
 type BidAmount = int
@@ -357,7 +355,7 @@ class GameState:
         )
 
         return cls(
-            status=Status(game.status.value),
+            status=Status(game.status.name),
             table=table,
             hand=tuple(player.hand),
             bidding=bidding,
