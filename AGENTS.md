@@ -2,24 +2,32 @@
 
 ## Project Overview
 
-Hundred and Ten is a Python implementation of the trick-taking card game "Hundred and Ten", organized as a **uv workspace monorepo** with three packages. The project targets **Python 3.12+** and uses PEP 695 type alias syntax.
+Hundred and Ten is a Python implementation of the trick-taking card game "Hundred and Ten", organized as a **uv workspace monorepo** with four packages. The project targets **Python 3.12+** and uses PEP 695 type alias syntax.
 
 ## Repository Structure
 
 ```
 /
 ├── packages/
+│   ├── hundredandten-deck/         # Card domain primitives (no dependencies)
+│   │   ├── src/hundredandten/deck/
+│   │   │   ├── __init__.py         # Public API exports
+│   │   │   ├── deck.py             # Card, Deck, CardSuit, CardNumber, SelectableSuit enums
+│   │   │   └── trumps.py           # trumps()/bleeds() logic
+│   │   └── tests/
+│   │       └── deck/               # Card/deck/trump tests
+│   │
 │   ├── hundredandten-engine/       # Core game logic
 │   │   ├── src/hundredandten/engine/
 │   │   │   ├── __init__.py         # Public API exports
 │   │   │   ├── game.py             # Game class (main entry point)
 │   │   │   ├── round.py            # Round lifecycle
 │   │   │   ├── trick.py            # Trick resolution
-│   │   │   ├── deck.py             # Card and Deck (frozen dataclasses)
+│   │   │   ├── deck.py             # Re-export stub → hundredandten.deck
 │   │   │   ├── player.py           # Player model
 │   │   │   ├── actions.py          # Bid, SelectTrump, Discard, Play
-│   │   │   ├── constants.py        # Enums (Status, BidAmount, SelectableSuit, etc.)
-│   │   │   ├── trumps.py           # Trump/bleed logic
+│   │   │   ├── constants.py        # Enums (Status, BidAmount, RoundRole, etc.)
+│   │   │   ├── trumps.py           # Re-export stub → hundredandten.deck
 │   │   │   └── errors.py           # Domain exceptions
 │   │   └── tests/
 │   │       ├── game/               # Game lifecycle tests
