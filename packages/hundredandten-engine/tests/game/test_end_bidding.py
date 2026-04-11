@@ -47,7 +47,6 @@ class TestEndBidding(TestCase):
 
         # old round ended as completed no bidders
         self.assertEqual(game.rounds[-2].status, Status.COMPLETED_NO_BIDDERS)
-        self.assertTrue(game.rounds[-2].completed)
         # new round in bidding
         self.assertEqual(game.status, Status.BIDDING)
 

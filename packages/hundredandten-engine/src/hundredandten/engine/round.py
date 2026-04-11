@@ -191,11 +191,6 @@ class Round:
             return None
         return self.selection.suit
 
-    @property
-    def completed(self) -> bool:
-        """True if the round is complete, False otherwise"""
-        return self.status in [Status.COMPLETED, Status.COMPLETED_NO_BIDDERS]
-
     @cached_property
     def status(self) -> Status:
         """The status property."""

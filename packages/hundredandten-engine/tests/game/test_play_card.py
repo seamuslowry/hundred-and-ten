@@ -166,7 +166,6 @@ class TestPlayCard(TestCase):
         game = arrange.game(Status.TRICKS, arrange.play_round)
 
         self.assertEqual(2, len(game.rounds))
-        self.assertTrue(game.rounds[-2].completed)
 
     def test_all_cards_available_when_not_bleeding(self):
         """Any card can be played when not bleeding"""
