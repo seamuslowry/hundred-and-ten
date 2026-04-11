@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish:
-    environment: release
+    environment: monolith
     runs-on: ubuntu-latest
     permissions:
       id-token: write
