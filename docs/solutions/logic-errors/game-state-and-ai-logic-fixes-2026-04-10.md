@@ -2,7 +2,7 @@
 title: Game State and AI Logic Fixes in Refactor/Workspaces Branch
 date: 2026-04-10
 category: logic-errors/
-module: hundredandten-engine, hundredandten-automation
+module: hundredandten-engine, hundredandten-state, hundredandten-automation-naive
 problem_type: logic_error
 component: game_logic
 symptoms:
@@ -42,7 +42,7 @@ During code review of the `refactor/workspaces` branch, multiple logic errors we
 ## Solution
 
 ### Fix #1: Game State Status Propagation
-**File**: `packages/hundredandten-automation/src/hundredandten/automation/state.py:32`
+**File**: `packages/hundredandten-state/src/hundredandten/state/state.py`
 
 **Before**:
 ```python
@@ -59,7 +59,7 @@ def status(self) -> GameStatus:
     return self._game.status
 ```
 
-Added test coverage in `packages/hundredandten-automation/tests/state/test_game_state.py` to validate `WON` status is correctly reflected.
+Added test coverage in `packages/hundredandten-state/tests/state/test_game_state.py` to validate `WON` status is correctly reflected.
 
 ### Fix #2: Frozen Dataclass Hashability
 **File**: `packages/hundredandten-engine/src/hundredandten/engine/deck.py`
@@ -81,7 +81,7 @@ class Card:
 ```
 
 ### Fix #3: AI Card Value Comparison
-**File**: `packages/hundredandten-automation/src/hundredandten/automation/naive.py:78`
+**File**: `packages/hundredandten-automation-naive/src/hundredandten/automation/naive/__init__.py`
 
 **Before**:
 ```python
@@ -96,7 +96,7 @@ if trick.winning_card.value == card.value:  # Compares card values
 ```
 
 ### Fix #4: PEP 695 Type Alias Compatibility
-**Files**: `packages/hundredandten-engine/pyproject.toml`, `packages/hundredandten-automation/pyproject.toml`
+**Files**: `packages/hundredandten-engine/pyproject.toml`, `packages/hundredandten-automation-naive/pyproject.toml`
 
 **Before**:
 ```toml
@@ -112,8 +112,7 @@ Updated minimum Python version to 3.12 to match PEP 695 type alias syntax used i
 
 ### Fix #5: Type Annotations
 Added missing return type hints to several functions:
-- `packages/hundredandten-engine/src/hundredandten/engine/player.py:45` - `-> str`
-- `packages/hundredandten-engine/src/hundredandten/engine/game.py:112` - `-> list[Card]`
+- `packages/hundredandten-automation-naive/src/hundredandten/automation/naive/__init__.py` - AI logic
 
 ### Fix #6: Safe Auto Fixes
 Applied 12 safe automated fixes:

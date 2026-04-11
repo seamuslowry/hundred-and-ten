@@ -54,7 +54,9 @@ Hundred and Ten is a Python implementation of the trick-taking card game "Hundre
 │
 ├── docs/
 │   ├── solutions/                  # Compound learnings (ce:compound)
-│   │   └── logic-errors/           # Categorized by problem_type
+│   │   ├── logic-errors/           # Categorized by problem_type
+│   │   ├── build-errors/           # Build/packaging failures
+│   │   └── best-practices/         # Architectural and tooling patterns
 │   ├── plans/                      # Technical plans (ce:plan)
 │   ├── brainstorms/                # Requirements docs (ce:brainstorm)
 │   └── references/                 # Reference material
