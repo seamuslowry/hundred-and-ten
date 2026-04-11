@@ -7,7 +7,7 @@ from .constants import BidAmount, SelectableSuit
 from .deck import Card
 
 
-@dataclass(order=True)
+@dataclass(order=True, frozen=True)
 class Bid:
     """A class to keep track of bid information"""
 
@@ -18,7 +18,7 @@ class Bid:
         return self.amount.value > 0
 
 
-@dataclass
+@dataclass(frozen=True)
 class SelectTrump:
     """A class to represent the select trump action"""
 
@@ -26,7 +26,7 @@ class SelectTrump:
     suit: SelectableSuit
 
 
-@dataclass
+@dataclass(frozen=True)
 class Discard:
     """A class to keep track of one player's discard action"""
 
@@ -34,7 +34,7 @@ class Discard:
     cards: list[Card]
 
 
-@dataclass
+@dataclass(frozen=True)
 class Play:
     """A class to keep track of one play in a trick"""
 
