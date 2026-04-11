@@ -188,10 +188,22 @@ dependencies = [
     { name = "hundredandten-state" },
 ]
 
+[package.dev-dependencies]
+test = [
+    { name = "hundredandten-engine" },
+    { name = "hundredandten-testing" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "hundredandten-deck", editable = "packages/hundredandten-deck" },
     { name = "hundredandten-state", editable = "packages/hundredandten-state" },
+]
+
+[package.metadata.requires-dev]
+test = [
+    { name = "hundredandten-engine", editable = "packages/hundredandten-engine" },
+    { name = "hundredandten-testing", editable = "packages/hundredandten-testing" },
 ]
 
 [[package]]

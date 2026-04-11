@@ -4,7 +4,6 @@ from unittest import TestCase
 
 from hundredandten.automation.naive import max_bid
 from hundredandten.deck import Card, CardNumber, CardSuit
-from hundredandten.engine.constants import BidAmount
 
 
 class TestBidDecision(TestCase):
@@ -12,12 +11,12 @@ class TestBidDecision(TestCase):
 
     def test_passes_with_nothing(self):
         """Decide to pass"""
-        self.assertEqual(BidAmount.PASS, max_bid([]))
+        self.assertEqual(0, max_bid([]))
 
     def test_goes_fifteen(self):
         """Decide to go up to fifteen"""
         self.assertEqual(
-            BidAmount.FIFTEEN,
+            15,
             max_bid(
                 [
                     Card(CardNumber.FIVE, CardSuit.CLUBS),
@@ -29,7 +28,7 @@ class TestBidDecision(TestCase):
     def test_wont_go_fifteen_without_five(self):
         """Decide not to go to fifteen without the five"""
         self.assertEqual(
-            BidAmount.PASS,
+            0,
             max_bid(
                 [
                     Card(CardNumber.JACK, CardSuit.CLUBS),
@@ -41,7 +40,7 @@ class TestBidDecision(TestCase):
     def test_will_go_fifteen_without_five(self):
         """Decide not to go to fifteen without the five"""
         self.assertEqual(
-            BidAmount.FIFTEEN,
+            15,
             max_bid(
                 [
                     Card(CardNumber.JACK, CardSuit.CLUBS),
@@ -54,7 +53,7 @@ class TestBidDecision(TestCase):
     def test_goes_twenty(self):
         """Decide to go up to twenty"""
         self.assertEqual(
-            BidAmount.TWENTY,
+            20,
             max_bid(
                 [
                     Card(CardNumber.FIVE, CardSuit.CLUBS),
@@ -66,7 +65,7 @@ class TestBidDecision(TestCase):
     def test_goes_twenty_five(self):
         """Decide to go up to twenty five"""
         self.assertEqual(
-            BidAmount.TWENTY_FIVE,
+            25,
             max_bid(
                 [
                     Card(CardNumber.FIVE, CardSuit.CLUBS),
@@ -79,7 +78,7 @@ class TestBidDecision(TestCase):
     def test_goes_thirty(self):
         """Decide to go up to thirty"""
         self.assertEqual(
-            BidAmount.THIRTY,
+            30,
             max_bid(
                 [
                     Card(CardNumber.FIVE, CardSuit.CLUBS),
@@ -93,7 +92,7 @@ class TestBidDecision(TestCase):
     def test_shoots_the_moon(self):
         """Decide to go up to shooting the moon"""
         self.assertEqual(
-            BidAmount.SHOOT_THE_MOON,
+            60,
             max_bid(
                 [
                     Card(CardNumber.FIVE, CardSuit.CLUBS),

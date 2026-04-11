@@ -6,10 +6,15 @@ from hundredandten.automation import naive
 from hundredandten.engine.constants import Status
 from hundredandten.engine.game import Game
 from hundredandten.engine.player import Player
-from hundredandten.state import StateError
+from hundredandten.state import GameState, StateError
 from hundredandten.testing import arrange
 
 AUTOMATED_SEED = "a92475b9-3df3-458d-b0df-486f9a305015"
+
+
+def action_for(game: Game, player: str):
+    """Bridge: wire naive._action to the engine Game type"""
+    return naive._action(GameState.from_game(game, player)).for_player(player)
 
 
 class TestAutomatedPlay(TestCase):
@@ -29,7 +34,7 @@ class TestAutomatedPlay(TestCase):
 
         while game.status != Status.WON:
             player_id = game.active_player.identifier
-            game.act(naive.action_for(game, player_id))
+            game.act(action_for(game, player_id))
 
         self.assertIsNotNone(game.winner)
 
@@ -39,7 +44,7 @@ class TestAutomatedPlay(TestCase):
 
         self.assertRaises(
             StateError,
-            naive.action_for,
+            action_for,
             game,
             game.players[0].identifier,
         )

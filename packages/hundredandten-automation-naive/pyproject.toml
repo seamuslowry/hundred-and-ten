@@ -18,5 +18,11 @@ classifiers = [
 ]
 dependencies = ["hundredandten-state>=0.0.0,<1.0.0", "hundredandten-deck>=0.0.0,<1.0.0"]
 
+[dependency-groups]
+test = [
+    "hundredandten-engine>=0.0.0,<1.0.0",
+    "hundredandten-testing>=0.0.0,<1.0.0",
+]
+
 [tool.uv.build-backend]
 module-name = "hundredandten.automation.naive"
