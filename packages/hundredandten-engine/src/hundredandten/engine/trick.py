@@ -3,6 +3,8 @@
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
+from hundredandten.engine.errors import HundredAndTenError
+
 from .actions import Play
 from .constants import CardSuit, SelectableSuit
 from .deck import Card
@@ -25,7 +27,7 @@ class Trick:
     plays: list[Play] = field(default_factory=list)
 
     @property
-    def winning_play(self) -> Optional[Play]:
+    def winning_play(self) -> Play:
         """Determine the winner of the trick considering the passed suit as trump"""
 
         strong_trump_winner = self.__winning_play(
@@ -38,7 +40,14 @@ class Trick:
             lambda play: play.card.weak_trump_value,
         )
 
-        return strong_trump_winner or weak_trump_winner
+        play = strong_trump_winner or weak_trump_winner
+
+        if not play:
+            raise HundredAndTenError(
+                f"Unable to determine winning play in {self.plays}"
+            )
+
+        return play
 
     @property
     def bleeding(self) -> bool:

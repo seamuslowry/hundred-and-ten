@@ -5,6 +5,7 @@ from unittest import TestCase
 from hundredandten.engine.actions import Play
 from hundredandten.engine.constants import CardNumber, CardSuit, SelectableSuit
 from hundredandten.engine.deck import Card
+from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.trick import Trick
 
 
@@ -16,7 +17,7 @@ class TestTrick(TestCase):
 
         trick = Trick(SelectableSuit.HEARTS)
 
-        self.assertIsNone(trick.winning_play)
+        self.assertRaises(HundredAndTenError, lambda: trick.winning_play)
 
     def test_no_weak_trump(self):
         """With no plays, there is no weak trump"""

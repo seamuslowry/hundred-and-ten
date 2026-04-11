@@ -153,7 +153,6 @@ class TestPlayCard(TestCase):
         game = arrange.game(Status.TRICKS, arrange.play_trick)
 
         winning_play = game.active_round.tricks[-2].winning_play
-        assert winning_play
 
         self.assertEqual(2, len(game.active_round.tricks))
         self.assertEqual(

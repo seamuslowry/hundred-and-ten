@@ -414,7 +414,6 @@ class GameState:
             )
             if len(trick.plays) == len(game_round.players):
                 winner_play = trick.winning_play
-                assert winner_play is not None
                 completed_tricks.append(
                     CompletedTrick(
                         plays=trick_plays,

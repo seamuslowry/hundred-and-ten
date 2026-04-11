@@ -138,8 +138,6 @@ class Round:
                     return player_after(self.players, self.active_bidder.identifier)
                 # otherwise, its the winner of the last trick
                 winning_play = self.tricks[-2].winning_play
-                # when we have more than one trick, any previous trick will have a winning play
-                assert winning_play
                 winner = player_by_identifier(self.players, winning_play.identifier)
                 # when the trick has a winning play, there will be a valid player associated to it
                 assert winner
