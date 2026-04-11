@@ -1,9 +1,9 @@
 """Represent the state of a game as observed by a single player"""
 
 from dataclasses import dataclass
-from typing import Optional, Self, Union
+from typing import Self
 
-from hundredandten.deck import SelectableSuit
+from hundredandten.deck import Card, SelectableSuit, defined_cards
 from hundredandten.engine import Game
 from hundredandten.engine.actions import (
     Action,
@@ -13,7 +13,6 @@ from hundredandten.engine.actions import (
     SelectTrump,
 )
 from hundredandten.engine.constants import BidAmount, Status
-from hundredandten.engine.deck import Card, defined_cards
 from hundredandten.engine.player import RoundPlayer, player_by_identifier
 from hundredandten.engine.round import Round
 
@@ -102,9 +101,7 @@ class AvailablePlay:
         return Play(identifier=identifier, card=self.card)
 
 
-type AvailableAction = Union[
-    AvailableBid, AvailableSelectTrump, AvailableDiscard, AvailablePlay
-]
+type AvailableAction = AvailableBid | AvailableSelectTrump | AvailableDiscard | AvailablePlay
 
 
 def _available_action_from_engine(a: Action) -> AvailableAction:
@@ -148,7 +145,7 @@ class Unknown:
     """Card location is not known to this player"""
 
 
-CardStatus = Union[InHand, Played, Discarded, Unknown]
+type CardStatus = InHand | Played | Discarded | Unknown
 
 
 @dataclass(frozen=True)
@@ -192,7 +189,7 @@ class TableInfo:
 
     num_players: int
     dealer_seat: int
-    bidder_seat: Optional[int]
+    bidder_seat: int | None
     scores: tuple[int, ...]
 
 
@@ -201,8 +198,8 @@ class BiddingState:
     """Bidding phase state including the resulting trump"""
 
     bid_history: tuple[BidEvent, ...]
-    active_bid: Optional[BidAmount]
-    trump: Optional[SelectableSuit]
+    active_bid: BidAmount | None
+    trump: SelectableSuit | None
 
 
 @dataclass(frozen=True)

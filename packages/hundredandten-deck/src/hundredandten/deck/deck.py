@@ -7,6 +7,12 @@ from uuid import uuid4
 
 
 class _Suit(Enum):
+    """
+    Base enum for card and selectable suits.
+    Cross-enum equality (CardSuit.X == SelectableSuit.X) is intentional --
+    it is load-bearing for trump comparison throughout the game engine.
+    """
+
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Enum):
             return self.value == other.value
@@ -54,7 +60,7 @@ class CardNumber(Enum):
     ACE = "ACE"
 
 
-@dataclass
+@dataclass(frozen=True)
 class CardInfo:
     """Game metadata about a card"""
 
@@ -144,7 +150,7 @@ class Card:
     number: CardNumber
     suit: CardSuit
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.number.name} of {self.suit.name}"
 
     @property
@@ -192,4 +198,4 @@ class Deck:
             raise ValueError("Deck is overdrawn.")
 
         self.pulled = end
-        return list(map(lambda num: defined_cards[num], self.cards[start:end]))
+        return [defined_cards[num] for num in self.cards[start:end]]

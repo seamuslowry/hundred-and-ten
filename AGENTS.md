@@ -98,7 +98,7 @@ All game mutations go through `Game.act(action)` where `action` is one of: `Bid`
 # Install all dependencies
 uv sync --all-groups --all-packages
 
-# Run tests (153 tests, must all pass)
+# Run tests (161 tests, must all pass)
 uv run pytest
 
 # Coverage (configured for 100% requirement)
@@ -130,13 +130,14 @@ uv build --all-packages
 
 ### Testing
 - Framework: pytest with `--import-mode=importlib`
-- Test paths: `packages/hundredandten-engine/tests/`, `packages/hundredandten-automation/tests/`
+- Test paths: `packages/hundredandten-deck/tests/`, `packages/hundredandten-engine/tests/`, `packages/hundredandten-automation/tests/`
 - Shared fixtures: `hundredandten.testing.arrange` (use `arrange.game(Status.X, seed=...)` to set up games at any phase)
 - Coverage: 100% required (configured in pyproject.toml)
 
 ### Architecture
-- Engine package has **no dependency** on automation
-- Automation depends on engine
+- Deck package has **no dependencies**
+- Engine depends on deck
+- Automation depends on engine (and transitively on deck)
 - Testing depends on engine (used by both engine and automation test suites)
 - Frozen dataclasses throughout -- use `field(default_factory=...)` for mutable defaults
 - GameState nested structure: `table` (TableInfo), `bidding` (BiddingState), `tricks` (TrickState)

@@ -20,6 +20,7 @@ jobs:
 
       - name: Build and Publish to PyPI
         run: |
+          uv build --package hundredandten-deck
           uv build --package hundredandten-engine
           uv build --package hundredandten-automation
           uv publish

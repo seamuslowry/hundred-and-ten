@@ -107,6 +107,33 @@ class TestCard(TestCase):
             card.trump_value, card_info[CardSuit.HEARTS][CardNumber.FIVE].trump_value
         )
 
+    def test_trump_value_five_is_fourteen(self):
+        """Five has trump_value of 14 (highest) in all suits"""
+        for suit in (
+            CardSuit.HEARTS,
+            CardSuit.DIAMONDS,
+            CardSuit.SPADES,
+            CardSuit.CLUBS,
+        ):
+            card = Card(CardNumber.FIVE, suit)
+            self.assertEqual(card.trump_value, 14)
+
+    def test_trump_value_jack_is_thirteen(self):
+        """Jack has trump_value of 13 in all suits"""
+        for suit in (
+            CardSuit.HEARTS,
+            CardSuit.DIAMONDS,
+            CardSuit.SPADES,
+            CardSuit.CLUBS,
+        ):
+            card = Card(CardNumber.JACK, suit)
+            self.assertEqual(card.trump_value, 13)
+
+    def test_trump_value_joker_is_twelve(self):
+        """Joker has trump_value of 12"""
+        joker = Card(CardNumber.JOKER, CardSuit.JOKER)
+        self.assertEqual(joker.trump_value, 12)
+
     def test_trump_value_black_number_card(self):
         """Trump value for black number card (reversed ordering) from card_info"""
         card = Card(CardNumber.TWO, CardSuit.SPADES)
@@ -243,6 +270,20 @@ class TestTrumps(TestCase):
         for suit in SelectableSuit:
             result = list(trumps(hand, suit))
             self.assertEqual(len(result), 2)
+
+    def test_trumps_with_none_returns_only_always_trump(self):
+        """trumps(hand, None) returns only always-trump cards (Ace of Hearts, Joker)"""
+        hand = [
+            Card(CardNumber.ACE, CardSuit.HEARTS),  # always trump
+            Card(CardNumber.JOKER, CardSuit.JOKER),  # always trump
+            Card(CardNumber.FIVE, CardSuit.SPADES),  # not always trump
+            Card(CardNumber.TWO, CardSuit.CLUBS),  # not always trump
+        ]
+        result = trumps(hand, None)
+        self.assertIn(Card(CardNumber.ACE, CardSuit.HEARTS), result)
+        self.assertIn(Card(CardNumber.JOKER, CardSuit.JOKER), result)
+        self.assertNotIn(Card(CardNumber.FIVE, CardSuit.SPADES), result)
+        self.assertNotIn(Card(CardNumber.TWO, CardSuit.CLUBS), result)
 
 
 class TestBleeds(TestCase):

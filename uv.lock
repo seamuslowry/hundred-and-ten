@@ -183,11 +183,15 @@ name = "hundredandten-automation"
 version = "0.0.0"
 source = { editable = "packages/hundredandten-automation" }
 dependencies = [
+    { name = "hundredandten-deck" },
     { name = "hundredandten-engine" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "hundredandten-engine", editable = "packages/hundredandten-engine" }]
+requires-dist = [
+    { name = "hundredandten-deck", editable = "packages/hundredandten-deck" },
+    { name = "hundredandten-engine", editable = "packages/hundredandten-engine" },
+]
 
 [[package]]
 name = "hundredandten-deck"

@@ -226,11 +226,7 @@ class Round:
         The list will come in the order the points were earned.
         This is to determine a disputed winner
         """
-        winning_plays = [
-            winning_play
-            for winning_play in map(lambda trick: trick.winning_play, self.tricks)
-            if winning_play is not None
-        ]
+        winning_plays = [trick.winning_play for trick in self.tricks if trick.plays]
 
         trump_wins = [
             play

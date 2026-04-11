@@ -1,17 +1,15 @@
 """A module providing naive decision making for hundred and ten games"""
 
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
-from hundredandten.deck import CardNumber, SelectableSuit
+from hundredandten.deck import Card, CardNumber, SelectableSuit, bleeds, trumps
 from hundredandten.engine.actions import Action
 from hundredandten.engine.constants import (
     BidAmount,
     Status,
 )
-from hundredandten.engine.deck import Card
 from hundredandten.engine.errors import HundredAndTenError
 from hundredandten.engine.game import Game
-from hundredandten.engine.trumps import bleeds, trumps
 
 from .state import (
     AvailableAction,
@@ -134,13 +132,13 @@ def desired_trump(cards: Sequence[Card]) -> SelectableSuit:
     return __most_valuable_suit(cards)[0]
 
 
-def best_card(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Card:
+def best_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:
     """Return the best trump card in the list of cards"""
     trump_cards = trumps(cards, trump)
     return max(trump_cards, key=lambda c: c.trump_value) if trump_cards else cards[0]
 
 
-def worst_card(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Card:
+def worst_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:
     """Return the worst card in the list of cards"""
     non_trumps = __non_trumps(cards, trump)
     worst_non_trump = (
@@ -156,16 +154,16 @@ def worst_card(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Card:
 
 
 def worst_card_beating(
-    cards: Sequence[Card], card_to_beat: Card, trump: Optional[SelectableSuit]
-) -> Optional[Card]:
-    """Return the worst card in the list of cards"""
+    cards: Sequence[Card], card_to_beat: Card, trump: SelectableSuit | None
+) -> Card | None:
+    """Return the worst card in the list that beats card_to_beat, or None"""
     beating = __cards_beating(cards, card_to_beat, trump)
 
     return worst_card(beating, trump) if beating else None
 
 
 def __cards_beating(
-    cards: Sequence[Card], card_to_beat: Card, trump: Optional[SelectableSuit]
+    cards: Sequence[Card], card_to_beat: Card, trump: SelectableSuit | None
 ) -> Sequence[Card]:
     """Return all cards in the list that beat the provided card"""
     trump_cards = trumps(cards, trump)
@@ -182,9 +180,7 @@ def __cards_beating(
     return [c for c in trump_cards if c.trump_value > card_to_beat.trump_value]
 
 
-def __non_trumps(
-    cards: Sequence[Card], trump: Optional[SelectableSuit]
-) -> Sequence[Card]:
+def __non_trumps(cards: Sequence[Card], trump: SelectableSuit | None) -> Sequence[Card]:
     """Return all non trump cards in the list"""
     return [card for card in cards if card.suit != trump and not card.always_trump]
 

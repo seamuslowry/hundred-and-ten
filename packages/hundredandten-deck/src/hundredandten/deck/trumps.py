@@ -1,11 +1,11 @@
 """Trump helpers for Hundred and Ten"""
 
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from hundredandten.deck.deck import Card, SelectableSuit
 
 
-def trumps(cards: Sequence[Card], trump: Optional[SelectableSuit]) -> Sequence[Card]:
+def trumps(cards: Sequence[Card], trump: SelectableSuit | None) -> list[Card]:
     """Return all trump cards in the list"""
     return [card for card in cards if card.suit == trump or card.always_trump]
 
