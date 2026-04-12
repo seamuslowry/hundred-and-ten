@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 from enum import Enum, IntEnum
-from typing import Self
 
 from hundredandten.deck import Card, SelectableSuit, defined_cards
 from hundredandten.engine import Game
@@ -54,15 +53,6 @@ class AvailableBid:
 
     amount: BidAmount
 
-    @classmethod
-    def from_engine(cls, b: Bid) -> Self:
-        """Create a player-agnostic Bid representation from a player-aware representation"""
-        return cls(BidAmount(b.amount))
-
-    def for_player(self, identifier: str) -> Bid:
-        """Create a player-aware Bid representation from a player-agnostic representation"""
-        return Bid(identifier=identifier, amount=EngineBidAmount(self.amount))
-
 
 @dataclass(frozen=True)
 class AvailableDiscard:
@@ -74,15 +64,6 @@ class AvailableDiscard:
     """
 
     cards: tuple[Card, ...]
-
-    @classmethod
-    def from_engine(cls, d: Discard) -> Self:
-        """Create a player-agnostic Discard representation from a player-aware representation"""
-        return cls(tuple(d.cards))
-
-    def for_player(self, identifier: str) -> Discard:
-        """Create a player-aware Discard representation from a player-agnostic representation"""
-        return Discard(identifier=identifier, cards=list(self.cards))
 
 
 @dataclass(frozen=True)
@@ -96,15 +77,6 @@ class AvailableSelectTrump:
 
     suit: SelectableSuit
 
-    @classmethod
-    def from_engine(cls, b: SelectTrump) -> Self:
-        """Create a player-agnostic SelectTrump representation from a player-aware representation"""
-        return cls(b.suit)
-
-    def for_player(self, identifier: str) -> SelectTrump:
-        """Create a player-aware SelectTrump representation from a player-agnostic representation"""
-        return SelectTrump(identifier=identifier, suit=self.suit)
-
 
 @dataclass(frozen=True)
 class AvailablePlay:
@@ -117,33 +89,8 @@ class AvailablePlay:
 
     card: Card
 
-    @classmethod
-    def from_engine(cls, b: Play) -> Self:
-        """Create a player-agnostic Play representation from a player-aware representation"""
-        return cls(b.card)
-
-    def for_player(self, identifier: str) -> Play:
-        """Create a player-aware Play representation from a player-agnostic representation"""
-        return Play(identifier=identifier, card=self.card)
-
 
 type AvailableAction = AvailableBid | AvailableSelectTrump | AvailableDiscard | AvailablePlay
-
-
-def _available_action_from_engine(a: Action) -> AvailableAction:
-    """Create a player-agnostic Action from a player-aware Action."""
-    match a:
-        case Bid():
-            return AvailableBid.from_engine(a)
-        case SelectTrump():
-            return AvailableSelectTrump.from_engine(a)
-        case Discard():
-            return AvailableDiscard.from_engine(a)
-        case Play():
-            return AvailablePlay.from_engine(a)
-    raise ValueError(
-        f"Could not convert engine action {a} to an internal action"
-    )  # pragma: no cover
 
 
 @dataclass(frozen=True)
@@ -299,8 +246,44 @@ class GameState:
         """Return True if the active player is the dealer"""
         return self.table.dealer_seat == 0
 
-    @classmethod
-    def from_game(cls, game: Game, identifier: str) -> Self:
+
+class EngineAdapter:
+    """Adapter to convert between engine actions and internal available actions"""
+
+    @staticmethod
+    def available_action_from_engine(a: Action) -> AvailableAction:
+        """Create a player-agnostic Action from a player-aware Action."""
+        match a:
+            case Bid():
+                return AvailableBid(BidAmount(a.amount))
+            case SelectTrump():
+                return AvailableSelectTrump(a.suit)
+            case Discard():
+                return AvailableDiscard(tuple(a.cards))
+            case Play():
+                return AvailablePlay(a.card)
+        raise ValueError(
+            f"Could not convert engine action {a} to an internal action"
+        )  # pragma: no cover
+
+    @staticmethod
+    def available_action_for_player(a: AvailableAction, identifier: str) -> Action:
+        """Create a player-aware Action from a player-agnostic Action."""
+        match a:
+            case AvailableBid():
+                return Bid(identifier=identifier, amount=EngineBidAmount(a.amount))
+            case AvailableSelectTrump():
+                return SelectTrump(identifier=identifier, suit=a.suit)
+            case AvailableDiscard():
+                return Discard(identifier=identifier, cards=list(a.cards))
+            case AvailablePlay():
+                return Play(identifier=identifier, card=a.card)
+        raise ValueError(
+            f"Could not convert internal action {a} to an engine action"
+        )  # pragma: no cover
+
+    @staticmethod
+    def state_from_engine(game: Game, identifier: str) -> GameState:
         """Build a GameState observation for the identified player.
 
         All seats are rotated so that the requesting player is seat 0.
@@ -318,14 +301,14 @@ class GameState:
         current_scores = game.scores
         table = TableInfo(
             num_players=num_players,
-            dealer_seat=GameState.__relative_seat(
+            dealer_seat=EngineAdapter.__relative_seat(
                 non_relative_seat_by_identifier,
                 player.identifier,
                 game_round.dealer.identifier,
                 num_players,
             ),
             bidder_seat=(
-                GameState.__relative_seat(
+                EngineAdapter.__relative_seat(
                     non_relative_seat_by_identifier,
                     player.identifier,
                     game_round.active_bidder.identifier,
@@ -344,7 +327,7 @@ class GameState:
         bidding = BiddingState(
             bid_history=tuple(
                 BidEvent(
-                    seat=GameState.__relative_seat(
+                    seat=EngineAdapter.__relative_seat(
                         non_relative_seat_by_identifier,
                         player.identifier,
                         bid.identifier,
@@ -362,19 +345,19 @@ class GameState:
             trump=game_round.trump,
         )
 
-        return cls(
+        return GameState(
             status=Status(game.status.name),
             table=table,
             hand=tuple(player.hand),
             bidding=bidding,
-            tricks=GameState.__build_trick_state(
+            tricks=EngineAdapter.__build_trick_state(
                 game_round, player, non_relative_seat_by_identifier
             ),
-            cards=GameState.__build_card_knowledge(
+            cards=EngineAdapter.__build_card_knowledge(
                 game_round, player, non_relative_seat_by_identifier
             ),
             available_actions=tuple(
-                _available_action_from_engine(a)
+                EngineAdapter.available_action_from_engine(a)
                 for a in game.available_actions(identifier)
             ),
         )
@@ -395,7 +378,7 @@ class GameState:
             for play in trick.plays:
                 card_status_by_card[play.card] = Played(
                     trick_index=trick_index,
-                    seat=GameState.__relative_seat(
+                    seat=EngineAdapter.__relative_seat(
                         non_relative_seat_by_identifier,
                         player.identifier,
                         play.identifier,
@@ -430,7 +413,7 @@ class GameState:
         for trick in game_round.tricks:
             trick_plays = tuple(
                 TrickPlay(
-                    seat=GameState.__relative_seat(
+                    seat=EngineAdapter.__relative_seat(
                         non_relative_seat_by_identifier,
                         player.identifier,
                         play.identifier,
@@ -445,7 +428,7 @@ class GameState:
                 completed_tricks.append(
                     CompletedTrick(
                         plays=trick_plays,
-                        winner_seat=GameState.__relative_seat(
+                        winner_seat=EngineAdapter.__relative_seat(
                             non_relative_seat_by_identifier,
                             player.identifier,
                             winner_play.identifier,

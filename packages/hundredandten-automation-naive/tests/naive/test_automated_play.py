@@ -6,15 +6,17 @@ from hundredandten.automation import naive
 from hundredandten.engine.constants import Status
 from hundredandten.engine.game import Game
 from hundredandten.engine.player import Player
-from hundredandten.state import GameState, StateError
+from hundredandten.state import EngineAdapter, StateError
 from hundredandten.testing import arrange
 
 AUTOMATED_SEED = "a92475b9-3df3-458d-b0df-486f9a305015"
 
 
 def action_for(game: Game, player: str):
-    """Bridge: wire naive._action to the engine Game type"""
-    return naive.action_for(GameState.from_game(game, player)).for_player(player)
+    """Bridge: wire naive.action_for to the engine Game type"""
+    return EngineAdapter.available_action_for_player(
+        naive.action_for(EngineAdapter.state_from_engine(game, player)), player
+    )
 
 
 class TestAutomatedPlay(TestCase):
