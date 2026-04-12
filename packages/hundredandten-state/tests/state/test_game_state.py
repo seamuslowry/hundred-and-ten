@@ -152,13 +152,13 @@ class TestGameStateBidding(TestCase):
             all(isinstance(a, AvailableBid) for a in state.available_actions)
         )
 
-    def test_no_actions_for_inactive_player(self):
-        """Inactive player has no available actions"""
+    def test_inactive_player_sees_possible_actions(self):
+        """Inactive player sees actions they could take on their turn"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         inactive = game.active_round.inactive_players[0]
         state = EngineAdapter.state_from_engine(game, inactive.identifier)
 
-        self.assertEqual(len(state.available_actions), 0)
+        self.assertGreater(len(state.available_actions), 0)
 
     def test_available_bids_convenience(self):
         """available_bids property returns only Bid actions"""
@@ -189,14 +189,6 @@ class TestGameStateBidding(TestCase):
 
         self.assertEqual(state.table.scores, (0, 0, 0, 0))
 
-    def test_is_bidder_false_during_bidding(self):
-        """is_bidder is False when no bidder determined yet"""
-        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
-        active = game.active_round.active_player
-        state = EngineAdapter.state_from_engine(game, active.identifier)
-
-        self.assertFalse(state.is_bidder)
-
 
 class TestGameStateTrumpSelection(TestCase):
     """Tests for game_state_for during TRUMP_SELECTION"""
@@ -208,25 +200,6 @@ class TestGameStateTrumpSelection(TestCase):
         state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(state.status, Status.TRUMP_SELECTION)
-
-    def test_bidder_seat_is_zero_for_bidder(self):
-        """The bidder sees themselves as seat 0"""
-        game = arrange.game(EngineStatus.TRUMP_SELECTION, seed=SEED)
-        bidder = game.active_round.active_bidder
-        assert bidder is not None
-        state = EngineAdapter.state_from_engine(game, bidder.identifier)
-
-        self.assertEqual(state.table.bidder_seat, 0)
-        self.assertTrue(state.is_bidder)
-
-    def test_bidder_seat_nonzero_for_non_bidder(self):
-        """Non-bidder sees the bidder at a non-zero seat"""
-        game = arrange.game(EngineStatus.TRUMP_SELECTION, seed=SEED)
-        non_bidder = game.active_round.inactive_players[0]
-        state = EngineAdapter.state_from_engine(game, non_bidder.identifier)
-
-        self.assertNotEqual(state.table.bidder_seat, 0)
-        self.assertFalse(state.is_bidder)
 
     def test_available_trump_selections(self):
         """Bidder has 4 trump selection options"""
@@ -506,24 +479,6 @@ class TestGameStateImmutability(TestCase):
 
 class TestGameStateConvenienceProperties(TestCase):
     """Tests for convenience properties on GameState"""
-
-    def test_is_dealer_true_for_dealer(self):
-        """is_dealer returns True for the dealer"""
-        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
-        dealer = game.active_round.dealer
-        state = EngineAdapter.state_from_engine(game, dealer.identifier)
-
-        self.assertTrue(state.is_dealer)
-
-    def test_is_dealer_false_for_non_dealer(self):
-        """is_dealer returns False for non-dealers"""
-        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
-        non_dealer = next(
-            p for p in game.active_round.players if p != game.active_round.dealer
-        )
-        state = EngineAdapter.state_from_engine(game, non_dealer.identifier)
-
-        self.assertFalse(state.is_dealer)
 
     def test_available_plays_empty_during_bidding(self):
         """available_plays returns empty during bidding"""

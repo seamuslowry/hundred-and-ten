@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum, IntEnum
+from itertools import combinations
 
 from hundredandten.deck import Card, SelectableSuit, defined_cards
 from hundredandten.engine import Game
@@ -209,8 +210,63 @@ class GameState:
     # Card knowledge (all 53 cards)
     cards: tuple[CardKnowledge, ...]
 
-    # Legal actions for the active player
-    available_actions: tuple[AvailableAction, ...]
+    @property
+    def available_actions(self) -> tuple[AvailableAction, ...]:
+        """Return all available actions"""
+        match self.status:
+            case Status.BIDDING:
+                if any(
+                    b == BidEvent(0, BidAmount.PASS) for b in self.bidding.bid_history
+                ):
+                    return ()
+
+                bids = [
+                    BidAmount.PASS
+                    * (
+                        [self.bidding.active_bid]
+                        if self.bidding.active_bid and self.table.dealer_seat == 0
+                        else []
+                    ),
+                    *(
+                        a
+                        for a in BidAmount
+                        if a.value > (self.bidding.active_bid or BidAmount.PASS).value
+                    ),
+                ]
+
+                return tuple(AvailableBid(amount=a) for a in bids)
+            case Status.TRUMP_SELECTION:
+                return (
+                    tuple(AvailableSelectTrump(suit=s) for s in SelectableSuit)
+                    if self.table.bidder_seat == 0
+                    else ()
+                )
+            case Status.DISCARD:
+                hand_list = list(self.hand)
+                return tuple(
+                    AvailableDiscard(subset)
+                    for r in range(len(hand_list) + 1)
+                    for subset in combinations(hand_list, r)
+                )
+            case Status.TRICKS:
+                playable = (
+                    self.hand
+                    if (
+                        not self.tricks.current_trick_plays
+                        or self.tricks.current_trick_plays[0].card.trump_for_selection(
+                            self.bidding.trump
+                        )
+                    )
+                    else tuple(
+                        c
+                        for c in self.hand
+                        if c.trump_for_selection(self.bidding.trump)
+                    )
+                )
+
+                return tuple(AvailablePlay(card) for card in playable)
+            case _:
+                return ()
 
     @property
     def available_bids(self) -> tuple[AvailableBid, ...]:
@@ -235,16 +291,6 @@ class GameState:
     def available_plays(self) -> tuple[AvailablePlay, ...]:
         """Return only Play actions from available_actions"""
         return tuple(a for a in self.available_actions if isinstance(a, AvailablePlay))
-
-    @property
-    def is_bidder(self) -> bool:
-        """Return True if the active player is the bidder"""
-        return self.table.bidder_seat == 0
-
-    @property
-    def is_dealer(self) -> bool:
-        """Return True if the active player is the dealer"""
-        return self.table.dealer_seat == 0
 
 
 class EngineAdapter:
@@ -355,10 +401,6 @@ class EngineAdapter:
             ),
             cards=EngineAdapter.__build_card_knowledge(
                 game_round, player, non_relative_seat_by_identifier
-            ),
-            available_actions=tuple(
-                EngineAdapter.available_action_from_engine(a)
-                for a in game.available_actions(identifier)
             ),
         )
 

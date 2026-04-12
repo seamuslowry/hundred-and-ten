@@ -83,14 +83,6 @@ class TestGameScoring(TestCase):
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores)
         self.assertEqual(SEEDS_TO_SCORES[seed], game.scores_by_round[-1])
 
-    def test_available_actions_empty_when_won(self):
-        """When game is won, available_actions returns empty tuple"""
-        game = arrange.game(Status.WON, seed=PLAYER_0_WIN_SEED)
-
-        # Try to get actions for any player
-        actions = game.available_actions(game.players[0].identifier)
-        self.assertEqual(actions, ())
-
     def test_act_does_nothing_when_won(self):
         """Game.act() returns None and doesn't change game state when won"""
 

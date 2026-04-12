@@ -2,14 +2,11 @@
 
 import hashlib
 from dataclasses import dataclass, field
-from itertools import combinations
 from random import Random
 from typing import Optional, Sequence
 from uuid import UUID, uuid4
 
-from hundredandten.deck import SelectableSuit
-
-from .actions import Action, Bid, Discard, Play, SelectTrump
+from .actions import Action
 from .constants import (
     WINNING_SCORE,
     Status,
@@ -142,58 +139,14 @@ class Game:
         """Perform an action as a player of the game"""
         self.__act(action)
 
-    def available_actions(
-        self,
-        identifier: str,
-    ) -> tuple[Action, ...]:
-        """Return all actions available to the player currently"""
-        game_round = self.active_round
-        player = player_by_identifier(game_round.players, identifier)
-        if (
-            self.status == Status.WON
-            or game_round.active_player.identifier != player.identifier
-        ):
-            return ()
-
-        if game_round.status == Status.BIDDING:
-            return tuple(
-                Bid(player.identifier, amount)
-                for amount in game_round.available_bids(player.identifier)
-            )
-
-        if game_round.status == Status.TRUMP_SELECTION:
-            return tuple(
-                SelectTrump(player.identifier, suit) for suit in SelectableSuit
-            )
-
-        if game_round.status == Status.DISCARD:
-            hand_list = list(player.hand)
-            return tuple(
-                Discard(player.identifier, list(subset))
-                for r in range(len(hand_list) + 1)
-                for subset in combinations(hand_list, r)
-            )
-
-        active_player_trumps = [
-            card for card in player.hand if card.trump_for_selection(game_round.trump)
-        ]
-        playable = (
-            active_player_trumps
-            if game_round.active_trick.bleeding and active_player_trumps
-            else list(player.hand)
-        )
-        return tuple(Play(player.identifier, card) for card in playable)
-
     def __act(self, action: Action) -> None:
         """Perform an action as a player of the game"""
         if self.status == Status.WON:
             return
         self.active_round.act(action)
         # handle creation of new round if appropriate
-        if isinstance(action, Bid):
-            self.__end_bid()
-        if isinstance(action, Play):
-            self.__end_play()
+        self.__end_bid()
+        self.__end_play()
 
     def __end_bid(self):
         if self.status == Status.COMPLETED_NO_BIDDERS:

@@ -81,7 +81,7 @@ def __suggested_play(game_state: GameState) -> AvailablePlay:
 
     if not best_played_card:
         # if you are the bidder and you can bleed, do so
-        if game_state.is_bidder:
+        if game_state.table.bidder_seat == 0:
             card = best_card(playable_cards, game_state.bidding.trump)
         # otherwise, don't bleed if you can help it
         else:
