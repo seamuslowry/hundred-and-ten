@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Hundred and Ten is a Python implementation of the trick-taking card game "Hundred and Ten", organized as a **uv workspace monorepo** with five packages. The project targets **Python 3.12+** and uses PEP 695 type alias syntax.
+Hundred and Ten is a Python implementation of the trick-taking card game "Hundred and Ten", organized as a **uv workspace monorepo** with six packages. The project targets **Python 3.12+** and uses PEP 695 type alias syntax.
 
 ## Repository Structure
 
@@ -37,10 +37,15 @@ Hundred and Ten is a Python implementation of the trick-taking card game "Hundre
 │   │
 │   ├── hundredandten-state/        # Player observation layer
 │   │   ├── src/hundredandten/state/
-│   │   │   ├── __init__.py         # Public API exports
-│   │   │   └── state.py            # GameState, Status, BidAmount, StateError, AvailableAction types
+│   │   │   └── __init__.py         # Public API exports; GameState, Status, BidAmount, StateError, AvailableAction types
 │   │   └── tests/
 │   │       └── state/              # GameState construction tests
+│   │
+│   ├── hundredandten-automation-engineadapter/  # Engine↔State bridge (EngineAdapter)
+│   │   ├── src/hundredandten/automation/engineadapter/
+│   │   │   └── __init__.py         # EngineAdapter class
+│   │   └── tests/
+│   │       └── engineadapter/      # EngineAdapter tests
 │   │
 │   ├── hundredandten-automation-naive/  # Naive AI strategy
 │   │   ├── src/hundredandten/automation/naive/
@@ -83,7 +88,7 @@ All game mutations go through `Game.act(action)` where `action` is one of: `Bid`
 
 ### GameState (State Package)
 
-`GameState.from_game(game, player_id)` produces a player-agnostic observation:
+`EngineAdapter.state_from_engine(game, player_id)` produces a player-agnostic observation:
 - All seats are **relative** (requesting player is always seat 0)
 - No player identifiers in the output (designed for ML training)
 - Nested structure: `state.table`, `state.bidding`, `state.tricks`
@@ -104,7 +109,7 @@ All game mutations go through `Game.act(action)` where `action` is one of: `Bid`
 # Install all dependencies
 uv sync --all-groups --all-packages
 
-# Run tests (161 tests, must all pass)
+# Run tests (181 tests, must all pass)
 uv run pytest
 
 # Coverage (configured for 100% requirement)
@@ -136,14 +141,15 @@ uv build --all-packages
 
 ### Testing
 - Framework: pytest with `--import-mode=importlib`
-- Test paths: `packages/hundredandten-deck/tests/`, `packages/hundredandten-engine/tests/`, `packages/hundredandten-state/tests/`, `packages/hundredandten-automation-naive/tests/`
+- Test paths: `packages/hundredandten-deck/tests/`, `packages/hundredandten-engine/tests/`, `packages/hundredandten-state/tests/`, `packages/hundredandten-automation-engineadapter/tests/`, `packages/hundredandten-automation-naive/tests/`
 - Shared fixtures: `hundredandten.testing.arrange` (use `arrange.game(Status.X, seed=...)` to set up games at any phase)
 - Coverage: 100% required (configured in pyproject.toml)
 
 ### Architecture
 - Deck package has **no dependencies**
 - Engine depends on deck
-- State depends on deck and engine (engine only for `from_game` bridge)
+- State depends on deck only (engine dep removed after EngineAdapter extraction)
+- Automation-engineadapter depends on state, engine, and deck (bridge between engine and state)
 - Automation-naive depends on state and deck (no direct engine dep)
 - Testing depends on engine (used by both engine and automation-naive test suites)
 - Frozen dataclasses throughout -- use `field(default_factory=...)` for mutable defaults

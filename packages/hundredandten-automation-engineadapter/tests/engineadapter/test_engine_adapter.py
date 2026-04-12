@@ -2,6 +2,7 @@
 
 from unittest import TestCase
 
+from hundredandten.automation.engineadapter import EngineAdapter
 from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit, defined_cards
 from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
@@ -18,9 +19,9 @@ from hundredandten.state import (
     BidAmount as StateBidAmount,
     CompletedTrick,
     Discarded,
-    EngineAdapter,
     InHand,
     Played,
+    StateError,
     Status,
     Unknown,
 )
@@ -459,6 +460,36 @@ class TestGameStateSeatNormalization(TestCase):
             state_other = EngineAdapter.state_from_engine(game, other.identifier)
             self.assertNotEqual(state_other.bidding.bid_history[0].seat, 0)
 
+    def test_played_card_seat_is_relative(self):
+        """Played card's seat in card knowledge reflects the playing player's relative position"""
+        game = arrange.game(EngineStatus.TRICKS, seed=SEED)
+        players = game.active_round.players
+        first_player = game.active_round.active_player
+        played_card = first_player.hand[0]
+        game.act(Play(first_player.identifier, played_card))
+
+        first_abs = list(players).index(first_player)
+        for i, observer in enumerate(players):
+            state = EngineAdapter.state_from_engine(game, observer.identifier)
+            played_ck = next(ck for ck in state.cards if ck.card == played_card)
+            assert isinstance(played_ck.status, Played)
+            expected_seat = (first_abs - i) % len(players)
+            self.assertEqual(played_ck.status.seat, expected_seat)
+
+    def test_trick_play_seat_is_relative(self):
+        """TrickPlay seat in current trick reflects the playing player's relative position"""
+        game = arrange.game(EngineStatus.TRICKS, seed=SEED)
+        players = game.active_round.players
+        first_player = game.active_round.active_player
+        game.act(Play(first_player.identifier, first_player.hand[0]))
+
+        first_abs = list(players).index(first_player)
+        for i, observer in enumerate(players):
+            state = EngineAdapter.state_from_engine(game, observer.identifier)
+            self.assertEqual(len(state.tricks.current_trick_plays), 1)
+            expected_seat = (first_abs - i) % len(players)
+            self.assertEqual(state.tricks.current_trick_plays[0].seat, expected_seat)
+
 
 class TestGameStateImmutability(TestCase):
     """Tests that GameState is immutable"""
@@ -697,12 +728,62 @@ class TestAdapterActionFor(TestCase):
         self.assertIsInstance(action, AvailableBid)
 
     def test_adapter_checks_action(self):
-        """Adapter checks if the provided action is available"""
+        """Adapter raises StateError if the decision function returns an unavailable action"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
 
-        action = EngineAdapter.action_for(
-            game, active.identifier, lambda _: AvailableDiscard(cards=())
-        )
+        with self.assertRaises(StateError):
+            EngineAdapter.action_for(
+                game, active.identifier, lambda _: AvailableDiscard(cards=())
+            )
+
+    def test_adapter_returns_none_when_decision_fn_returns_none(self):
+        """Adapter returns None when the decision function returns None"""
+        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
+        active = game.active_round.active_player
+
+        action = EngineAdapter.action_for(game, active.identifier, lambda _: None)
 
         self.assertIsNone(action)
+
+
+class TestEngineAdapterAvailableActionForPlayer(TestCase):
+    """Tests for EngineAdapter.available_action_for_player() — state→engine conversion"""
+
+    def test_available_bid_converts_to_bid(self):
+        """AvailableBid converts to a player-aware Bid"""
+        action = AvailableBid(StateBidAmount.FIFTEEN)
+        result = EngineAdapter.available_action_for_player(action, "player-1")
+
+        assert isinstance(result, Bid)
+        self.assertEqual(result.identifier, "player-1")
+        self.assertEqual(result.amount, BidAmount.FIFTEEN)
+
+    def test_available_select_trump_converts_to_select_trump(self):
+        """AvailableSelectTrump converts to a player-aware SelectTrump"""
+        action = AvailableSelectTrump(SelectableSuit.HEARTS)
+        result = EngineAdapter.available_action_for_player(action, "player-1")
+
+        assert isinstance(result, SelectTrump)
+        self.assertEqual(result.identifier, "player-1")
+        self.assertEqual(result.suit, SelectableSuit.HEARTS)
+
+    def test_available_discard_converts_to_discard(self):
+        """AvailableDiscard converts to a player-aware Discard"""
+        cards = [Card(CardNumber.ACE, CardSuit.HEARTS)]
+        action = AvailableDiscard(tuple(cards))
+        result = EngineAdapter.available_action_for_player(action, "player-1")
+
+        assert isinstance(result, Discard)
+        self.assertEqual(result.identifier, "player-1")
+        self.assertEqual(result.cards, cards)
+
+    def test_available_play_converts_to_play(self):
+        """AvailablePlay converts to a player-aware Play"""
+        card = Card(CardNumber.FIVE, CardSuit.SPADES)
+        action = AvailablePlay(card)
+        result = EngineAdapter.available_action_for_player(action, "player-1")
+
+        assert isinstance(result, Play)
+        self.assertEqual(result.identifier, "player-1")
+        self.assertEqual(result.card, card)

@@ -4,6 +4,7 @@ requires-python = ">=3.12"
 
 [manifest]
 members = [
+    "hundredandten-automation-engineadapter",
     "hundredandten-automation-naive",
     "hundredandten-deck",
     "hundredandten-engine",
@@ -180,6 +181,31 @@ wheels = [
 ]
 
 [[package]]
+name = "hundredandten-automation-engineadapter"
+version = "0.0.1.dev0"
+source = { editable = "packages/hundredandten-automation-engineadapter" }
+dependencies = [
+    { name = "hundredandten-deck" },
+    { name = "hundredandten-engine" },
+    { name = "hundredandten-state" },
+]
+
+[package.dev-dependencies]
+test = [
+    { name = "hundredandten-testing" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "hundredandten-deck", editable = "packages/hundredandten-deck" },
+    { name = "hundredandten-engine", editable = "packages/hundredandten-engine" },
+    { name = "hundredandten-state", editable = "packages/hundredandten-state" },
+]
+
+[package.metadata.requires-dev]
+test = [{ name = "hundredandten-testing", editable = "packages/hundredandten-testing" }]
+
+[[package]]
 name = "hundredandten-automation-naive"
 version = "0.0.1.dev2"
 source = { editable = "packages/hundredandten-automation-naive" }
@@ -190,6 +216,7 @@ dependencies = [
 
 [package.dev-dependencies]
 test = [
+    { name = "hundredandten-automation-engineadapter" },
     { name = "hundredandten-engine" },
     { name = "hundredandten-testing" },
 ]
@@ -202,6 +229,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 test = [
+    { name = "hundredandten-automation-engineadapter", editable = "packages/hundredandten-automation-engineadapter" },
     { name = "hundredandten-engine", editable = "packages/hundredandten-engine" },
     { name = "hundredandten-testing", editable = "packages/hundredandten-testing" },
 ]
@@ -224,18 +252,14 @@ requires-dist = [{ name = "hundredandten-deck", editable = "packages/hundredandt
 
 [[package]]
 name = "hundredandten-state"
-version = "0.0.1.dev3"
+version = "0.0.1.dev4"
 source = { editable = "packages/hundredandten-state" }
 dependencies = [
     { name = "hundredandten-deck" },
-    { name = "hundredandten-engine" },
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "hundredandten-deck", editable = "packages/hundredandten-deck" },
-    { name = "hundredandten-engine", editable = "packages/hundredandten-engine" },
-]
+requires-dist = [{ name = "hundredandten-deck", editable = "packages/hundredandten-deck" }]
 
 [[package]]
 name = "hundredandten-testing"

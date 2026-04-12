@@ -3,10 +3,11 @@
 from unittest import TestCase
 
 from hundredandten.automation import naive
+from hundredandten.automation.engineadapter import EngineAdapter
 from hundredandten.engine.constants import Status
 from hundredandten.engine.game import Game
 from hundredandten.engine.player import Player
-from hundredandten.state import EngineAdapter, StateError
+from hundredandten.state import StateError
 from hundredandten.testing import arrange
 
 AUTOMATED_SEED = "a92475b9-3df3-458d-b0df-486f9a305015"
