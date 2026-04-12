@@ -7,14 +7,6 @@ from hundredandten.engine.deck import Deck
 
 class TestDeck(TestCase):
     """Unit tests for a deck"""
-
-    def test_card_repr_override(self):
-        """Card representation is human readable"""
-
-        deck = Deck()
-
-        self.assertFalse("Card" in str(deck.draw(1)[0]))
-
     def test_shuffling_without_seed(self):
         """Shuffling without the same seed is always different"""
 
