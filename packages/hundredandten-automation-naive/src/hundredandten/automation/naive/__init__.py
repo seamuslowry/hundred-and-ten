@@ -16,7 +16,7 @@ from hundredandten.state import (
 )
 
 
-def _action(state: GameState) -> AvailableAction:
+def action_for(state: GameState) -> AvailableAction:
     """Return the suggested action given the game state"""
     if state.status == Status.BIDDING:
         return __suggested_bid(state)

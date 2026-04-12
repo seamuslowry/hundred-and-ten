@@ -14,7 +14,7 @@ AUTOMATED_SEED = "a92475b9-3df3-458d-b0df-486f9a305015"
 
 def action_for(game: Game, player: str):
     """Bridge: wire naive._action to the engine Game type"""
-    return naive._action(GameState.from_game(game, player)).for_player(player)
+    return naive.action_for(GameState.from_game(game, player)).for_player(player)
 
 
 class TestAutomatedPlay(TestCase):
