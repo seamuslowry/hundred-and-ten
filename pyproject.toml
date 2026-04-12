@@ -22,6 +22,7 @@ min-public-methods = 0
 target-version = "py314"
 line-length = 100
 lint.extend-select = ["I"]
+lint.isort.combine-as-imports = true
 
 [tool.black]
 target-version = ["py314"]
