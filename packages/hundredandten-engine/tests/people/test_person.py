@@ -2,9 +2,8 @@
 
 from unittest import TestCase
 
-from hundredandten.deck import CardNumber, CardSuit
+from hundredandten.deck import Card, CardNumber, CardSuit
 from hundredandten.engine.constants import RoundRole
-from hundredandten.engine.deck import Card
 from hundredandten.engine.player import Player, RoundPlayer
 
 

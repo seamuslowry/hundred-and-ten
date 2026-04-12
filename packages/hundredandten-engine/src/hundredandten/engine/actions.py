@@ -3,10 +3,9 @@
 from dataclasses import dataclass, field
 from typing import Union
 
-from hundredandten.deck import SelectableSuit
+from hundredandten.deck import Card, SelectableSuit
 
 from .constants import BidAmount
-from .deck import Card
 
 
 @dataclass(order=True, frozen=True)

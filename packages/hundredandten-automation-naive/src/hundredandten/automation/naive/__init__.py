@@ -60,9 +60,13 @@ def __suggested_play(game_state: GameState) -> AvailablePlay:
     if (
         len(game_state.tricks.current_trick_plays) > 0
         and game_state.bidding.trump
-        and bleeds(game_state.tricks.current_trick_plays[0].card, game_state.bidding.trump)
+        and bleeds(
+            game_state.tricks.current_trick_plays[0].card, game_state.bidding.trump
+        )
     ):
-        playable_cards = trumps(game_state.hand, game_state.bidding.trump) or playable_cards
+        playable_cards = (
+            trumps(game_state.hand, game_state.bidding.trump) or playable_cards
+        )
 
     # Find the current winning card (not just the lead card)
     best_played_card = None
@@ -86,7 +90,9 @@ def __suggested_play(game_state: GameState) -> AvailablePlay:
         )
         # if you can beat the current winning card, do it with the lowest card that will do it
         # otherwise, play nothing
-        card = worst_winning_card or worst_card(playable_cards, game_state.bidding.trump)
+        card = worst_winning_card or worst_card(
+            playable_cards, game_state.bidding.trump
+        )
 
     return AvailablePlay(card)
 
@@ -125,10 +131,14 @@ def best_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:
 def worst_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:
     """Return the worst card in the list of cards"""
     non_trumps = __non_trumps(cards, trump)
-    worst_non_trump = min(non_trumps, key=lambda c: c.weak_trump_value) if non_trumps else None
+    worst_non_trump = (
+        min(non_trumps, key=lambda c: c.weak_trump_value) if non_trumps else None
+    )
 
     trump_cards = trumps(cards, trump)
-    worst_trump = min(trump_cards, key=lambda c: c.trump_value) if trump_cards else cards[0]
+    worst_trump = (
+        min(trump_cards, key=lambda c: c.trump_value) if trump_cards else cards[0]
+    )
 
     return worst_non_trump or worst_trump
 
@@ -152,7 +162,8 @@ def __cards_beating(
         non_trump_beaters = [
             c
             for c in __non_trumps(cards, trump)
-            if c.suit == card_to_beat.suit and c.weak_trump_value > card_to_beat.weak_trump_value
+            if c.suit == card_to_beat.suit
+            and c.weak_trump_value > card_to_beat.weak_trump_value
         ]
         return [*trump_cards, *non_trump_beaters]
 
@@ -180,7 +191,8 @@ def __most_valuable_suit(cards: Sequence[Card]) -> tuple[SelectableSuit, int]:
 def __suits_by_value(cards: Sequence[Card]) -> dict[SelectableSuit, int]:
     """Return a list of each suit with a numeric value of how much trump it has"""
     return {
-        suit: __bid_value(grouped_cards) for suit, grouped_cards in __cards_by_suit(cards).items()
+        suit: __bid_value(grouped_cards)
+        for suit, grouped_cards in __cards_by_suit(cards).items()
     }
 
 

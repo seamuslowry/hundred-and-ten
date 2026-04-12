@@ -103,7 +103,9 @@ class TestCard(TestCase):
     def test_trump_value_red_number_card(self):
         """Trump value for red number card comes from card_info"""
         card = Card(CardNumber.FIVE, CardSuit.HEARTS)
-        self.assertEqual(card.trump_value, card_info[CardSuit.HEARTS][CardNumber.FIVE].trump_value)
+        self.assertEqual(
+            card.trump_value, card_info[CardSuit.HEARTS][CardNumber.FIVE].trump_value
+        )
 
     def test_trump_value_five_is_fourteen(self):
         """Five has trump_value of 14 (highest) in all suits"""
@@ -135,7 +137,9 @@ class TestCard(TestCase):
     def test_trump_value_black_number_card(self):
         """Trump value for black number card (reversed ordering) from card_info"""
         card = Card(CardNumber.TWO, CardSuit.SPADES)
-        self.assertEqual(card.trump_value, card_info[CardSuit.SPADES][CardNumber.TWO].trump_value)
+        self.assertEqual(
+            card.trump_value, card_info[CardSuit.SPADES][CardNumber.TWO].trump_value
+        )
 
     def test_weak_trump_value(self):
         """Weak trump value comes from card_info"""

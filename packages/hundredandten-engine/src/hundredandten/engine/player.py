@@ -2,8 +2,9 @@
 
 from dataclasses import dataclass, field
 
+from hundredandten.deck import Card
+
 from .constants import RoundRole
-from .deck import Card
 from .errors import HundredAndTenError
 
 
