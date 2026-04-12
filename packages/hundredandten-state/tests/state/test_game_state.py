@@ -15,6 +15,7 @@ from hundredandten.state import (
     AvailableDiscard,
     AvailablePlay,
     AvailableSelectTrump,
+    BidAmount as StateBidAmount,
     CompletedTrick,
     Discarded,
     EngineAdapter,
@@ -529,7 +530,6 @@ class TestGameStateBiddingEdgeCases(TestCase):
         state = EngineAdapter.state_from_engine(game, active.identifier)
 
         bid_amounts = [a.amount for a in state.available_bids]
-        from hundredandten.state import BidAmount as StateBidAmount
 
         self.assertIn(StateBidAmount.PASS, bid_amounts)
 
@@ -554,8 +554,6 @@ class TestGameStateBiddingEdgeCases(TestCase):
         dealer = game.active_round.active_player
         active_bid_amount = game.active_round.active_bid
         state = EngineAdapter.state_from_engine(game, dealer.identifier)
-
-        from hundredandten.state import BidAmount as StateBidAmount
 
         bid_amounts = [a.amount for a in state.available_bids]
 
@@ -647,12 +645,11 @@ class TestEngineAdapterAvailableActionFromEngine(TestCase):
 
     def test_bid_converts_to_available_bid(self):
         """Bid engine action converts to AvailableBid"""
-        from hundredandten.state import BidAmount as StateBidAmount
 
         action = Bid(identifier="player-1", amount=BidAmount.FIFTEEN)
         result = EngineAdapter.available_action_from_engine(action)
 
-        self.assertIsInstance(result, AvailableBid)
+        assert isinstance(result, AvailableBid)
         self.assertEqual(result.amount, StateBidAmount.FIFTEEN)
 
     def test_select_trump_converts_to_available_select_trump(self):
@@ -660,7 +657,7 @@ class TestEngineAdapterAvailableActionFromEngine(TestCase):
         action = SelectTrump(identifier="player-1", suit=SelectableSuit.HEARTS)
         result = EngineAdapter.available_action_from_engine(action)
 
-        self.assertIsInstance(result, AvailableSelectTrump)
+        assert isinstance(result, AvailableSelectTrump)
         self.assertEqual(result.suit, SelectableSuit.HEARTS)
 
     def test_discard_converts_to_available_discard(self):
@@ -669,7 +666,7 @@ class TestEngineAdapterAvailableActionFromEngine(TestCase):
         action = Discard(identifier="player-1", cards=cards)
         result = EngineAdapter.available_action_from_engine(action)
 
-        self.assertIsInstance(result, AvailableDiscard)
+        assert isinstance(result, AvailableDiscard)
         self.assertEqual(result.cards, tuple(cards))
 
     def test_play_converts_to_available_play(self):
@@ -678,5 +675,34 @@ class TestEngineAdapterAvailableActionFromEngine(TestCase):
         action = Play(identifier="player-1", card=card)
         result = EngineAdapter.available_action_from_engine(action)
 
-        self.assertIsInstance(result, AvailablePlay)
+        assert isinstance(result, AvailablePlay)
         self.assertEqual(result.card, card)
+
+
+class TestAdapterActionFor(TestCase):
+    """Tests for the adapter action_for, hepler to get an action from an engine generically"""
+
+    def test_adapter_gets_action(self):
+        """Adapter can help get an available action for the active player"""
+        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
+        active = game.active_round.active_player
+
+        action = EngineAdapter.action_for(
+            game,
+            active.identifier,
+            lambda s: s.available_actions[0],
+        )
+
+        self.assertIsNotNone(action)
+        self.assertIsInstance(action, AvailableBid)
+
+    def test_adapter_checks_action(self):
+        """Adapter checks if the provided action is available"""
+        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
+        active = game.active_round.active_player
+
+        action = EngineAdapter.action_for(
+            game, active.identifier, lambda _: AvailableDiscard(cards=())
+        )
+
+        self.assertIsNone(action)

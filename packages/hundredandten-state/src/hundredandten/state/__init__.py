@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from enum import Enum, IntEnum
 from itertools import combinations
+from typing import Callable
 
 from hundredandten.deck import Card, SelectableSuit, defined_cards
 from hundredandten.engine import Game
@@ -293,6 +294,22 @@ class GameState:
 
 class EngineAdapter:
     """Adapter to convert between engine actions and internal available actions"""
+
+    @staticmethod
+    def action_for(
+        game: Game,
+        identifier: str,
+        decision_fn: Callable[[GameState], AvailableAction | None],
+    ) -> AvailableAction | None:
+        """
+        Return an action for the current player, using the decision function.
+        If the provided action is not in the player's available actions, return None.
+        """
+        state = EngineAdapter.state_from_engine(game, identifier)
+        suggested_action = decision_fn(state)
+        if suggested_action not in state.available_actions:
+            return None
+        return suggested_action
 
     @staticmethod
     def available_action_from_engine(a: Action) -> AvailableAction:
