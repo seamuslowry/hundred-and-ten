@@ -1,4 +1,4 @@
-"""Test behavior of GameState.from_game(game, )"""
+"""Test behavior of EngineAdapter.state_from_engine(game, )"""
 
 from unittest import TestCase
 
@@ -16,7 +16,7 @@ from hundredandten.state import (
     AvailableSelectTrump,
     CompletedTrick,
     Discarded,
-    GameState,
+    EngineAdapter,
     InHand,
     Played,
     Status,
@@ -34,7 +34,7 @@ class TestGameStateBidding(TestCase):
         """State reflects bidding status"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(state.status, Status.BIDDING)
 
@@ -42,7 +42,7 @@ class TestGameStateBidding(TestCase):
         """State reflects the number of players"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(state.table.num_players, 4)
 
@@ -50,7 +50,7 @@ class TestGameStateBidding(TestCase):
         """The requesting player is always seat 0"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         for player in game.active_round.players:
-            state = GameState.from_game(game, player.identifier)
+            state = EngineAdapter.state_from_engine(game, player.identifier)
             # self is always seat 0 — verified through hand matching
             self.assertEqual(state.hand, tuple(player.hand))
 
@@ -62,7 +62,7 @@ class TestGameStateBidding(TestCase):
         dealer_index = players.index(dealer)
 
         for i, player in enumerate(players):
-            state = GameState.from_game(game, player.identifier)
+            state = EngineAdapter.state_from_engine(game, player.identifier)
             expected_dealer_seat = (dealer_index - i) % len(players)
             self.assertEqual(state.table.dealer_seat, expected_dealer_seat)
 
@@ -70,7 +70,7 @@ class TestGameStateBidding(TestCase):
         """Hand in state matches the requesting player's actual hand"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         for player in game.active_round.players:
-            state = GameState.from_game(game, player.identifier)
+            state = EngineAdapter.state_from_engine(game, player.identifier)
             self.assertEqual(state.hand, tuple(player.hand))
             self.assertEqual(len(state.hand), HAND_SIZE)
 
@@ -78,7 +78,7 @@ class TestGameStateBidding(TestCase):
         """Card knowledge always has 53 entries"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(len(state.cards), 53)
 
@@ -86,7 +86,7 @@ class TestGameStateBidding(TestCase):
         """Player's own cards show as InHand"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         in_hand_cards = [ck.card for ck in state.cards if isinstance(ck.status, InHand)]
         self.assertCountEqual(in_hand_cards, list(active.hand))
@@ -95,7 +95,7 @@ class TestGameStateBidding(TestCase):
         """Cards not in player's hand are Unknown"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         unknown_cards = [ck for ck in state.cards if isinstance(ck.status, Unknown)]
         self.assertEqual(len(unknown_cards), 53 - HAND_SIZE)
@@ -104,7 +104,7 @@ class TestGameStateBidding(TestCase):
         """bidder_seat is None during bidding"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertIsNone(state.table.bidder_seat)
 
@@ -112,7 +112,7 @@ class TestGameStateBidding(TestCase):
         """No bids placed yet"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(len(state.bidding.bid_history), 0)
 
@@ -120,7 +120,7 @@ class TestGameStateBidding(TestCase):
         """No active bid yet"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertIsNone(state.bidding.active_bid)
 
@@ -128,7 +128,7 @@ class TestGameStateBidding(TestCase):
         """Trump is not yet selected"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertIsNone(state.bidding.trump)
 
@@ -136,7 +136,7 @@ class TestGameStateBidding(TestCase):
         """No tricks have been played"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(len(state.tricks.completed_tricks), 0)
         self.assertEqual(len(state.tricks.current_trick_plays), 0)
@@ -145,7 +145,7 @@ class TestGameStateBidding(TestCase):
         """Active player has bid actions available"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertTrue(len(state.available_actions) > 0)
         self.assertTrue(
@@ -156,7 +156,7 @@ class TestGameStateBidding(TestCase):
         """Inactive player has no available actions"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         inactive = game.active_round.inactive_players[0]
-        state = GameState.from_game(game, inactive.identifier)
+        state = EngineAdapter.state_from_engine(game, inactive.identifier)
 
         self.assertEqual(len(state.available_actions), 0)
 
@@ -164,7 +164,7 @@ class TestGameStateBidding(TestCase):
         """available_bids property returns only Bid actions"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(state.available_bids, state.available_actions)
 
@@ -176,7 +176,7 @@ class TestGameStateBidding(TestCase):
 
         # now a different player is active
         new_active = game.active_round.active_player
-        state = GameState.from_game(game, new_active.identifier)
+        state = EngineAdapter.state_from_engine(game, new_active.identifier)
 
         self.assertEqual(len(state.bidding.bid_history), 1)
         self.assertEqual(state.bidding.bid_history[0].amount, BidAmount.PASS)
@@ -185,7 +185,7 @@ class TestGameStateBidding(TestCase):
         """All scores start at 0"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(state.table.scores, (0, 0, 0, 0))
 
@@ -193,7 +193,7 @@ class TestGameStateBidding(TestCase):
         """is_bidder is False when no bidder determined yet"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertFalse(state.is_bidder)
 
@@ -205,7 +205,7 @@ class TestGameStateTrumpSelection(TestCase):
         """State reflects trump selection status"""
         game = arrange.game(EngineStatus.TRUMP_SELECTION, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(state.status, Status.TRUMP_SELECTION)
 
@@ -214,7 +214,7 @@ class TestGameStateTrumpSelection(TestCase):
         game = arrange.game(EngineStatus.TRUMP_SELECTION, seed=SEED)
         bidder = game.active_round.active_bidder
         assert bidder is not None
-        state = GameState.from_game(game, bidder.identifier)
+        state = EngineAdapter.state_from_engine(game, bidder.identifier)
 
         self.assertEqual(state.table.bidder_seat, 0)
         self.assertTrue(state.is_bidder)
@@ -223,7 +223,7 @@ class TestGameStateTrumpSelection(TestCase):
         """Non-bidder sees the bidder at a non-zero seat"""
         game = arrange.game(EngineStatus.TRUMP_SELECTION, seed=SEED)
         non_bidder = game.active_round.inactive_players[0]
-        state = GameState.from_game(game, non_bidder.identifier)
+        state = EngineAdapter.state_from_engine(game, non_bidder.identifier)
 
         self.assertNotEqual(state.table.bidder_seat, 0)
         self.assertFalse(state.is_bidder)
@@ -233,7 +233,7 @@ class TestGameStateTrumpSelection(TestCase):
         game = arrange.game(EngineStatus.TRUMP_SELECTION, seed=SEED)
         bidder = game.active_round.active_bidder
         assert bidder is not None
-        state = GameState.from_game(game, bidder.identifier)
+        state = EngineAdapter.state_from_engine(game, bidder.identifier)
 
         self.assertEqual(len(state.available_trump_selections), 4)
         self.assertTrue(
@@ -247,7 +247,7 @@ class TestGameStateTrumpSelection(TestCase):
         """Non-bidder has no actions during trump selection"""
         game = arrange.game(EngineStatus.TRUMP_SELECTION, seed=SEED)
         non_bidder = game.active_round.inactive_players[0]
-        state = GameState.from_game(game, non_bidder.identifier)
+        state = EngineAdapter.state_from_engine(game, non_bidder.identifier)
 
         self.assertEqual(len(state.available_actions), 0)
 
@@ -255,7 +255,7 @@ class TestGameStateTrumpSelection(TestCase):
         """Bid history has entries from the bidding phase"""
         game = arrange.game(EngineStatus.TRUMP_SELECTION, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertTrue(len(state.bidding.bid_history) > 0)
 
@@ -263,7 +263,7 @@ class TestGameStateTrumpSelection(TestCase):
         """Active bid is set after bidding is complete"""
         game = arrange.game(EngineStatus.TRUMP_SELECTION, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertIsNotNone(state.bidding.active_bid)
 
@@ -275,7 +275,7 @@ class TestGameStateDiscard(TestCase):
         """State reflects discard status"""
         game = arrange.game(EngineStatus.DISCARD, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(state.status, Status.DISCARD)
 
@@ -283,7 +283,7 @@ class TestGameStateDiscard(TestCase):
         """Trump has been selected"""
         game = arrange.game(EngineStatus.DISCARD, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertIsNotNone(state.bidding.trump)
 
@@ -291,7 +291,7 @@ class TestGameStateDiscard(TestCase):
         """Active player has discard options (2^hand_size subsets)"""
         game = arrange.game(EngineStatus.DISCARD, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         discard_actions = state.available_discards
         # 2^5 = 32 subsets for a 5-card hand
@@ -302,7 +302,7 @@ class TestGameStateDiscard(TestCase):
         """Discard options include keeping all cards (empty discard)"""
         game = arrange.game(EngineStatus.DISCARD, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         empty_discards = [d for d in state.available_discards if len(d.cards) == 0]
         self.assertEqual(len(empty_discards), 1)
@@ -311,7 +311,7 @@ class TestGameStateDiscard(TestCase):
         """Discard options include discarding entire hand"""
         game = arrange.game(EngineStatus.DISCARD, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         full_discards = [
             d for d in state.available_discards if len(d.cards) == HAND_SIZE
@@ -325,7 +325,7 @@ class TestGameStateDiscard(TestCase):
         discarded_cards = [active.hand[0], active.hand[1]]
         game.act(Discard(active.identifier, discarded_cards))
 
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
         discarded_in_state = [
             ck.card for ck in state.cards if isinstance(ck.status, Discarded)
         ]
@@ -345,7 +345,7 @@ class TestGameStateDiscard(TestCase):
 
         # Second player looks at state — should not see first player's discards
         second_active = game.active_round.active_player
-        state = GameState.from_game(game, second_active.identifier)
+        state = EngineAdapter.state_from_engine(game, second_active.identifier)
 
         for card in first_discarded:
             ck = next(c for c in state.cards if c.card == card)
@@ -359,7 +359,7 @@ class TestGameStateTricks(TestCase):
         """State reflects tricks status"""
         game = arrange.game(EngineStatus.TRICKS, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(state.status, Status.TRICKS)
 
@@ -367,7 +367,7 @@ class TestGameStateTricks(TestCase):
         """Active player has play actions available"""
         game = arrange.game(EngineStatus.TRICKS, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertTrue(len(state.available_plays) > 0)
         self.assertTrue(
@@ -378,7 +378,7 @@ class TestGameStateTricks(TestCase):
         """Play actions correspond to cards in hand (when not bleeding)"""
         game = arrange.game(EngineStatus.TRICKS, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         play_cards = [p.card for p in state.available_plays]
         # When first to play (not bleeding), all hand cards are playable
@@ -393,7 +393,7 @@ class TestGameStateTricks(TestCase):
 
         # Next player sees the played card
         next_active = game.active_round.active_player
-        state = GameState.from_game(game, next_active.identifier)
+        state = EngineAdapter.state_from_engine(game, next_active.identifier)
 
         ck = next(c for c in state.cards if c.card == card_to_play)
         self.assertIsInstance(ck.status, Played)
@@ -407,7 +407,7 @@ class TestGameStateTricks(TestCase):
         game.act(Play(active.identifier, active.hand[0]))
 
         next_active = game.active_round.active_player
-        state = GameState.from_game(game, next_active.identifier)
+        state = EngineAdapter.state_from_engine(game, next_active.identifier)
 
         self.assertEqual(len(state.tricks.current_trick_plays), 1)
 
@@ -417,7 +417,7 @@ class TestGameStateTricks(TestCase):
         arrange.play_trick(game)
 
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(len(state.tricks.completed_tricks), 1)
         self.assertIsInstance(state.tricks.completed_tricks[0], CompletedTrick)
@@ -429,7 +429,7 @@ class TestGameStateTricks(TestCase):
         arrange.play_trick(game)
 
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         winner_seat = state.tricks.completed_tricks[0].winner_seat
         self.assertGreaterEqual(winner_seat, 0)
@@ -445,7 +445,7 @@ class TestGameStateSeatNormalization(TestCase):
         arrange.play_trick(game)
 
         for player in game.active_round.players:
-            state = GameState.from_game(game, player.identifier)
+            state = EngineAdapter.state_from_engine(game, player.identifier)
             # Verify hand matches (proving seat 0 = self)
             self.assertEqual(state.hand, tuple(player.hand))
 
@@ -457,7 +457,7 @@ class TestGameStateSeatNormalization(TestCase):
         dealer_abs = players.index(dealer)
 
         for i, player in enumerate(players):
-            state = GameState.from_game(game, player.identifier)
+            state = EngineAdapter.state_from_engine(game, player.identifier)
             expected = (dealer_abs - i) % len(players)
             self.assertEqual(
                 state.table.dealer_seat,
@@ -472,13 +472,13 @@ class TestGameStateSeatNormalization(TestCase):
         game.act(Bid(active.identifier, BidAmount.PASS))
 
         # The player who just bid sees themselves as seat 0
-        state_self = GameState.from_game(game, active.identifier)
+        state_self = EngineAdapter.state_from_engine(game, active.identifier)
         self.assertEqual(state_self.bidding.bid_history[0].seat, 0)
 
         # A different player sees the bidder at a non-zero seat
         other = game.active_round.inactive_players[-1]
         if other.identifier != active.identifier:
-            state_other = GameState.from_game(game, other.identifier)
+            state_other = EngineAdapter.state_from_engine(game, other.identifier)
             self.assertNotEqual(state_other.bidding.bid_history[0].seat, 0)
 
 
@@ -489,7 +489,7 @@ class TestGameStateImmutability(TestCase):
         """GameState cannot be mutated"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         with self.assertRaises(AttributeError):
             state.status = Status.TRICKS  # type: ignore[misc]
@@ -498,7 +498,7 @@ class TestGameStateImmutability(TestCase):
         """Verify all 53 defined cards are represented"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         state_cards = [ck.card for ck in state.cards]
         self.assertCountEqual(state_cards, defined_cards)
@@ -511,7 +511,7 @@ class TestGameStateConvenienceProperties(TestCase):
         """is_dealer returns True for the dealer"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         dealer = game.active_round.dealer
-        state = GameState.from_game(game, dealer.identifier)
+        state = EngineAdapter.state_from_engine(game, dealer.identifier)
 
         self.assertTrue(state.is_dealer)
 
@@ -521,7 +521,7 @@ class TestGameStateConvenienceProperties(TestCase):
         non_dealer = next(
             p for p in game.active_round.players if p != game.active_round.dealer
         )
-        state = GameState.from_game(game, non_dealer.identifier)
+        state = EngineAdapter.state_from_engine(game, non_dealer.identifier)
 
         self.assertFalse(state.is_dealer)
 
@@ -529,7 +529,7 @@ class TestGameStateConvenienceProperties(TestCase):
         """available_plays returns empty during bidding"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(len(state.available_plays), 0)
 
@@ -537,7 +537,7 @@ class TestGameStateConvenienceProperties(TestCase):
         """available_discards returns empty during bidding"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
-        state = GameState.from_game(game, active.identifier)
+        state = EngineAdapter.state_from_engine(game, active.identifier)
 
         self.assertEqual(len(state.available_discards), 0)
 
@@ -548,13 +548,13 @@ class TestGameStateWon(TestCase):
     def test_status_is_won(self):
         """GameState.status reflects game WON status"""
         game = arrange.game(EngineStatus.WON, seed=SEED)
-        state = GameState.from_game(game, game.players[0].identifier)
+        state = EngineAdapter.state_from_engine(game, game.players[0].identifier)
 
         self.assertEqual(state.status, Status.WON)
 
     def test_available_actions_empty_when_won(self):
         """No actions available when game is won"""
         game = arrange.game(EngineStatus.WON, seed=SEED)
-        state = GameState.from_game(game, game.players[0].identifier)
+        state = EngineAdapter.state_from_engine(game, game.players[0].identifier)
 
         self.assertEqual(len(state.available_actions), 0)
