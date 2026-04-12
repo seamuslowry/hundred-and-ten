@@ -24,4 +24,5 @@ jobs:
           uv build --package hundredandten-engine
           uv build --package hundredandten-state
           uv build --package hundredandten-automation-naive
+          uv build --package hundredandten-automation-engineadapter
           uv publish
