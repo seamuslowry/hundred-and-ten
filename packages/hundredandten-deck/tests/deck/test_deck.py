@@ -9,10 +9,8 @@ from hundredandten.deck import (
     CardSuit,
     Deck,
     SelectableSuit,
-    bleeds,
     card_info,
     defined_cards,
-    trumps,
 )
 
 
@@ -235,73 +233,71 @@ class TestDeck(TestCase):
         self.assertEqual(deck_1.draw(amt), deck_2.draw(amt))
 
 
-class TestTrumps(TestCase):
-    """Unit tests for trumps()"""
+class TestTrumpForSelection(TestCase):
+    """Unit tests for Card.trump_for_selection()"""
 
-    def test_returns_only_trump_cards(self):
-        """trumps() returns only cards matching trump suit or always-trump"""
+    def test_returns_true_for_trump_suit(self):
+        """trump_for_selection returns True when card suit matches trump"""
         hand = [
             Card(CardNumber.ACE, CardSuit.HEARTS),  # always trump
             Card(CardNumber.TWO, CardSuit.SPADES),  # trump suit
             Card(CardNumber.TWO, CardSuit.HEARTS),  # non-trump (SPADES is trump)
             Card(CardNumber.JOKER, CardSuit.JOKER),  # always trump
         ]
-        result = trumps(hand, SelectableSuit.SPADES)
+        result = [
+            card for card in hand if card.trump_for_selection(SelectableSuit.SPADES)
+        ]
         self.assertIn(Card(CardNumber.ACE, CardSuit.HEARTS), result)
         self.assertIn(Card(CardNumber.TWO, CardSuit.SPADES), result)
         self.assertIn(Card(CardNumber.JOKER, CardSuit.JOKER), result)
         self.assertNotIn(Card(CardNumber.TWO, CardSuit.HEARTS), result)
 
-    def test_returns_empty_when_no_trumps(self):
-        """trumps() returns empty when hand has no trump cards"""
+    def test_returns_false_for_non_trump_cards(self):
+        """trump_for_selection returns False for cards outside the trump suit"""
         hand = [
             Card(CardNumber.TWO, CardSuit.HEARTS),
             Card(CardNumber.THREE, CardSuit.DIAMONDS),
         ]
-        result = trumps(hand, SelectableSuit.CLUBS)
-        self.assertEqual(list(result), [])
+        result = [
+            card for card in hand if card.trump_for_selection(SelectableSuit.CLUBS)
+        ]
+        self.assertEqual(result, [])
 
     def test_always_trump_included_regardless_of_suit(self):
-        """Ace of Hearts and Joker are always included regardless of trump suit"""
+        """Ace of Hearts and Joker return True regardless of trump suit"""
         hand = [
             Card(CardNumber.ACE, CardSuit.HEARTS),
             Card(CardNumber.JOKER, CardSuit.JOKER),
         ]
         for suit in SelectableSuit:
-            result = list(trumps(hand, suit))
+            result = [card for card in hand if card.trump_for_selection(suit)]
             self.assertEqual(len(result), 2)
 
-    def test_trumps_with_none_returns_only_always_trump(self):
-        """trumps(hand, None) returns only always-trump cards (Ace of Hearts, Joker)"""
-        hand = [
-            Card(CardNumber.ACE, CardSuit.HEARTS),  # always trump
-            Card(CardNumber.JOKER, CardSuit.JOKER),  # always trump
-            Card(CardNumber.FIVE, CardSuit.SPADES),  # not always trump
-            Card(CardNumber.TWO, CardSuit.CLUBS),  # not always trump
-        ]
-        result = trumps(hand, None)
-        self.assertIn(Card(CardNumber.ACE, CardSuit.HEARTS), result)
-        self.assertIn(Card(CardNumber.JOKER, CardSuit.JOKER), result)
-        self.assertNotIn(Card(CardNumber.FIVE, CardSuit.SPADES), result)
-        self.assertNotIn(Card(CardNumber.TWO, CardSuit.CLUBS), result)
-
-
-class TestBleeds(TestCase):
-    """Unit tests for bleeds()"""
-
-    def test_bleeds_for_matching_suit(self):
-        """bleeds() returns True when card suit matches trump"""
-        card = Card(CardNumber.TWO, CardSuit.CLUBS)
-        self.assertTrue(bleeds(card, SelectableSuit.CLUBS))
-
-    def test_bleeds_for_always_trump(self):
-        """bleeds() returns True for always-trump cards"""
+    def test_none_trump_returns_only_always_trump(self):
+        """trump_for_selection(None) returns True only for always-trump cards"""
         ace_of_hearts = Card(CardNumber.ACE, CardSuit.HEARTS)
         joker = Card(CardNumber.JOKER, CardSuit.JOKER)
-        self.assertTrue(bleeds(ace_of_hearts, SelectableSuit.SPADES))
-        self.assertTrue(bleeds(joker, SelectableSuit.DIAMONDS))
+        five_of_spades = Card(CardNumber.FIVE, CardSuit.SPADES)
+        two_of_clubs = Card(CardNumber.TWO, CardSuit.CLUBS)
 
-    def test_does_not_bleed_for_non_trump(self):
-        """bleeds() returns False for non-trump, non-always-trump cards"""
+        self.assertTrue(ace_of_hearts.trump_for_selection(None))
+        self.assertTrue(joker.trump_for_selection(None))
+        self.assertFalse(five_of_spades.trump_for_selection(None))
+        self.assertFalse(two_of_clubs.trump_for_selection(None))
+
+    def test_matching_suit_is_trump(self):
+        """trump_for_selection returns True when card suit matches trump"""
+        card = Card(CardNumber.TWO, CardSuit.CLUBS)
+        self.assertTrue(card.trump_for_selection(SelectableSuit.CLUBS))
+
+    def test_always_trump_cards_trump_regardless(self):
+        """Always-trump cards return True even when their suit doesn't match trump"""
+        ace_of_hearts = Card(CardNumber.ACE, CardSuit.HEARTS)
+        joker = Card(CardNumber.JOKER, CardSuit.JOKER)
+        self.assertTrue(ace_of_hearts.trump_for_selection(SelectableSuit.SPADES))
+        self.assertTrue(joker.trump_for_selection(SelectableSuit.DIAMONDS))
+
+    def test_non_trump_non_always_trump_returns_false(self):
+        """Non-trump, non-always-trump cards return False"""
         card = Card(CardNumber.TWO, CardSuit.HEARTS)
-        self.assertFalse(bleeds(card, SelectableSuit.CLUBS))
+        self.assertFalse(card.trump_for_selection(SelectableSuit.CLUBS))

@@ -22,7 +22,6 @@ from .player import (
 )
 from .round import Round
 from .trick import Score
-from .trumps import trumps
 
 
 @dataclass
@@ -175,7 +174,9 @@ class Game:
                 for subset in combinations(hand_list, r)
             )
 
-        active_player_trumps = trumps(player.hand, game_round.trump)
+        active_player_trumps = [
+            card for card in player.hand if card.trump_for_selection(game_round.trump)
+        ]
         playable = (
             active_player_trumps
             if game_round.active_trick.bleeding and active_player_trumps

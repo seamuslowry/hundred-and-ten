@@ -7,7 +7,6 @@ from hundredandten.deck import Card, CardSuit, SelectableSuit
 from hundredandten.engine.errors import HundredAndTenError
 
 from .actions import Play
-from .trumps import bleeds
 
 
 @dataclass
@@ -51,7 +50,9 @@ class Trick:
     @property
     def bleeding(self) -> bool:
         """True if the trick should force players to play a trump card (if they have one)"""
-        return bool(self.leading_card) and bleeds(self.leading_card, self.round_trump)
+        return bool(self.leading_card) and self.leading_card.trump_for_selection(
+            self.round_trump
+        )
 
     @property
     def leading_card(self) -> Optional[Card]:

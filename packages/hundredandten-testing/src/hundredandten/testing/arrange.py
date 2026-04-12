@@ -3,7 +3,7 @@
 from typing import Callable, Optional
 from uuid import uuid4
 
-from hundredandten.deck import SelectableSuit, trumps
+from hundredandten.deck import SelectableSuit
 from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
     BidAmount,
@@ -95,7 +95,11 @@ def play_trick(game_to_play: Game) -> None:
     starting_active_trick = game_to_play.active_round.active_trick
     while len(starting_active_trick.plays) < len(game_to_play.players):
         active_player = game_to_play.active_round.active_player
-        trump_cards = list(trumps(active_player.hand, game_to_play.active_round.trump))
+        trump_cards = list(
+            card
+            for card in active_player.hand
+            if card.trump_for_selection(game_to_play.active_round.trump)
+        )
         game_to_play.act(
             Play(active_player.identifier, next(iter(trump_cards + active_player.hand)))
         )

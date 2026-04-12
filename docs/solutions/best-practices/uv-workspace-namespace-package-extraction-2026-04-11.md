@@ -28,9 +28,7 @@ packages/hundredandten-deck/
   src/
     hundredandten/          ← namespace root (no __init__.py)
       deck/                 ← owned sub-package
-        __init__.py         ← public API
-        deck.py
-        trumps.py
+        __init__.py         ← public API (Card, Deck, trump_for_selection, etc.)
 ```
 
 The `hundredandten/` directory at the namespace root **must not** contain an `__init__.py`. A regular package init would shadow the namespace and prevent other workspace members from contributing their own sub-packages.
@@ -94,13 +92,17 @@ Without an explicit dependency, the engine package would rely on transitive reso
 
 ```python
 # packages/hundredandten-deck/src/hundredandten/deck/__init__.py
-from hundredandten.deck.deck import Card, CardInfo, CardNumber, CardSuit, Deck, SelectableSuit, card_info, defined_cards
-from hundredandten.deck.trumps import bleeds, trumps
+# All card domain types defined directly in this module — no sub-module imports needed
 
-__all__ = ["Card", "CardInfo", "CardNumber", "CardSuit", "SelectableSuit", "card_info", "defined_cards", "Deck", "trumps", "bleeds"]
+__all__ = ["Card", "CardInfo", "CardNumber", "CardSuit", "SelectableSuit", "card_info", "defined_cards", "Deck"]
 ```
 
 `__all__` is the contract. Anything not listed is internal and may change without notice.
+
+> **Note**: Earlier versions of this package also exported `trumps()` and `bleeds()` as module-level
+> helpers from a `trumps.py` sub-module. These were removed when trump predicate logic was moved
+> onto `Card` as the `trump_for_selection(trump)` instance method. See
+> `best-practices/trump-logic-card-instance-method-2026-04-11.md`.
 
 ## Why This Matters
 
@@ -139,9 +141,7 @@ dependencies = []  # no separate deck dep needed
 packages/
   hundredandten-deck/
     src/hundredandten/deck/
-      __init__.py   ← Card, Deck, etc. now live here
-      deck.py
-      trumps.py
+      __init__.py   ← Card, Deck, etc. (including trump_for_selection) all live here
   hundredandten-engine/
     src/hundredandten/engine/
       deck.py       ← re-export stub only

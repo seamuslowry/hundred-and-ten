@@ -2,7 +2,7 @@
 
 from collections.abc import Sequence
 
-from hundredandten.deck import Card, CardNumber, SelectableSuit, bleeds, trumps
+from hundredandten.deck import Card, CardNumber, SelectableSuit
 from hundredandten.state import (
     AvailableAction,
     AvailableBid,
@@ -60,13 +60,15 @@ def __suggested_play(game_state: GameState) -> AvailablePlay:
     if (
         len(game_state.tricks.current_trick_plays) > 0
         and game_state.bidding.trump
-        and bleeds(
-            game_state.tricks.current_trick_plays[0].card, game_state.bidding.trump
+        and game_state.tricks.current_trick_plays[0].card.trump_for_selection(
+            game_state.bidding.trump
         )
     ):
-        playable_cards = (
-            trumps(game_state.hand, game_state.bidding.trump) or playable_cards
-        )
+        playable_cards = [
+            card
+            for card in game_state.hand
+            if card.trump_for_selection(game_state.bidding.trump)
+        ] or playable_cards
 
     # Find the current winning card (not just the lead card)
     best_played_card = None
@@ -120,6 +122,11 @@ def desired_trump(cards: Sequence[Card]) -> SelectableSuit:
     """Return the desired trump for the given hand"""
 
     return __most_valuable_suit(cards)[0]
+
+
+def trumps(cards: Sequence[Card], trump: SelectableSuit | None) -> Sequence[Card]:
+    """Return the trump cards in the list of cards"""
+    return [card for card in cards if card.trump_for_selection(trump)]
 
 
 def best_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:

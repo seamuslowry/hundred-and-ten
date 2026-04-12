@@ -31,9 +31,6 @@ from .player import (
     players_by_role,
 )
 from .trick import Score, Trick
-from .trumps import (
-    trumps,
-)
 
 
 @dataclass
@@ -342,7 +339,11 @@ class Round:
     def __play(self, play: Play) -> None:
         """Play the specified card from the identified player's hand"""
 
-        active_player_trump_cards = trumps(self.active_player.hand, self.trump)
+        active_player_trump_cards = [
+            card
+            for card in self.active_player.hand
+            if card.trump_for_selection(self.trump)
+        ]
 
         if self.active_player.identifier != play.identifier:
             raise HundredAndTenError("Cannot play a card out of turn.")
