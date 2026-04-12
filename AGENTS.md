@@ -148,7 +148,7 @@ uv build --all-packages
 - Testing depends on engine (used by both engine and automation-naive test suites)
 - Frozen dataclasses throughout -- use `field(default_factory=...)` for mutable defaults
 - GameState nested structure: `table` (TableInfo), `bidding` (BiddingState), `tricks` (TrickState)
-- Convenience properties `is_bidder` and `is_dealer` exist on GameState; all other fields accessed via nested objects
+- All positional/role fields accessed via nested objects (e.g. `state.table.bidder_seat == 0`, `state.table.dealer_seat`)
 
 ## Knowledge Base
 

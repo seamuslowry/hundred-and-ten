@@ -220,21 +220,21 @@ class GameState:
                 ):
                     return ()
 
-                bids = [
-                    BidAmount.PASS
-                    * (
-                        [self.bidding.active_bid]
-                        if self.bidding.active_bid and self.table.dealer_seat == 0
-                        else []
-                    ),
-                    *(
-                        a
-                        for a in BidAmount
-                        if a.value > (self.bidding.active_bid or BidAmount.PASS).value
-                    ),
+                dealer_steal = (
+                    [self.bidding.active_bid]
+                    if self.bidding.active_bid and self.table.dealer_seat == 0
+                    else []
+                )
+                higher_bids = [
+                    a
+                    for a in BidAmount
+                    if a.value > (self.bidding.active_bid or BidAmount.PASS).value
                 ]
 
-                return tuple(AvailableBid(amount=a) for a in bids)
+                return tuple(
+                    AvailableBid(amount=a)
+                    for a in [BidAmount.PASS, *dealer_steal, *higher_bids]
+                )
             case Status.TRUMP_SELECTION:
                 return (
                     tuple(AvailableSelectTrump(suit=s) for s in SelectableSuit)
@@ -249,19 +249,17 @@ class GameState:
                     for subset in combinations(hand_list, r)
                 )
             case Status.TRICKS:
+                bleeding = bool(self.tricks.current_trick_plays) and (
+                    self.tricks.current_trick_plays[0].card.trump_for_selection(
+                        self.bidding.trump
+                    )
+                )
+                player_trumps = [
+                    c for c in self.hand if c.trump_for_selection(self.bidding.trump)
+                ]
+
                 playable = (
-                    self.hand
-                    if (
-                        not self.tricks.current_trick_plays
-                        or self.tricks.current_trick_plays[0].card.trump_for_selection(
-                            self.bidding.trump
-                        )
-                    )
-                    else tuple(
-                        c
-                        for c in self.hand
-                        if c.trump_for_selection(self.bidding.trump)
-                    )
+                    self.hand if (not bleeding or not player_trumps) else player_trumps
                 )
 
                 return tuple(AvailablePlay(card) for card in playable)

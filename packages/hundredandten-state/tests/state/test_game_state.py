@@ -2,13 +2,14 @@
 
 from unittest import TestCase
 
-from hundredandten.deck import defined_cards
-from hundredandten.engine.actions import Bid, Discard, Play
+from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit, defined_cards
+from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
     HAND_SIZE,
     BidAmount,
     Status as EngineStatus,
 )
+from hundredandten.engine.player import player_after
 from hundredandten.state import (
     AvailableBid,
     AvailableDiscard,
@@ -159,6 +160,9 @@ class TestGameStateBidding(TestCase):
         state = EngineAdapter.state_from_engine(game, inactive.identifier)
 
         self.assertGreater(len(state.available_actions), 0)
+        self.assertTrue(
+            all(isinstance(a, AvailableBid) for a in state.available_actions)
+        )
 
     def test_available_bids_convenience(self):
         """available_bids property returns only Bid actions"""
@@ -513,3 +517,166 @@ class TestGameStateWon(TestCase):
         state = EngineAdapter.state_from_engine(game, game.players[0].identifier)
 
         self.assertEqual(len(state.available_actions), 0)
+
+
+class TestGameStateBiddingEdgeCases(TestCase):
+    """Edge case tests for BIDDING available_actions"""
+
+    def test_available_actions_include_pass(self):
+        """PASS is always among available bids when no bids have been placed"""
+        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
+        active = game.active_round.active_player
+        state = EngineAdapter.state_from_engine(game, active.identifier)
+
+        bid_amounts = [a.amount for a in state.available_bids]
+        from hundredandten.state import BidAmount as StateBidAmount
+
+        self.assertIn(StateBidAmount.PASS, bid_amounts)
+
+    def test_already_passed_player_has_no_available_actions(self):
+        """A player who has already passed sees no available actions"""
+        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
+        active = game.active_round.active_player
+        game.act(Bid(active.identifier, BidAmount.PASS))
+
+        # The player who just passed now observes the state
+        state = EngineAdapter.state_from_engine(game, active.identifier)
+
+        self.assertEqual(len(state.available_actions), 0)
+
+    def test_dealer_can_steal_active_bid(self):
+        """Dealer can match (steal) the active bid as well as raise it"""
+        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
+
+        # Advance until only the dealer is left to bid (everyone else passes)
+        arrange.pass_to_dealer(game)
+
+        dealer = game.active_round.active_player
+        active_bid_amount = game.active_round.active_bid
+        state = EngineAdapter.state_from_engine(game, dealer.identifier)
+
+        from hundredandten.state import BidAmount as StateBidAmount
+
+        bid_amounts = [a.amount for a in state.available_bids]
+
+        # Dealer must be able to match the current active bid (steal)
+        self.assertIsNotNone(active_bid_amount)
+        self.assertIn(StateBidAmount(active_bid_amount), bid_amounts)
+
+
+class TestGameStateTricksBleedingLogic(TestCase):
+    """Tests for bleeding (trump-lead) logic in available_plays"""
+
+    def test_non_trump_lead_allows_full_hand(self):
+        """When the lead card is not trump, all hand cards are playable"""
+        game = arrange.game(EngineStatus.TRICKS, seed=SEED)
+        assert game.active_round.trump
+
+        non_trump_suit = next(
+            s for s in iter(SelectableSuit) if s != game.active_round.trump
+        )
+        active_player = game.active_round.active_player
+        next_player = player_after(game.active_round.players, active_player.identifier)
+
+        # Lead with a non-trump card
+        active_player.hand[0] = Card(CardNumber.TWO, CardSuit[non_trump_suit.value])
+        game.act(Play(active_player.identifier, active_player.hand[0]))
+
+        # Next player has both trump and non-trump cards
+        state = EngineAdapter.state_from_engine(game, next_player.identifier)
+        play_cards = {p.card for p in state.available_plays}
+
+        self.assertEqual(play_cards, set(next_player.hand))
+
+    def test_trump_lead_restricts_to_trump_cards(self):
+        """When the lead card is trump, only trump cards are playable (if held)"""
+        game = arrange.game(EngineStatus.TRICKS, seed=SEED)
+        assert game.active_round.trump
+
+        non_trump_suit = next(
+            s for s in iter(SelectableSuit) if s != game.active_round.trump
+        )
+        active_player = game.active_round.active_player
+        next_player = player_after(game.active_round.players, active_player.identifier)
+
+        # Lead with a trump card to trigger bleeding
+        active_player.hand[0] = Card(
+            CardNumber.TEN, CardSuit[game.active_round.trump.value]
+        )
+        # Give next player a mix: some trump, some non-trump
+        trump_card = Card(CardNumber.NINE, CardSuit[game.active_round.trump.value])
+        non_trump_card = Card(CardNumber.TWO, CardSuit[non_trump_suit.value])
+        next_player.hand = [non_trump_card] * 4 + [trump_card]
+
+        game.act(Play(active_player.identifier, active_player.hand[0]))
+
+        state = EngineAdapter.state_from_engine(game, next_player.identifier)
+        play_cards = {p.card for p in state.available_plays}
+
+        # Only the trump card should be available
+        self.assertEqual(play_cards, {trump_card})
+
+    def test_trump_lead_allows_full_hand_when_no_trumps_held(self):
+        """When bleeding but player holds no trumps, full hand is playable"""
+        game = arrange.game(EngineStatus.TRICKS, seed=SEED)
+        assert game.active_round.trump
+
+        non_trump_suit = next(
+            s for s in iter(SelectableSuit) if s != game.active_round.trump
+        )
+        active_player = game.active_round.active_player
+        next_player = player_after(game.active_round.players, active_player.identifier)
+
+        # Lead with a trump card to trigger bleeding
+        active_player.hand[0] = Card(
+            CardNumber.TEN, CardSuit[game.active_round.trump.value]
+        )
+        # Give next player only non-trump cards
+        next_player.hand = [Card(CardNumber.TWO, CardSuit[non_trump_suit.value])] * 5
+
+        game.act(Play(active_player.identifier, active_player.hand[0]))
+
+        state = EngineAdapter.state_from_engine(game, next_player.identifier)
+        play_cards = {p.card for p in state.available_plays}
+
+        self.assertEqual(play_cards, set(next_player.hand))
+
+
+class TestEngineAdapterAvailableActionFromEngine(TestCase):
+    """Tests for EngineAdapter.available_action_from_engine() conversion"""
+
+    def test_bid_converts_to_available_bid(self):
+        """Bid engine action converts to AvailableBid"""
+        from hundredandten.state import BidAmount as StateBidAmount
+
+        action = Bid(identifier="player-1", amount=BidAmount.FIFTEEN)
+        result = EngineAdapter.available_action_from_engine(action)
+
+        self.assertIsInstance(result, AvailableBid)
+        self.assertEqual(result.amount, StateBidAmount.FIFTEEN)
+
+    def test_select_trump_converts_to_available_select_trump(self):
+        """SelectTrump engine action converts to AvailableSelectTrump"""
+        action = SelectTrump(identifier="player-1", suit=SelectableSuit.HEARTS)
+        result = EngineAdapter.available_action_from_engine(action)
+
+        self.assertIsInstance(result, AvailableSelectTrump)
+        self.assertEqual(result.suit, SelectableSuit.HEARTS)
+
+    def test_discard_converts_to_available_discard(self):
+        """Discard engine action converts to AvailableDiscard"""
+        cards = [Card(CardNumber.ACE, CardSuit.HEARTS)]
+        action = Discard(identifier="player-1", cards=cards)
+        result = EngineAdapter.available_action_from_engine(action)
+
+        self.assertIsInstance(result, AvailableDiscard)
+        self.assertEqual(result.cards, tuple(cards))
+
+    def test_play_converts_to_available_play(self):
+        """Play engine action converts to AvailablePlay"""
+        card = Card(CardNumber.FIVE, CardSuit.SPADES)
+        action = Play(identifier="player-1", card=card)
+        result = EngineAdapter.available_action_from_engine(action)
+
+        self.assertIsInstance(result, AvailablePlay)
+        self.assertEqual(result.card, card)
