@@ -224,7 +224,7 @@ requires-dist = [{ name = "hundredandten-deck", editable = "packages/hundredandt
 
 [[package]]
 name = "hundredandten-state"
-version = "0.0.1"
+version = "0.0.1.dev0"
 source = { editable = "packages/hundredandten-state" }
 dependencies = [
     { name = "hundredandten-deck" },
