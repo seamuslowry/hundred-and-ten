@@ -36,7 +36,7 @@ def __suggested_bid(game_state: GameState) -> AvailableBid:
     available_bids = [b.amount for b in game_state.available_bids]
     willing_bids = [b for b in available_bids if b and b <= maximum_bid]
 
-    return AvailableBid(next(iter(willing_bids), 0))
+    return AvailableBid(next(iter(willing_bids), BidAmount.PASS))
 
 
 def __suggested_trump_selection(game_state: GameState) -> AvailableSelectTrump:
@@ -105,17 +105,17 @@ def max_bid(cards: Sequence[Card]) -> BidAmount:
     best_value = __most_valuable_suit(cards)[1]
 
     if best_value > 50:
-        return 60
+        return BidAmount.SHOOT_THE_MOON
     if best_value > 40:
-        return 30
+        return BidAmount.THIRTY
     if best_value > 30:
-        return 25
+        return BidAmount.TWENTY_FIVE
     if best_value > 25:
-        return 20
+        return BidAmount.TWENTY
     if best_value > 20:
-        return 15
+        return BidAmount.FIFTEEN
 
-    return 0
+    return BidAmount.PASS
 
 
 def desired_trump(cards: Sequence[Card]) -> SelectableSuit:

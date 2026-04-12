@@ -1,7 +1,7 @@
 """Represent the state of a game as observed by a single player"""
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Self
 
 from hundredandten.deck import Card, SelectableSuit, defined_cards
@@ -32,7 +32,15 @@ class Status(Enum):
     WON = "WON"
 
 
-type BidAmount = int
+class BidAmount(IntEnum):
+    """Possible bid amounts"""
+
+    SHOOT_THE_MOON = 60
+    THIRTY = 30
+    TWENTY_FIVE = 25
+    TWENTY = 20
+    FIFTEEN = 15
+    PASS = 0
 
 
 @dataclass(frozen=True)
@@ -49,7 +57,7 @@ class AvailableBid:
     @classmethod
     def from_engine(cls, b: Bid) -> Self:
         """Create a player-agnostic Bid representation from a player-aware representation"""
-        return cls(int(b.amount))
+        return cls(BidAmount(b.amount))
 
     def for_player(self, identifier: str) -> Bid:
         """Create a player-aware Bid representation from a player-agnostic representation"""
@@ -342,12 +350,12 @@ class GameState:
                         bid.identifier,
                         num_players,
                     ),
-                    amount=int(bid.amount),
+                    amount=BidAmount(bid.amount),
                 )
                 for bid in game_round.bids
             ),
             active_bid=(
-                int(game_round.active_bid)
+                BidAmount(game_round.active_bid)
                 if game_round.active_bid is not None
                 else None
             ),
