@@ -591,11 +591,11 @@ class TestGameStateTricksBleedingLogic(TestCase):
         game = arrange.game(EngineStatus.TRICKS, seed=SEED)
         assert game.active_round.trump
 
+        active_player = game.active_round.active_player
+        next_player = player_after(game.active_round.players, active_player.identifier)
         non_trump_suit = next(
             s for s in iter(SelectableSuit) if s != game.active_round.trump
         )
-        active_player = game.active_round.active_player
-        next_player = player_after(game.active_round.players, active_player.identifier)
 
         # Lead with a trump card to trigger bleeding
         active_player.hand[0] = Card(
@@ -619,11 +619,11 @@ class TestGameStateTricksBleedingLogic(TestCase):
         game = arrange.game(EngineStatus.TRICKS, seed=SEED)
         assert game.active_round.trump
 
+        active_player = game.active_round.active_player
+        next_player = player_after(game.active_round.players, active_player.identifier)
         non_trump_suit = next(
             s for s in iter(SelectableSuit) if s != game.active_round.trump
         )
-        active_player = game.active_round.active_player
-        next_player = player_after(game.active_round.players, active_player.identifier)
 
         # Lead with a trump card to trigger bleeding
         active_player.hand[0] = Card(
