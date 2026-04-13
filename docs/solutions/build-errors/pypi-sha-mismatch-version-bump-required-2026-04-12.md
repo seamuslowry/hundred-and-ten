@@ -9,16 +9,16 @@ severity: high
 symptoms:
   - "CI publish fails with 'Local file and index file do not match' SHA mismatch error"
   - "PyPI/Test PyPI rejects re-upload of same filename with different tarball hash"
-root_cause: missing_workflow_step
-resolution_type: workflow_improvement
+root_cause: sdist_embeds_pyproject_toml
+resolution_type: ci_configuration
 related_components:
   - development_workflow
 tags:
   - pypi
   - uv
   - publish
-  - version-bump
   - sdist
+  - wheel
   - sha-mismatch
   - pep-440
   - monorepo
@@ -28,9 +28,12 @@ tags:
 
 ## Problem
 
-After modifying a package's `pyproject.toml` (even a test-only section like `[dependency-groups].test`)
-without bumping the version, the CI publish step fails with a SHA mismatch error because `uv build`
-produces a tarball with different content than the one already on PyPI under that version.
+After modifying a package's `pyproject.toml` (even a non-functional section like
+`[dependency-groups].test` or `[tool.ruff]`) without bumping the version, the CI publish step
+fails with a SHA mismatch error. `uv build` (without `--wheel`) produces both an sdist
+(`.tar.gz`) and a wheel (`.whl`). The sdist embeds `pyproject.toml` verbatim, so any edit —
+however minor — changes the tarball SHA. PyPI treats filenames as immutable and rejects the
+re-upload.
 
 ## Symptoms
 
@@ -40,83 +43,67 @@ Local: sha256=c3217edd22d01d13f46233ad3ada68b30b3ae8f5dc5db9be1a783310a41c7dbe
 Remote: sha256=9539d56f7bef5999430e426aaec75daf56fe705fa0f07358483235d5e1055dd9
 ```
 
-## What Didn't Work
+Note the filename ends in `.tar.gz` — it is the sdist, not the wheel, that conflicts.
 
-- Treating `[dependency-groups].test` changes as "safe" (non-publishing) changes that don't
-  require a version bump. Even though test dependency groups are not part of the installed package
-  metadata, they are part of `pyproject.toml`, which `uv build` includes verbatim in the sdist
-  tarball — changing any section changes the tarball SHA.
+## Root Cause
 
-## Solution
+`uv build` (default) produces both artifacts:
 
-Bump the package version before pushing to CI. The correct bump strategy depends on the current
-version's release stage:
+- **sdist** (`.tar.gz`): includes `pyproject.toml` verbatim. Any edit changes its SHA.
+- **wheel** (`.whl`): contains only compiled `METADATA` derived from `[project]` fields.
+  Non-functional sections (`[dependency-groups]`, `[tool.*]`) are not in wheel `METADATA`.
 
-**Under a dev release (`X.Y.Z.devN`):** increment the dev counter — stay in the dev series.
+The sdist is the source of the conflict. Wheels built from the same `[project]` fields produce
+identical bytes regardless of edits to test groups or linter config.
 
-```toml
-# Before (published at this version, then pyproject.toml edited → publish fails)
-[project]
-name = "hundredandten-automation-naive"
-version = "0.0.1.dev2"
+## Structural Fix (Active)
 
-[dependency-groups]
-test = [
-    "hundredandten-testing>=0.0.0,<1.0.0",
-]
+The CI workflows (`deploy.yaml`, `deploy-test.yaml`) now pass `--wheel` to every `uv build` call:
+
+```yaml
+uv build --wheel --package hundredandten-deck
+uv build --wheel --package hundredandten-engine
+# ...etc
 ```
 
-```toml
-# After (increment dev counter → new filename, PyPI accepts it)
-[project]
-name = "hundredandten-automation-naive"
-version = "0.0.1.dev3"
+This suppresses sdist generation entirely. Only wheels are uploaded to PyPI. A non-functional
+`pyproject.toml` edit produces a byte-for-byte identical wheel, so PyPI treats the re-upload as
+a no-op. A functional change (adding a runtime dependency) does change wheel `METADATA`, so
+those still correctly fail publish without a version bump.
 
-[dependency-groups]
-test = [
-    "hundredandten-automation-engineadapter>=0.0.0,<1.0.0",
-    "hundredandten-testing>=0.0.0,<1.0.0",
-]
+## When a Version Bump Is Still Required
+
+Functional changes to `[project]` fields always require a version bump:
+
+- New or changed `[project].dependencies`
+- Changed `[project].requires-python`
+- Changed `[project].name`, `version` itself, `description`, `keywords`, `classifiers`
+
+Non-functional sections that **no longer** require a bump (wheels-only CI):
+
+- `[dependency-groups].*` (test/dev groups)
+- `[tool.ruff]`, `[tool.black]`, `[tool.pyright]`, `[tool.pytest.*]`
+- `[build-system]` (does not appear in wheel METADATA)
+
+## Version Bump Strategy (When Still Needed)
+
+**Under a dev release (`X.Y.Z.devN`):** increment the dev counter.
+
+```toml
+version = "0.0.1.dev3"  # was dev2, functional change made
 ```
 
-**Under a proper release (`X.Y.Z`):** use the **`.postX` suffix** (PEP 440 §8.1) to signal
-"same functional code, administrative correction":
+**Under a proper release (`X.Y.Z`):** use the `.postX` suffix (PEP 440 §8.1):
 
 ```toml
-# 0.1.0 already on PyPI, pyproject.toml edited for non-functional reason
-version = "0.1.0.post1"  # correct
-
-# Do NOT combine .dev and .post — "0.0.1.dev2.post1" is not valid PEP 440
+version = "0.1.0.post1"  # was 0.1.0, functional change made
 ```
 
-Subsequent administrative fixes increment the appropriate counter:
-`0.0.1.dev3` → `0.0.1.dev4`, or `0.1.0.post1` → `0.1.0.post2`.
+Do not combine the two suffixes — `0.0.1.dev2.post1` is not valid PEP 440.
 
-**Functional changes** (new features, bug fixes) always follow normal semver conventions
-regardless of release stage.
+## Related
 
-## Why This Works
-
-PyPI treats filenames as immutable: once `...-0.0.1.dev2.tar.gz` is accepted at a given SHA,
-no other content can be uploaded under that filename. `uv build` packages `pyproject.toml`
-verbatim into the sdist, so any edit — no matter how minor — produces a different tarball with
-a different SHA. Bumping the version creates a new, distinct filename that PyPI will accept.
-
-## Prevention
-
-- **Rule:** Any commit that modifies a package's `pyproject.toml` requires a version bump
-  before the next publish — no exceptions, regardless of which section changed.
-- **Dev release** (`X.Y.Z.devN`): increment `N`. **Proper release** (`X.Y.Z`): append `.postX`.
-  Do not combine the two suffixes (`X.Y.Z.devN.postX` is not valid PEP 440).
-- Non-obvious sections that still require a bump: `[dependency-groups].test`,
-  `[project].description`/`keywords`/`classifiers`, `[tool.*]` config blocks (ruff, black,
-  pyright, pytest), and `[build-system]` requires.
-- In a uv workspace monorepo, each package in the publish workflow must be checked independently —
-  only packages whose `pyproject.toml` changed need a bump, but one unbumped package fails
-  the entire `uv publish` run.
-
-## Related Issues
-
+- `docs/plans/2026-04-12-002-fix-exclude-pyproject-from-sdist-plan.md` — plan that introduced
+  the wheels-only CI fix.
 - `docs/solutions/best-practices/uv-test-only-dependencies-and-decoupled-strategy-packages-2026-04-11.md`
-  — covers `[dependency-groups]` scoping; note that test deps not being in installed metadata
-  does not exempt `pyproject.toml` from the version-bump rule.
+  — covers `[dependency-groups]` scoping.
