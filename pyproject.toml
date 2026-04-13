@@ -11,7 +11,7 @@ lint = [
 test = [
     "coverage==7.13.5",
     "hundredandten-testing",
-    "pytest==9.0.2"
+    "pytest==9.0.3"
 ]
 
 [tool.pylint.design]
