@@ -6,6 +6,7 @@ from itertools import combinations
 
 from hundredandten.deck import Card, SelectableSuit
 
+
 class Status(Enum):
     """Game status as observed by a player"""
 

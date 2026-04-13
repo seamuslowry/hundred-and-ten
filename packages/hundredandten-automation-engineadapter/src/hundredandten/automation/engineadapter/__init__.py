@@ -53,7 +53,8 @@ class EngineAdapter:
         """
         Return an action for the current player, using the decision function.
         Returns None if the decision function returns None.
-        Raises UnavailableActionError if the decision function returns an action not available to the player.
+        Raises UnavailableActionError if the decision function returns an action
+        not available to the player.
         """
         state = EngineAdapter.state_from_engine(game, identifier)
         suggested_action = decision_fn(state)

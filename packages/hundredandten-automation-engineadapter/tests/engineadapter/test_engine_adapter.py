@@ -727,7 +727,9 @@ class TestAdapterActionFor(TestCase):
         self.assertIsInstance(action, Bid)
 
     def test_adapter_checks_action(self):
-        """Adapter raises UnavailableActionError if the decision function returns an unavailable action"""
+        """
+        Adapter raises UnavailableActionError if the decision function returns an unavailable action
+        """
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
 

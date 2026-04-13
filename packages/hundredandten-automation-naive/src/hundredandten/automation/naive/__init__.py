@@ -14,6 +14,7 @@ from hundredandten.state import (
     Status,
 )
 
+
 class AutomationError(Exception):
     """Raised when there is an error in the automation process"""
 
