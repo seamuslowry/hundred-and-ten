@@ -182,7 +182,7 @@ wheels = [
 
 [[package]]
 name = "hundredandten-automation-engineadapter"
-version = "0.0.1.dev4"
+version = "0.0.1.dev5"
 source = { editable = "packages/hundredandten-automation-engineadapter" }
 dependencies = [
     { name = "hundredandten-deck" },
@@ -207,7 +207,7 @@ test = [{ name = "hundredandten-testing", editable = "packages/hundredandten-tes
 
 [[package]]
 name = "hundredandten-automation-naive"
-version = "0.0.1.dev3"
+version = "0.0.1.dev4"
 source = { editable = "packages/hundredandten-automation-naive" }
 dependencies = [
     { name = "hundredandten-deck" },
@@ -252,7 +252,7 @@ requires-dist = [{ name = "hundredandten-deck", editable = "packages/hundredandt
 
 [[package]]
 name = "hundredandten-state"
-version = "0.0.1.dev4"
+version = "0.0.1.dev5"
 source = { editable = "packages/hundredandten-state" }
 dependencies = [
     { name = "hundredandten-deck" },
