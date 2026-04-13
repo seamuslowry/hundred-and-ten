@@ -58,6 +58,7 @@ class EngineAdapter:
             raise StateError(f"""
                 decision_fn returned an action {suggested_action}
                 not in available_actions: {state.available_actions}
+                game state: {state}
                 """)
         return EngineAdapter.available_action_for_player(suggested_action, identifier)
 
