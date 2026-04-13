@@ -737,15 +737,6 @@ class TestAdapterActionFor(TestCase):
                 game, active.identifier, lambda _: AvailableDiscard(cards=())
             )
 
-    def test_adapter_returns_none_when_decision_fn_returns_none(self):
-        """Adapter returns None when the decision function returns None"""
-        game = arrange.game(EngineStatus.BIDDING, seed=SEED)
-        active = game.active_round.active_player
-
-        action = EngineAdapter.action_for(game, active.identifier, lambda _: None)
-
-        self.assertIsNone(action)
-
 
 class TestEngineAdapterAvailableActionForPlayer(TestCase):
     """Tests for EngineAdapter.available_action_for_player() — state→engine conversion"""
