@@ -55,9 +55,10 @@ class EngineAdapter:
         state = EngineAdapter.state_from_engine(game, identifier)
         suggested_action = decision_fn(state)
         if suggested_action not in state.available_actions:
-            raise StateError(
-                f"decision_fn returned an action not in available_actions: {suggested_action}"
-            )
+            raise StateError(f"""
+                decision_fn returned an action {suggested_action}
+                not in available_actions: {state.available_actions}
+                """)
         return EngineAdapter.available_action_for_player(suggested_action, identifier)
 
     @staticmethod
