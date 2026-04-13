@@ -7,7 +7,6 @@ from hundredandten.automation.engineadapter import EngineAdapter
 from hundredandten.engine.constants import Status
 from hundredandten.engine.game import Game
 from hundredandten.engine.player import Player
-from hundredandten.state import StateError
 from hundredandten.testing import arrange
 
 AUTOMATED_SEED = "a92475b9-3df3-458d-b0df-486f9a305015"
@@ -46,7 +45,7 @@ class TestAutomatedPlay(TestCase):
         game = arrange.game(Status.WON, seed=AUTOMATED_SEED)
 
         self.assertRaises(
-            StateError,
+            naive.AutomationError,
             action_for,
             game,
             game.players[0].identifier,

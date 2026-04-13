@@ -29,13 +29,16 @@ from hundredandten.state import (
     GameState,
     InHand,
     Played,
-    StateError,
     Status,
     TableInfo,
     TrickPlay,
     TrickState,
     Unknown,
 )
+
+
+class UnavailableActionError(Exception):
+    """Raised when the decision function returns an action not available to the player"""
 
 
 class EngineAdapter:
@@ -50,12 +53,12 @@ class EngineAdapter:
         """
         Return an action for the current player, using the decision function.
         Returns None if the decision function returns None.
-        Raises StateError if the decision function returns an action not available to the player.
+        Raises UnavailableActionError if the decision function returns an action not available to the player.
         """
         state = EngineAdapter.state_from_engine(game, identifier)
         suggested_action = decision_fn(state)
         if suggested_action not in state.available_actions:
-            raise StateError(f"""
+            raise UnavailableActionError(f"""
                 decision_fn returned an action {suggested_action}
                 not in available_actions: {state.available_actions}
                 game state: {state}

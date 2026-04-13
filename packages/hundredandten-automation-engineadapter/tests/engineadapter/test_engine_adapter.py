@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.automation.engineadapter import EngineAdapter
+from hundredandten.automation.engineadapter import EngineAdapter, UnavailableActionError
 from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit, defined_cards
 from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
@@ -21,7 +21,6 @@ from hundredandten.state import (
     Discarded,
     InHand,
     Played,
-    StateError,
     Status,
     Unknown,
 )
@@ -728,11 +727,11 @@ class TestAdapterActionFor(TestCase):
         self.assertIsInstance(action, Bid)
 
     def test_adapter_checks_action(self):
-        """Adapter raises StateError if the decision function returns an unavailable action"""
+        """Adapter raises UnavailableActionError if the decision function returns an unavailable action"""
         game = arrange.game(EngineStatus.BIDDING, seed=SEED)
         active = game.active_round.active_player
 
-        with self.assertRaises(StateError):
+        with self.assertRaises(UnavailableActionError):
             EngineAdapter.action_for(
                 game, active.identifier, lambda _: AvailableDiscard(cards=())
             )

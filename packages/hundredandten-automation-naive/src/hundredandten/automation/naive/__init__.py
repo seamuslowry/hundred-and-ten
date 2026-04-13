@@ -11,9 +11,11 @@ from hundredandten.state import (
     AvailableSelectTrump,
     BidAmount,
     GameState,
-    StateError,
     Status,
 )
+
+class AutomationError(Exception):
+    """Raised when there is an error in the automation process"""
 
 
 def action_for(state: GameState) -> AvailableAction:
@@ -26,7 +28,7 @@ def action_for(state: GameState) -> AvailableAction:
         return __suggested_discard(state)
     if state.status == Status.TRICKS:
         return __suggested_play(state)
-    raise StateError(f"Cannot automate the action in status {state.status}")
+    raise AutomationError(f"Cannot determine a naive action in status {state.status}")
 
 
 def __suggested_bid(game_state: GameState) -> AvailableBid:

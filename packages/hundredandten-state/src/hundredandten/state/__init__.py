@@ -6,11 +6,6 @@ from itertools import combinations
 
 from hundredandten.deck import Card, SelectableSuit
 
-
-class StateError(Exception):
-    """Raised when a state operation cannot be completed"""
-
-
 class Status(Enum):
     """Game status as observed by a player"""
 
