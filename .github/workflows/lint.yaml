@@ -13,12 +13,10 @@ jobs:
         with:
           enable-cache: true
 
-      - run: uv sync --group lint
+      - run: uv sync --locked --group lint
 
       - name: PyLint
-        run: |
-          readarray -t py_files < <(git ls-files '*.py')
-          uv run pylint "${py_files[@]}"
+        run: uv run pylint packages
 
       - name: Pyright
         run: uv run pyright

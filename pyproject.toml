@@ -1,50 +1,68 @@
-[build-system]
-requires = ["uv_build>=0.11.2,<0.12"]
-build-backend = "uv_build"
-
-[project]
-name = "hundredandten"
-version = "5.0.0"
-description = "An engine to play the game Hundred and Ten"
-readme = "README.md"
-requires-python = ">=3.11"
-license = {text = "MIT"}
-authors = [
-    { name = "Seamus Lowry" },
-]
-classifiers = [
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-]
-dependencies = []
+[tool.uv.workspace]
+members = ["packages/*"]
 
 [dependency-groups]
 lint = [
     "pylint==4.0.5",
     "pyright==1.1.408",
-    "ruff==0.15.9",
+    "ruff==0.15.10",
     "black==26.3.1",
 ]
 test = [
     "coverage==7.13.5",
-    "pytest==9.0.2",
+    "hundredandten-testing",
+    "pytest==9.0.2"
 ]
 
-[tool.coverage.run]
-omit = [
-    "tests/*",
-]
+[tool.pylint.design]
+# Allow Settings/Config classes to have no methods
+min-public-methods = 0
 
 [tool.ruff]
 target-version = "py314"
 line-length = 100
 lint.extend-select = ["I"]
+lint.isort.combine-as-imports = true
 
 [tool.black]
 target-version = ["py314"]
 
-[tool.uv.build-backend]
-module-root = "."
+[tool.pytest.ini_options]
+testpaths = [
+    "packages/hundredandten-engine",
+    "packages/hundredandten-state",
+    "packages/hundredandten-automation-naive",
+    "packages/hundredandten-automation-engineadapter",
+    "packages/hundredandten-deck"
+]
+addopts = [
+    "--import-mode=importlib",
+]
+
+[tool.coverage.run]
+source = [
+    "hundredandten.engine",
+    "hundredandten.state",
+    "hundredandten.automation.naive",
+    "hundredandten.automation.engineadapter",
+    "hundredandten.deck"
+]
+omit = ["*/tests/*", "*/hundredandten-testing/*"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 100
+
+[tool.uv]
+check-url = "https://pypi.org/simple/"
+
+[tool.uv.sources]
+hundredandten-engine = { workspace = true }
+hundredandten-state = { workspace = true }
+hundredandten-automation-naive = { workspace = true }
+hundredandten-automation-engineadapter = { workspace = true }
+hundredandten-testing = { workspace = true }
+hundredandten-deck = { workspace = true }
 
 [[tool.uv.index]]
 name = "testpypi"

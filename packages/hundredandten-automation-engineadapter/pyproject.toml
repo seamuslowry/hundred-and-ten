@@ -1,0 +1,31 @@
+[build-system]
+requires = ["uv_build>=0.11.2,<0.12"]
+build-backend = "uv_build"
+
+[project]
+name = "hundredandten-automation-engineadapter"
+version = "0.0.2"
+description = "Engine adapter for wiring automation strategies to the Hundred and Ten game engine"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    { name = "Seamus Lowry" },
+]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "hundredandten-state>=0.0.0,<1.0.0",
+    "hundredandten-engine>=0.0.0,<1.0.0",
+    "hundredandten-deck>=0.0.0,<1.0.0",
+]
+
+[dependency-groups]
+test = [
+    "hundredandten-testing>=0.0.0,<1.0.0",
+]
+
+[tool.uv.build-backend]
+module-name = "hundredandten.automation.engineadapter"

@@ -1,0 +1,31 @@
+name: Publish (Test)
+
+on:
+  push:
+
+jobs:
+  publish:
+    environment: test
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    strategy:
+      matrix:
+        package:
+          - hundredandten-deck
+          - hundredandten-engine
+          - hundredandten-state
+          - hundredandten-automation-naive
+          - hundredandten-automation-engineadapter
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Build and Publish to Test PyPI
+        run: |
+          uv version --package ${{ matrix.package }} --bump patch --bump dev=${{ github.run_number }}
+          uv build --wheel --package ${{ matrix.package }}
+          uv publish --index testpypi

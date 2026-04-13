@@ -1,0 +1,32 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    environment: release
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    strategy:
+      matrix:
+        package:
+          - hundredandten-deck
+          - hundredandten-engine
+          - hundredandten-state
+          - hundredandten-automation-naive
+          - hundredandten-automation-engineadapter
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Build and Publish to PyPI
+        run: |
+          uv build --wheel --package ${{ matrix.package }}
+          uv publish
