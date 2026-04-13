@@ -725,7 +725,7 @@ class TestAdapterActionFor(TestCase):
         )
 
         self.assertIsNotNone(action)
-        self.assertIsInstance(action, AvailableBid)
+        self.assertIsInstance(action, Bid)
 
     def test_adapter_checks_action(self):
         """Adapter raises StateError if the decision function returns an unavailable action"""

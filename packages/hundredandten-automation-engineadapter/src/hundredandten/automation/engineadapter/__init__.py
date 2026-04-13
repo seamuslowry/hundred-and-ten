@@ -46,7 +46,7 @@ class EngineAdapter:
         game: Game,
         identifier: str,
         decision_fn: Callable[[GameState], AvailableAction],
-    ) -> AvailableAction:
+    ) -> Action:
         """
         Return an action for the current player, using the decision function.
         Returns None if the decision function returns None.
@@ -58,7 +58,7 @@ class EngineAdapter:
             raise StateError(
                 f"decision_fn returned an action not in available_actions: {suggested_action}"
             )
-        return suggested_action
+        return EngineAdapter.available_action_for_player(suggested_action, identifier)
 
     @staticmethod
     def available_action_from_engine(a: Action) -> AvailableAction:
