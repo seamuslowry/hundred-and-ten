@@ -2,6 +2,8 @@ name: Publish (Test)
 
 on:
   push:
+    branches-ignore:
+      - main
 
 jobs:
   publish:
