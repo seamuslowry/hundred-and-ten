@@ -87,6 +87,8 @@ Fields requiring rotation tests:
 | `TrickPlay.seat` | `state.tricks.current_trick_plays[n].seat` |
 | `CompletedTrick.winner_seat` | `state.tricks.completed_tricks[n].winner_seat` | ⚠ not yet covered |
 
+`Discarded` intentionally has no `seat` field — only the requesting player's own discards are ever visible, so the seat is always 0 by design and was removed as structural noise (see [`logic-errors/discarded-seat-field-always-zero-2026-04-17.md`](../logic-errors/discarded-seat-field-always-zero-2026-04-17.md)).
+
 ## Why This Matters
 
 ### Inverse conversion symmetry
