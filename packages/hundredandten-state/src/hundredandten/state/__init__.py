@@ -105,9 +105,7 @@ class Played:
 
 @dataclass(frozen=True)
 class Discarded:
-    """Card was discarded by a specific seat"""
-
-    seat: int
+    """Card was discarded by the requesting player"""
 
 
 @dataclass(frozen=True)

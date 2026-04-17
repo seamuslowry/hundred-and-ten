@@ -64,5 +64,5 @@ print(state.table.scores)      # tuple[int, ...] — scores indexed by relative 
 | `CardStatus` | Union type: `InHand \| Played \| Discarded \| Unknown`. |
 | `InHand` | Card is in this player's hand. |
 | `Played` | Card was played in `trick_index` by relative `seat`. |
-| `Discarded` | Card was discarded by relative `seat`. |
+| `Discarded` | Card was discarded by this player. |
 | `Unknown` | Card location is not visible to this player. |

@@ -308,10 +308,6 @@ class TestGameStateDiscard(TestCase):
             ck.card for ck in state.cards if isinstance(ck.status, Discarded)
         ]
         self.assertCountEqual(discarded_in_state, discarded_cards)
-        # Verify all discarded cards show seat=0 (own seat)
-        for ck in state.cards:
-            if isinstance(ck.status, Discarded):
-                self.assertEqual(ck.status.seat, 0)
 
     def test_other_player_discards_not_visible(self):
         """Other players' discards appear as Unknown, not Discarded"""

@@ -201,7 +201,7 @@ class EngineAdapter:
         for discard in game_round.discards:
             if discard.identifier == player.identifier:
                 for card in discard.cards:
-                    card_status_by_card[card] = Discarded(seat=0)
+                    card_status_by_card[card] = Discarded()
 
         unknown = Unknown()
         return tuple(
