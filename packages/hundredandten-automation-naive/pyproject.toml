@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "hundredandten-automation-naive"
-version = "0.0.2"
+version = "0.0.3"
 description = "Naive strategy player for the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.12"
