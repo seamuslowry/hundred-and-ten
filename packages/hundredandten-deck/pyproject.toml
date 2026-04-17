@@ -18,5 +18,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.urls]
+Repository = "https://github.com/seamuslowry/hundred-and-ten"
+Source = "https://github.com/seamuslowry/hundred-and-ten/tree/main/packages/hundredandten-deck"
+
 [tool.uv.build-backend]
 module-name = "hundredandten.deck"

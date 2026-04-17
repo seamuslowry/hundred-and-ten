@@ -18,5 +18,9 @@ classifiers = [
 ]
 dependencies = ["hundredandten-deck>=0.0.0,<1.0.0"]
 
+[project.urls]
+Repository = "https://github.com/seamuslowry/hundred-and-ten"
+Source = "https://github.com/seamuslowry/hundred-and-ten/tree/main/packages/hundredandten-engine"
+
 [tool.uv.build-backend]
 module-name = "hundredandten.engine"

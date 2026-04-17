@@ -27,5 +27,9 @@ test = [
     "hundredandten-testing>=0.0.0,<1.0.0",
 ]
 
+[project.urls]
+Repository = "https://github.com/seamuslowry/hundred-and-ten"
+Source = "https://github.com/seamuslowry/hundred-and-ten/tree/main/packages/hundredandten-automation-engineadapter"
+
 [tool.uv.build-backend]
 module-name = "hundredandten.automation.engineadapter"
