@@ -4,12 +4,12 @@ from unittest import TestCase
 
 from hundredandten.deck import (
     Card,
-    CardInfo,
+    _CardInfo,
     CardNumber,
     CardSuit,
     Deck,
     SelectableSuit,
-    card_info,
+    _CARD_INFO,
     ALL_CARDS,
 )
 
@@ -62,14 +62,14 @@ class TestCardInfo(TestCase):
 
     def test_card_info_creation(self):
         """CardInfo stores trump_value, weak_trump_value, and always_trump"""
-        info = CardInfo(trump_value=5, weak_trump_value=3)
+        info = _CardInfo(trump_value=5, weak_trump_value=3)
         self.assertEqual(info.trump_value, 5)
         self.assertEqual(info.weak_trump_value, 3)
         self.assertFalse(info.always_trump)
 
     def test_card_info_always_trump(self):
         """CardInfo always_trump flag works"""
-        info = CardInfo(trump_value=10, weak_trump_value=10, always_trump=True)
+        info = _CardInfo(trump_value=10, weak_trump_value=10, always_trump=True)
         self.assertTrue(info.always_trump)
 
 
@@ -102,7 +102,7 @@ class TestCard(TestCase):
         """Trump value for red number card comes from card_info"""
         card = Card(CardNumber.FIVE, CardSuit.HEARTS)
         self.assertEqual(
-            card.trump_value, card_info[CardSuit.HEARTS][CardNumber.FIVE].trump_value
+            card.trump_value, _CARD_INFO[CardSuit.HEARTS][CardNumber.FIVE].trump_value
         )
 
     def test_trump_value_five_is_fourteen(self):
@@ -136,7 +136,7 @@ class TestCard(TestCase):
         """Trump value for black number card (reversed ordering) from card_info"""
         card = Card(CardNumber.TWO, CardSuit.SPADES)
         self.assertEqual(
-            card.trump_value, card_info[CardSuit.SPADES][CardNumber.TWO].trump_value
+            card.trump_value, _CARD_INFO[CardSuit.SPADES][CardNumber.TWO].trump_value
         )
 
     def test_weak_trump_value(self):
@@ -144,7 +144,7 @@ class TestCard(TestCase):
         card = Card(CardNumber.THREE, CardSuit.DIAMONDS)
         self.assertEqual(
             card.weak_trump_value,
-            card_info[CardSuit.DIAMONDS][CardNumber.THREE].weak_trump_value,
+            _CARD_INFO[CardSuit.DIAMONDS][CardNumber.THREE].weak_trump_value,
         )
 
     def test_card_frozen(self):
