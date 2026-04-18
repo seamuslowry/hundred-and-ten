@@ -11,8 +11,10 @@ The most common usage is `action_for`, which handles the full loop: build state,
 ```python
 from hundredandten.automation.engineadapter import EngineAdapter
 from hundredandten.automation import naive
+from hundredandten.engine import Game, Player
 
-engine_action = EngineAdapter.action_for(game, 'player_1', naive.action_for)
+game = Game(players=[Player('player_1'), Player('player_2')])
+engine_action = EngineAdapter.action_for(game, 'player_2', naive.action_for)
 game.act(engine_action)
 ```
 
