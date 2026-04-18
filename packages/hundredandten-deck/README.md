@@ -21,9 +21,7 @@ for card in hand:
 | `CardSuit` | Enum of suits: `HEARTS`, `DIAMONDS`, `SPADES`, `CLUBS`, `JOKER`. |
 | `CardNumber` | Enum of card values: `TWO` through `ACE` plus `JOKER`. |
 | `SelectableSuit` | Enum of the four choosable trump suits: `HEARTS`, `DIAMONDS`, `SPADES`, `CLUBS`. |
-| `CardInfo` | Frozen dataclass holding game metadata for a card: `trump_value`, `weak_trump_value`, `always_trump`. |
-| `card_info` | `dict[CardSuit, dict[CardNumber, CardInfo]]` — the full card metadata table. |
-| `defined_cards` | `list[Card]` — all 53 cards in the deck (52 standard + Joker), in a fixed order. |
+| `ALL_CARDS` | `list[Card]` — all 53 cards in the deck (52 standard + Joker), in a fixed order. |
 | `Deck` | A seeded, shuffled deck. Construct with an optional `seed` string; call `deck.draw(n)` to pull `n` cards. |
 
 ## Card Values
