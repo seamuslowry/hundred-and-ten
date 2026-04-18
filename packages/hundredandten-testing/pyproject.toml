@@ -14,3 +14,5 @@ dependencies = [
 [tool.uv]
 package = false
 
+[tool.uv.build-backend]
+module-name = "hundredandten.testing"
