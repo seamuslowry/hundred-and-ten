@@ -4,7 +4,7 @@ Player observation layer for the card game Hundred and Ten.
 
 `GameState` is a player-agnostic snapshot of the game at decision time. All seat positions are **relative** — the observing player is always seat 0, with other players numbered clockwise. No player identifiers appear in the state. This design makes `GameState` the natural observation space for automation strategies and future ML training.
 
-`GameState` is constructed by [`EngineAdapter`](../hundredandten-automation-engineadapter/) from a live `Game` object, not built directly.
+`GameState` is usually constructed by an [`EngineAdapter`](../hundredandten-automation-engineadapter/) from a live `Game` object. But it may be built directly.
 
 ```python
 from hundredandten.automation.engineadapter import EngineAdapter
