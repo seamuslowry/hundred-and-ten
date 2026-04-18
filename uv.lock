@@ -21,7 +21,7 @@ lint = [
 ]
 test = [
     { name = "coverage", specifier = "==7.13.5" },
-    { name = "hundredandten-testing", editable = "packages/hundredandten-testing" },
+    { name = "hundredandten-testing", virtual = "packages/hundredandten-testing" },
     { name = "pytest", specifier = "==9.0.2" },
 ]
 
@@ -203,7 +203,7 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-test = [{ name = "hundredandten-testing", editable = "packages/hundredandten-testing" }]
+test = [{ name = "hundredandten-testing", virtual = "packages/hundredandten-testing" }]
 
 [[package]]
 name = "hundredandten-automation-naive"
@@ -231,7 +231,7 @@ requires-dist = [
 test = [
     { name = "hundredandten-automation-engineadapter", editable = "packages/hundredandten-automation-engineadapter" },
     { name = "hundredandten-engine", editable = "packages/hundredandten-engine" },
-    { name = "hundredandten-testing", editable = "packages/hundredandten-testing" },
+    { name = "hundredandten-testing", virtual = "packages/hundredandten-testing" },
 ]
 
 [[package]]
@@ -264,7 +264,7 @@ requires-dist = [{ name = "hundredandten-deck", editable = "packages/hundredandt
 [[package]]
 name = "hundredandten-testing"
 version = "0.0.0"
-source = { editable = "packages/hundredandten-testing" }
+source = { virtual = "packages/hundredandten-testing" }
 dependencies = [
     { name = "hundredandten-engine" },
 ]
