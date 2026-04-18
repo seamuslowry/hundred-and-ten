@@ -26,12 +26,8 @@ game = Game([
 | `Bid` | Action to place a bid or pass during `BIDDING`. |
 | `BidAmount` | Enum of valid bid values: `FIFTEEN`, `TWENTY`, `TWENTY_FIVE`, `THIRTY`, `SHOOT_THE_MOON`, `PASS`. |
 | `SelectTrump` | Action to choose the trump suit during `TRUMP_SELECTION`. |
-| `SelectableSuit` | Enum of the four choosable suits: `HEARTS`, `DIAMONDS`, `SPADES`, `CLUBS`. |
 | `Discard` | Action to discard cards and refill during `DISCARD`. |
 | `Play` | Action to play a card into the current trick during `TRICKS`. |
-| `Card` | A frozen dataclass representing a single playing card. |
-| `CardSuit` | Enum of card suits including `JOKER`. |
-| `CardNumber` | Enum of card values from `TWO` through `ACE` plus `JOKER`. |
 | `HundredAndTenError` | Base exception raised on invalid game actions. |
 
 ## Game Status
