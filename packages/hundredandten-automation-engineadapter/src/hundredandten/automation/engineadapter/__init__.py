@@ -2,7 +2,7 @@
 
 from typing import Callable
 
-from hundredandten.deck import Card, ALL_CARDS
+from hundredandten.deck import ALL_CARDS, Card
 from hundredandten.engine import Game
 from hundredandten.engine.actions import (
     Action,

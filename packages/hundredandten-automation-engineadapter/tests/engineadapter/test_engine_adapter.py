@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.automation.engineadapter import EngineAdapter, UnavailableActionError
-from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit, ALL_CARDS
+from hundredandten.deck import ALL_CARDS, Card, CardNumber, CardSuit, SelectableSuit
 from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
     HAND_SIZE,

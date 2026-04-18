@@ -3,14 +3,14 @@
 from unittest import TestCase
 
 from hundredandten.deck import (
+    _CARD_INFO,
+    ALL_CARDS,
     Card,
-    _CardInfo,
     CardNumber,
     CardSuit,
     Deck,
     SelectableSuit,
-    _CARD_INFO,
-    ALL_CARDS,
+    _CardInfo,
 )
 
 
@@ -154,20 +154,20 @@ class TestCard(TestCase):
             card.number = CardNumber.TWO  # type: ignore[misc]
 
 
-class TestDefinedCards(TestCase):
-    """Unit tests for defined_cards"""
+class TestAllCards(TestCase):
+    """Unit tests for ALL_CARDS"""
 
-    def test_defined_cards_length(self):
-        """There are exactly 53 defined cards (52 + Joker)"""
+    def test_all_cards_length(self):
+        """There are exactly 53 cards (52 + Joker)"""
         self.assertEqual(len(ALL_CARDS), 53)
 
-    def test_defined_cards_contains_joker(self):
-        """defined_cards contains the Joker"""
+    def test_all_cards_contains_joker(self):
+        """ALL_CARDS contains the Joker"""
         joker = Card(CardNumber.JOKER, CardSuit.JOKER)
         self.assertIn(joker, ALL_CARDS)
 
-    def test_defined_cards_contains_ace_of_hearts(self):
-        """defined_cards contains Ace of Hearts"""
+    def test_all_cards_contains_ace_of_hearts(self):
+        """ALL_CARDS contains Ace of Hearts"""
         ace_of_hearts = Card(CardNumber.ACE, CardSuit.HEARTS)
         self.assertIn(ace_of_hearts, ALL_CARDS)
 

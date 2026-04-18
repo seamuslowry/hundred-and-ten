@@ -173,11 +173,11 @@ class Card:
         return _CARD_INFO[self.suit][self.number].always_trump
 
 
-ALL_CARDS = [
+ALL_CARDS: tuple[Card, ...] = tuple(
     Card(number, suit)
     for (suit, number_dict) in _CARD_INFO.items()
     for number in number_dict
-]
+)
 
 
 @dataclass
