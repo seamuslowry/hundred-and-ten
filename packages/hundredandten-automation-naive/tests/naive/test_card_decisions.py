@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.automation.naive import best_card, worst_card, worst_card_beating
+from hundredandten.automation.naive import _best_card, _worst_card, _worst_card_beating
 from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit
 
 
@@ -15,7 +15,7 @@ class TestCardDecisions(TestCase):
         card = Card(CardNumber.FIVE, CardSuit[suit.name])
         self.assertEqual(
             card,
-            best_card(
+            _best_card(
                 [
                     Card(CardNumber.FIVE, CardSuit.DIAMONDS),
                     card,
@@ -31,7 +31,7 @@ class TestCardDecisions(TestCase):
         card = Card(CardNumber.JOKER, CardSuit.JOKER)
         self.assertEqual(
             card,
-            best_card(
+            _best_card(
                 [
                     Card(CardNumber.FIVE, CardSuit.DIAMONDS),
                     card,
@@ -46,7 +46,7 @@ class TestCardDecisions(TestCase):
         card = Card(CardNumber.TWO, CardSuit.DIAMONDS)
         self.assertEqual(
             card,
-            worst_card(
+            _worst_card(
                 [
                     Card(CardNumber.FIVE, CardSuit.SPADES),
                     card,
@@ -62,7 +62,7 @@ class TestCardDecisions(TestCase):
         card = Card(CardNumber.TWO, CardSuit[suit.name])
         self.assertEqual(
             card,
-            worst_card(
+            _worst_card(
                 [
                     Card(CardNumber.FIVE, CardSuit[suit.name]),
                     card,
@@ -79,7 +79,7 @@ class TestCardDecisions(TestCase):
         card = Card(CardNumber.ACE, CardSuit[suit.name])
         self.assertEqual(
             card,
-            worst_card_beating(
+            _worst_card_beating(
                 [
                     Card(CardNumber.FIVE, CardSuit[suit.name]),
                     Card(CardNumber.JACK, CardSuit[suit.name]),
@@ -97,7 +97,7 @@ class TestCardDecisions(TestCase):
         card = Card(CardNumber.TWO, CardSuit.SPADES)
         self.assertEqual(
             card,
-            worst_card_beating(
+            _worst_card_beating(
                 [
                     Card(CardNumber.FIVE, CardSuit[trump.name]),
                     Card(CardNumber.JACK, CardSuit[trump.name]),

@@ -11,9 +11,7 @@ Hundred and Ten is a Python implementation of the trick-taking card game "Hundre
 ├── packages/
 │   ├── hundredandten-deck/         # Card domain primitives (no dependencies)
 │   │   ├── src/hundredandten/deck/
-│   │   │   ├── __init__.py         # Public API exports
-│   │   │   ├── deck.py             # Card, Deck, CardSuit, CardNumber, SelectableSuit enums
-│   │   │   └── trumps.py           # trumps()/bleeds() logic
+│   │   │   └── __init__.py         # Public API: Card, Deck, CardSuit, CardNumber, SelectableSuit, ALL_CARDS
 │   │   └── tests/
 │   │       └── deck/               # Card/deck/trump tests
 │   │
@@ -23,11 +21,9 @@ Hundred and Ten is a Python implementation of the trick-taking card game "Hundre
 │   │   │   ├── game.py             # Game class (main entry point)
 │   │   │   ├── round.py            # Round lifecycle
 │   │   │   ├── trick.py            # Trick resolution
-│   │   │   ├── deck.py             # Re-export stub → hundredandten.deck
 │   │   │   ├── player.py           # Player model
 │   │   │   ├── actions.py          # Bid, SelectTrump, Discard, Play
 │   │   │   ├── constants.py        # Enums (Status, BidAmount, RoundRole, etc.)
-│   │   │   ├── trumps.py           # Re-export stub → hundredandten.deck
 │   │   │   └── errors.py           # Domain exceptions
 │   │   └── tests/
 │   │       ├── game/               # Game lifecycle tests
@@ -109,7 +105,7 @@ All game mutations go through `Game.act(action)` where `action` is one of: `Bid`
 # Install all dependencies
 uv sync --all-groups --all-packages
 
-# Run tests (181 tests, must all pass)
+# Run tests (must all pass)
 uv run pytest
 
 # Coverage (configured for 100% requirement)

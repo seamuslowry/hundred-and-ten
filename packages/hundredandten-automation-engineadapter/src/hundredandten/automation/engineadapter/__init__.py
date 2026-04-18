@@ -2,7 +2,7 @@
 
 from typing import Callable
 
-from hundredandten.deck import Card, defined_cards
+from hundredandten.deck import ALL_CARDS, Card
 from hundredandten.engine import Game
 from hundredandten.engine.actions import (
     Action,
@@ -201,7 +201,7 @@ class EngineAdapter:
         for discard in game_round.discards:
             if discard.identifier == player.identifier:
                 for card in discard.cards:
-                    card_status_by_card[card] = Discarded(seat=0)
+                    card_status_by_card[card] = Discarded()
 
         unknown = Unknown()
         return tuple(
@@ -209,7 +209,7 @@ class EngineAdapter:
                 card=card,
                 status=card_status_by_card.get(card, unknown),
             )
-            for card in defined_cards
+            for card in ALL_CARDS
         )
 
     @staticmethod

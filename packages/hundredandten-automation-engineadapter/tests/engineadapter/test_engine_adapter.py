@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.automation.engineadapter import EngineAdapter, UnavailableActionError
-from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit, defined_cards
+from hundredandten.deck import ALL_CARDS, Card, CardNumber, CardSuit, SelectableSuit
 from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
     HAND_SIZE,
@@ -308,10 +308,6 @@ class TestGameStateDiscard(TestCase):
             ck.card for ck in state.cards if isinstance(ck.status, Discarded)
         ]
         self.assertCountEqual(discarded_in_state, discarded_cards)
-        # Verify all discarded cards show seat=0 (own seat)
-        for ck in state.cards:
-            if isinstance(ck.status, Discarded):
-                self.assertEqual(ck.status.seat, 0)
 
     def test_other_player_discards_not_visible(self):
         """Other players' discards appear as Unknown, not Discarded"""
@@ -509,7 +505,7 @@ class TestGameStateImmutability(TestCase):
         state = EngineAdapter.state_from_engine(game, active.identifier)
 
         state_cards = [ck.card for ck in state.cards]
-        self.assertCountEqual(state_cards, defined_cards)
+        self.assertCountEqual(state_cards, ALL_CARDS)
 
 
 class TestGameStateConvenienceProperties(TestCase):

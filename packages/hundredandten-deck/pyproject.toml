@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "hundredandten-deck"
-version = "0.0.2"
+version = "0.0.3"
 description = "Card domain primitives for the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -17,6 +17,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = []
+
+[project.urls]
+Repository = "https://github.com/seamuslowry/hundred-and-ten"
+Source = "https://github.com/seamuslowry/hundred-and-ten/tree/main/packages/hundredandten-deck"
 
 [tool.uv.build-backend]
 module-name = "hundredandten.deck"

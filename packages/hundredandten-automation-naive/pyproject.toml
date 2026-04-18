@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "hundredandten-automation-naive"
-version = "0.0.2"
+version = "0.0.3"
 description = "Naive strategy player for the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -24,6 +24,10 @@ test = [
     "hundredandten-engine>=0.0.0,<1.0.0",
     "hundredandten-testing>=0.0.0,<1.0.0",
 ]
+
+[project.urls]
+Repository = "https://github.com/seamuslowry/hundred-and-ten"
+Source = "https://github.com/seamuslowry/hundred-and-ten/tree/main/packages/hundredandten-automation-naive"
 
 [tool.uv.build-backend]
 module-name = "hundredandten.automation.naive"

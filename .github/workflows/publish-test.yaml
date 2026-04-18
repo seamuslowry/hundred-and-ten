@@ -11,14 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-    strategy:
-      matrix:
-        package:
-          - hundredandten-deck
-          - hundredandten-engine
-          - hundredandten-state
-          - hundredandten-automation-naive
-          - hundredandten-automation-engineadapter
     steps:
       - uses: actions/checkout@v6
 
@@ -28,6 +20,8 @@ jobs:
 
       - name: Build and Publish to Test PyPI
         run: |
-          uv version --package ${{ matrix.package }} --bump patch --bump dev=${{ github.run_number }}
-          uv build --wheel --package ${{ matrix.package }}
+          for pkg in hundredandten-deck hundredandten-engine hundredandten-state hundredandten-automation-naive hundredandten-automation-engineadapter; do
+            uv version --package "$pkg" --bump patch --bump dev=${{ github.run_number }}
+            uv build --wheel --package "$pkg"
+          done
           uv publish --index testpypi

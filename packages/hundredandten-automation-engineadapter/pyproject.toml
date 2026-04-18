@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "hundredandten-automation-engineadapter"
-version = "0.0.2"
+version = "0.0.3"
 description = "Engine adapter for wiring automation strategies to the Hundred and Ten game engine"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -26,6 +26,10 @@ dependencies = [
 test = [
     "hundredandten-testing>=0.0.0,<1.0.0",
 ]
+
+[project.urls]
+Repository = "https://github.com/seamuslowry/hundred-and-ten"
+Source = "https://github.com/seamuslowry/hundred-and-ten/tree/main/packages/hundredandten-automation-engineadapter"
 
 [tool.uv.build-backend]
 module-name = "hundredandten.automation.engineadapter"

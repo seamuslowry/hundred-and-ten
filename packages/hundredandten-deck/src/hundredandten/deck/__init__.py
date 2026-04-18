@@ -61,7 +61,7 @@ class CardNumber(Enum):
 
 
 @dataclass(frozen=True)
-class CardInfo:
+class _CardInfo:
     """Game metadata about a card"""
 
     # value when this suit is trumps
@@ -72,71 +72,71 @@ class CardInfo:
     always_trump: bool = False
 
 
-card_info = {
+_CARD_INFO = {
     CardSuit.HEARTS: {
-        CardNumber.TWO: CardInfo(trump_value=0, weak_trump_value=0),
-        CardNumber.THREE: CardInfo(trump_value=1, weak_trump_value=1),
-        CardNumber.FOUR: CardInfo(trump_value=2, weak_trump_value=2),
-        CardNumber.FIVE: CardInfo(trump_value=14, weak_trump_value=3),
-        CardNumber.SIX: CardInfo(trump_value=3, weak_trump_value=4),
-        CardNumber.SEVEN: CardInfo(trump_value=4, weak_trump_value=5),
-        CardNumber.EIGHT: CardInfo(trump_value=5, weak_trump_value=6),
-        CardNumber.NINE: CardInfo(trump_value=6, weak_trump_value=7),
-        CardNumber.TEN: CardInfo(trump_value=7, weak_trump_value=8),
-        CardNumber.JACK: CardInfo(trump_value=13, weak_trump_value=9),
-        CardNumber.QUEEN: CardInfo(trump_value=8, weak_trump_value=10),
-        CardNumber.KING: CardInfo(trump_value=9, weak_trump_value=11),
-        CardNumber.ACE: CardInfo(
+        CardNumber.TWO: _CardInfo(trump_value=0, weak_trump_value=0),
+        CardNumber.THREE: _CardInfo(trump_value=1, weak_trump_value=1),
+        CardNumber.FOUR: _CardInfo(trump_value=2, weak_trump_value=2),
+        CardNumber.FIVE: _CardInfo(trump_value=14, weak_trump_value=3),
+        CardNumber.SIX: _CardInfo(trump_value=3, weak_trump_value=4),
+        CardNumber.SEVEN: _CardInfo(trump_value=4, weak_trump_value=5),
+        CardNumber.EIGHT: _CardInfo(trump_value=5, weak_trump_value=6),
+        CardNumber.NINE: _CardInfo(trump_value=6, weak_trump_value=7),
+        CardNumber.TEN: _CardInfo(trump_value=7, weak_trump_value=8),
+        CardNumber.JACK: _CardInfo(trump_value=13, weak_trump_value=9),
+        CardNumber.QUEEN: _CardInfo(trump_value=8, weak_trump_value=10),
+        CardNumber.KING: _CardInfo(trump_value=9, weak_trump_value=11),
+        CardNumber.ACE: _CardInfo(
             trump_value=11, weak_trump_value=12, always_trump=True
         ),
     },
     CardSuit.DIAMONDS: {
-        CardNumber.TWO: CardInfo(trump_value=0, weak_trump_value=0),
-        CardNumber.THREE: CardInfo(trump_value=1, weak_trump_value=1),
-        CardNumber.FOUR: CardInfo(trump_value=2, weak_trump_value=2),
-        CardNumber.FIVE: CardInfo(trump_value=14, weak_trump_value=3),
-        CardNumber.SIX: CardInfo(trump_value=3, weak_trump_value=4),
-        CardNumber.SEVEN: CardInfo(trump_value=4, weak_trump_value=5),
-        CardNumber.EIGHT: CardInfo(trump_value=5, weak_trump_value=6),
-        CardNumber.NINE: CardInfo(trump_value=6, weak_trump_value=7),
-        CardNumber.TEN: CardInfo(trump_value=7, weak_trump_value=8),
-        CardNumber.JACK: CardInfo(trump_value=13, weak_trump_value=9),
-        CardNumber.QUEEN: CardInfo(trump_value=8, weak_trump_value=10),
-        CardNumber.KING: CardInfo(trump_value=9, weak_trump_value=11),
-        CardNumber.ACE: CardInfo(trump_value=10, weak_trump_value=12),
+        CardNumber.TWO: _CardInfo(trump_value=0, weak_trump_value=0),
+        CardNumber.THREE: _CardInfo(trump_value=1, weak_trump_value=1),
+        CardNumber.FOUR: _CardInfo(trump_value=2, weak_trump_value=2),
+        CardNumber.FIVE: _CardInfo(trump_value=14, weak_trump_value=3),
+        CardNumber.SIX: _CardInfo(trump_value=3, weak_trump_value=4),
+        CardNumber.SEVEN: _CardInfo(trump_value=4, weak_trump_value=5),
+        CardNumber.EIGHT: _CardInfo(trump_value=5, weak_trump_value=6),
+        CardNumber.NINE: _CardInfo(trump_value=6, weak_trump_value=7),
+        CardNumber.TEN: _CardInfo(trump_value=7, weak_trump_value=8),
+        CardNumber.JACK: _CardInfo(trump_value=13, weak_trump_value=9),
+        CardNumber.QUEEN: _CardInfo(trump_value=8, weak_trump_value=10),
+        CardNumber.KING: _CardInfo(trump_value=9, weak_trump_value=11),
+        CardNumber.ACE: _CardInfo(trump_value=10, weak_trump_value=12),
     },
     CardSuit.SPADES: {
-        CardNumber.TWO: CardInfo(trump_value=7, weak_trump_value=8),
-        CardNumber.THREE: CardInfo(trump_value=6, weak_trump_value=7),
-        CardNumber.FOUR: CardInfo(trump_value=5, weak_trump_value=6),
-        CardNumber.FIVE: CardInfo(trump_value=14, weak_trump_value=5),
-        CardNumber.SIX: CardInfo(trump_value=4, weak_trump_value=4),
-        CardNumber.SEVEN: CardInfo(trump_value=3, weak_trump_value=3),
-        CardNumber.EIGHT: CardInfo(trump_value=2, weak_trump_value=2),
-        CardNumber.NINE: CardInfo(trump_value=1, weak_trump_value=1),
-        CardNumber.TEN: CardInfo(trump_value=0, weak_trump_value=0),
-        CardNumber.JACK: CardInfo(trump_value=13, weak_trump_value=9),
-        CardNumber.QUEEN: CardInfo(trump_value=8, weak_trump_value=10),
-        CardNumber.KING: CardInfo(trump_value=9, weak_trump_value=11),
-        CardNumber.ACE: CardInfo(trump_value=10, weak_trump_value=12),
+        CardNumber.TWO: _CardInfo(trump_value=7, weak_trump_value=8),
+        CardNumber.THREE: _CardInfo(trump_value=6, weak_trump_value=7),
+        CardNumber.FOUR: _CardInfo(trump_value=5, weak_trump_value=6),
+        CardNumber.FIVE: _CardInfo(trump_value=14, weak_trump_value=5),
+        CardNumber.SIX: _CardInfo(trump_value=4, weak_trump_value=4),
+        CardNumber.SEVEN: _CardInfo(trump_value=3, weak_trump_value=3),
+        CardNumber.EIGHT: _CardInfo(trump_value=2, weak_trump_value=2),
+        CardNumber.NINE: _CardInfo(trump_value=1, weak_trump_value=1),
+        CardNumber.TEN: _CardInfo(trump_value=0, weak_trump_value=0),
+        CardNumber.JACK: _CardInfo(trump_value=13, weak_trump_value=9),
+        CardNumber.QUEEN: _CardInfo(trump_value=8, weak_trump_value=10),
+        CardNumber.KING: _CardInfo(trump_value=9, weak_trump_value=11),
+        CardNumber.ACE: _CardInfo(trump_value=10, weak_trump_value=12),
     },
     CardSuit.CLUBS: {
-        CardNumber.TWO: CardInfo(trump_value=7, weak_trump_value=8),
-        CardNumber.THREE: CardInfo(trump_value=6, weak_trump_value=7),
-        CardNumber.FOUR: CardInfo(trump_value=5, weak_trump_value=6),
-        CardNumber.FIVE: CardInfo(trump_value=14, weak_trump_value=5),
-        CardNumber.SIX: CardInfo(trump_value=4, weak_trump_value=4),
-        CardNumber.SEVEN: CardInfo(trump_value=3, weak_trump_value=3),
-        CardNumber.EIGHT: CardInfo(trump_value=2, weak_trump_value=2),
-        CardNumber.NINE: CardInfo(trump_value=1, weak_trump_value=1),
-        CardNumber.TEN: CardInfo(trump_value=0, weak_trump_value=0),
-        CardNumber.JACK: CardInfo(trump_value=13, weak_trump_value=9),
-        CardNumber.QUEEN: CardInfo(trump_value=8, weak_trump_value=10),
-        CardNumber.KING: CardInfo(trump_value=9, weak_trump_value=11),
-        CardNumber.ACE: CardInfo(trump_value=10, weak_trump_value=12),
+        CardNumber.TWO: _CardInfo(trump_value=7, weak_trump_value=8),
+        CardNumber.THREE: _CardInfo(trump_value=6, weak_trump_value=7),
+        CardNumber.FOUR: _CardInfo(trump_value=5, weak_trump_value=6),
+        CardNumber.FIVE: _CardInfo(trump_value=14, weak_trump_value=5),
+        CardNumber.SIX: _CardInfo(trump_value=4, weak_trump_value=4),
+        CardNumber.SEVEN: _CardInfo(trump_value=3, weak_trump_value=3),
+        CardNumber.EIGHT: _CardInfo(trump_value=2, weak_trump_value=2),
+        CardNumber.NINE: _CardInfo(trump_value=1, weak_trump_value=1),
+        CardNumber.TEN: _CardInfo(trump_value=0, weak_trump_value=0),
+        CardNumber.JACK: _CardInfo(trump_value=13, weak_trump_value=9),
+        CardNumber.QUEEN: _CardInfo(trump_value=8, weak_trump_value=10),
+        CardNumber.KING: _CardInfo(trump_value=9, weak_trump_value=11),
+        CardNumber.ACE: _CardInfo(trump_value=10, weak_trump_value=12),
     },
     CardSuit.JOKER: {
-        CardNumber.JOKER: CardInfo(
+        CardNumber.JOKER: _CardInfo(
             trump_value=12, weak_trump_value=12, always_trump=True
         )
     },
@@ -160,24 +160,24 @@ class Card:
     @property
     def trump_value(self) -> int:
         """The value of this card as a trump"""
-        return card_info[self.suit][self.number].trump_value
+        return _CARD_INFO[self.suit][self.number].trump_value
 
     @property
     def weak_trump_value(self) -> int:
         """The value of this card in a suit with no trumps where its suit leads"""
-        return card_info[self.suit][self.number].weak_trump_value
+        return _CARD_INFO[self.suit][self.number].weak_trump_value
 
     @property
     def always_trump(self) -> bool:
         """Whether the card is always considered trump"""
-        return card_info[self.suit][self.number].always_trump
+        return _CARD_INFO[self.suit][self.number].always_trump
 
 
-defined_cards = [
+ALL_CARDS: tuple[Card, ...] = tuple(
     Card(number, suit)
-    for (suit, number_dict) in card_info.items()
+    for (suit, number_dict) in _CARD_INFO.items()
     for number in number_dict
-]
+)
 
 
 @dataclass
@@ -189,7 +189,7 @@ class Deck:
     cards: list[int] = field(init=False)
 
     def __post_init__(self):
-        self.cards = [*range(len(defined_cards))]
+        self.cards = [*range(len(ALL_CARDS))]
         Random(self.seed).shuffle(self.cards)
 
     def draw(self, amount: int) -> list[Card]:
@@ -202,4 +202,4 @@ class Deck:
             raise ValueError("Deck is overdrawn.")
 
         self.pulled = end
-        return [defined_cards[num] for num in self.cards[start:end]]
+        return [ALL_CARDS[num] for num in self.cards[start:end]]

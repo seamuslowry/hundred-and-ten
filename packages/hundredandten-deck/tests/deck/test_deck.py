@@ -3,14 +3,14 @@
 from unittest import TestCase
 
 from hundredandten.deck import (
+    _CARD_INFO,
+    ALL_CARDS,
     Card,
-    CardInfo,
     CardNumber,
     CardSuit,
     Deck,
     SelectableSuit,
-    card_info,
-    defined_cards,
+    _CardInfo,
 )
 
 
@@ -62,14 +62,14 @@ class TestCardInfo(TestCase):
 
     def test_card_info_creation(self):
         """CardInfo stores trump_value, weak_trump_value, and always_trump"""
-        info = CardInfo(trump_value=5, weak_trump_value=3)
+        info = _CardInfo(trump_value=5, weak_trump_value=3)
         self.assertEqual(info.trump_value, 5)
         self.assertEqual(info.weak_trump_value, 3)
         self.assertFalse(info.always_trump)
 
     def test_card_info_always_trump(self):
         """CardInfo always_trump flag works"""
-        info = CardInfo(trump_value=10, weak_trump_value=10, always_trump=True)
+        info = _CardInfo(trump_value=10, weak_trump_value=10, always_trump=True)
         self.assertTrue(info.always_trump)
 
 
@@ -102,7 +102,7 @@ class TestCard(TestCase):
         """Trump value for red number card comes from card_info"""
         card = Card(CardNumber.FIVE, CardSuit.HEARTS)
         self.assertEqual(
-            card.trump_value, card_info[CardSuit.HEARTS][CardNumber.FIVE].trump_value
+            card.trump_value, _CARD_INFO[CardSuit.HEARTS][CardNumber.FIVE].trump_value
         )
 
     def test_trump_value_five_is_fourteen(self):
@@ -136,7 +136,7 @@ class TestCard(TestCase):
         """Trump value for black number card (reversed ordering) from card_info"""
         card = Card(CardNumber.TWO, CardSuit.SPADES)
         self.assertEqual(
-            card.trump_value, card_info[CardSuit.SPADES][CardNumber.TWO].trump_value
+            card.trump_value, _CARD_INFO[CardSuit.SPADES][CardNumber.TWO].trump_value
         )
 
     def test_weak_trump_value(self):
@@ -144,7 +144,7 @@ class TestCard(TestCase):
         card = Card(CardNumber.THREE, CardSuit.DIAMONDS)
         self.assertEqual(
             card.weak_trump_value,
-            card_info[CardSuit.DIAMONDS][CardNumber.THREE].weak_trump_value,
+            _CARD_INFO[CardSuit.DIAMONDS][CardNumber.THREE].weak_trump_value,
         )
 
     def test_card_frozen(self):
@@ -154,22 +154,22 @@ class TestCard(TestCase):
             card.number = CardNumber.TWO  # type: ignore[misc]
 
 
-class TestDefinedCards(TestCase):
-    """Unit tests for defined_cards"""
+class TestAllCards(TestCase):
+    """Unit tests for ALL_CARDS"""
 
-    def test_defined_cards_length(self):
-        """There are exactly 53 defined cards (52 + Joker)"""
-        self.assertEqual(len(defined_cards), 53)
+    def test_all_cards_length(self):
+        """There are exactly 53 cards (52 + Joker)"""
+        self.assertEqual(len(ALL_CARDS), 53)
 
-    def test_defined_cards_contains_joker(self):
-        """defined_cards contains the Joker"""
+    def test_all_cards_contains_joker(self):
+        """ALL_CARDS contains the Joker"""
         joker = Card(CardNumber.JOKER, CardSuit.JOKER)
-        self.assertIn(joker, defined_cards)
+        self.assertIn(joker, ALL_CARDS)
 
-    def test_defined_cards_contains_ace_of_hearts(self):
-        """defined_cards contains Ace of Hearts"""
+    def test_all_cards_contains_ace_of_hearts(self):
+        """ALL_CARDS contains Ace of Hearts"""
         ace_of_hearts = Card(CardNumber.ACE, CardSuit.HEARTS)
-        self.assertIn(ace_of_hearts, defined_cards)
+        self.assertIn(ace_of_hearts, ALL_CARDS)
 
 
 class TestDeck(TestCase):

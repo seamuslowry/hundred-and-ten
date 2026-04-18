@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "hundredandten-state"
-version = "0.0.3"
+version = "0.0.4"
 description = "Player observation layer for the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -17,6 +17,10 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = ["hundredandten-deck>=0.0.0,<1.0.0"]
+
+[project.urls]
+Repository = "https://github.com/seamuslowry/hundred-and-ten"
+Source = "https://github.com/seamuslowry/hundred-and-ten/tree/main/packages/hundredandten-state"
 
 [tool.uv.build-backend]
 module-name = "hundredandten.state"

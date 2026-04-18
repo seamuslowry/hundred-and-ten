@@ -2,7 +2,7 @@
 
 from unittest import TestCase
 
-from hundredandten.automation.naive import desired_trump
+from hundredandten.automation.naive import _desired_trump
 from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit
 
 
@@ -13,7 +13,7 @@ class TestTrumpDecision(TestCase):
         """Select trump with the highest value"""
         self.assertEqual(
             SelectableSuit.HEARTS,
-            desired_trump(
+            _desired_trump(
                 [
                     Card(CardNumber.FIVE, CardSuit.CLUBS),
                     Card(CardNumber.QUEEN, CardSuit.CLUBS),

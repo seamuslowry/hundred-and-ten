@@ -35,7 +35,7 @@ def action_for(state: GameState) -> AvailableAction:
 def __suggested_bid(game_state: GameState) -> AvailableBid:
     """Return the suggested bid for the current player"""
 
-    maximum_bid = max_bid(game_state.hand)
+    maximum_bid = _max_bid(game_state.hand)
     available_bids = [b.amount for b in game_state.available_bids]
     willing_bids = [b for b in available_bids if b and b <= maximum_bid]
 
@@ -45,7 +45,7 @@ def __suggested_bid(game_state: GameState) -> AvailableBid:
 def __suggested_trump_selection(game_state: GameState) -> AvailableSelectTrump:
     """Return the suggested trump selection for the current player"""
 
-    return AvailableSelectTrump(desired_trump(game_state.hand))
+    return AvailableSelectTrump(_desired_trump(game_state.hand))
 
 
 def __suggested_discard(game_state: GameState) -> AvailableDiscard:
@@ -85,24 +85,24 @@ def __suggested_play(game_state: GameState) -> AvailablePlay:
     if not best_played_card:
         # if you are the bidder and you can bleed, do so
         if game_state.table.bidder_seat == 0:
-            card = best_card(playable_cards, game_state.bidding.trump)
+            card = _best_card(playable_cards, game_state.bidding.trump)
         # otherwise, don't bleed if you can help it
         else:
-            card = worst_card(playable_cards, game_state.bidding.trump)
+            card = _worst_card(playable_cards, game_state.bidding.trump)
     else:
-        worst_winning_card = worst_card_beating(
+        worst_winning_card = _worst_card_beating(
             playable_cards, best_played_card, game_state.bidding.trump
         )
         # if you can beat the current winning card, do it with the lowest card that will do it
         # otherwise, play nothing
-        card = worst_winning_card or worst_card(
+        card = worst_winning_card or _worst_card(
             playable_cards, game_state.bidding.trump
         )
 
     return AvailablePlay(card)
 
 
-def max_bid(cards: Sequence[Card]) -> BidAmount:
+def _max_bid(cards: Sequence[Card]) -> BidAmount:
     """Return the maximum amount to bid with the given hand"""
 
     best_value = __most_valuable_suit(cards)[1]
@@ -121,31 +121,31 @@ def max_bid(cards: Sequence[Card]) -> BidAmount:
     return BidAmount.PASS
 
 
-def desired_trump(cards: Sequence[Card]) -> SelectableSuit:
+def _desired_trump(cards: Sequence[Card]) -> SelectableSuit:
     """Return the desired trump for the given hand"""
 
     return __most_valuable_suit(cards)[0]
 
 
-def trumps(cards: Sequence[Card], trump: SelectableSuit | None) -> Sequence[Card]:
+def _trumps(cards: Sequence[Card], trump: SelectableSuit | None) -> Sequence[Card]:
     """Return the trump cards in the list of cards"""
     return [card for card in cards if card.trump_for_selection(trump)]
 
 
-def best_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:
+def _best_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:
     """Return the best trump card in the list of cards"""
-    trump_cards = trumps(cards, trump)
+    trump_cards = _trumps(cards, trump)
     return max(trump_cards, key=lambda c: c.trump_value) if trump_cards else cards[0]
 
 
-def worst_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:
+def _worst_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:
     """Return the worst card in the list of cards"""
     non_trumps = __non_trumps(cards, trump)
     worst_non_trump = (
         min(non_trumps, key=lambda c: c.weak_trump_value) if non_trumps else None
     )
 
-    trump_cards = trumps(cards, trump)
+    trump_cards = _trumps(cards, trump)
     worst_trump = (
         min(trump_cards, key=lambda c: c.trump_value) if trump_cards else cards[0]
     )
@@ -153,22 +153,22 @@ def worst_card(cards: Sequence[Card], trump: SelectableSuit | None) -> Card:
     return worst_non_trump or worst_trump
 
 
-def worst_card_beating(
+def _worst_card_beating(
     cards: Sequence[Card], card_to_beat: Card, trump: SelectableSuit | None
 ) -> Card | None:
     """Return the worst card in the list that beats card_to_beat, or None"""
     beating = __cards_beating(cards, card_to_beat, trump)
 
-    return worst_card(beating, trump) if beating else None
+    return _worst_card(beating, trump) if beating else None
 
 
 def __cards_beating(
     cards: Sequence[Card], card_to_beat: Card, trump: SelectableSuit | None
 ) -> Sequence[Card]:
     """Return all cards in the list that beat the provided card"""
-    trump_cards = trumps(cards, trump)
+    trump_cards = _trumps(cards, trump)
 
-    if not trumps([card_to_beat], trump):
+    if not _trumps([card_to_beat], trump):
         non_trump_beaters = [
             c
             for c in __non_trumps(cards, trump)
