@@ -2,7 +2,7 @@
 
 from typing import Callable
 
-from hundredandten.deck import Card, defined_cards
+from hundredandten.deck import Card, ALL_CARDS
 from hundredandten.engine import Game
 from hundredandten.engine.actions import (
     Action,
@@ -209,7 +209,7 @@ class EngineAdapter:
                 card=card,
                 status=card_status_by_card.get(card, unknown),
             )
-            for card in defined_cards
+            for card in ALL_CARDS
         )
 
     @staticmethod

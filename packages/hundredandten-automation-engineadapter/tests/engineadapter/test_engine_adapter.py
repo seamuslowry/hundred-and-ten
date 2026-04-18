@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 from hundredandten.automation.engineadapter import EngineAdapter, UnavailableActionError
-from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit, defined_cards
+from hundredandten.deck import Card, CardNumber, CardSuit, SelectableSuit, ALL_CARDS
 from hundredandten.engine.actions import Bid, Discard, Play, SelectTrump
 from hundredandten.engine.constants import (
     HAND_SIZE,
@@ -505,7 +505,7 @@ class TestGameStateImmutability(TestCase):
         state = EngineAdapter.state_from_engine(game, active.identifier)
 
         state_cards = [ck.card for ck in state.cards]
-        self.assertCountEqual(state_cards, defined_cards)
+        self.assertCountEqual(state_cards, ALL_CARDS)
 
 
 class TestGameStateConvenienceProperties(TestCase):

@@ -10,7 +10,7 @@ from hundredandten.deck import (
     Deck,
     SelectableSuit,
     card_info,
-    defined_cards,
+    ALL_CARDS,
 )
 
 
@@ -159,17 +159,17 @@ class TestDefinedCards(TestCase):
 
     def test_defined_cards_length(self):
         """There are exactly 53 defined cards (52 + Joker)"""
-        self.assertEqual(len(defined_cards), 53)
+        self.assertEqual(len(ALL_CARDS), 53)
 
     def test_defined_cards_contains_joker(self):
         """defined_cards contains the Joker"""
         joker = Card(CardNumber.JOKER, CardSuit.JOKER)
-        self.assertIn(joker, defined_cards)
+        self.assertIn(joker, ALL_CARDS)
 
     def test_defined_cards_contains_ace_of_hearts(self):
         """defined_cards contains Ace of Hearts"""
         ace_of_hearts = Card(CardNumber.ACE, CardSuit.HEARTS)
-        self.assertIn(ace_of_hearts, defined_cards)
+        self.assertIn(ace_of_hearts, ALL_CARDS)
 
 
 class TestDeck(TestCase):

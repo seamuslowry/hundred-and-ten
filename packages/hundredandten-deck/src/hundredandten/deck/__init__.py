@@ -173,7 +173,7 @@ class Card:
         return card_info[self.suit][self.number].always_trump
 
 
-defined_cards = [
+ALL_CARDS = [
     Card(number, suit)
     for (suit, number_dict) in card_info.items()
     for number in number_dict
@@ -189,7 +189,7 @@ class Deck:
     cards: list[int] = field(init=False)
 
     def __post_init__(self):
-        self.cards = [*range(len(defined_cards))]
+        self.cards = [*range(len(ALL_CARDS))]
         Random(self.seed).shuffle(self.cards)
 
     def draw(self, amount: int) -> list[Card]:
@@ -202,4 +202,4 @@ class Deck:
             raise ValueError("Deck is overdrawn.")
 
         self.pulled = end
-        return [defined_cards[num] for num in self.cards[start:end]]
+        return [ALL_CARDS[num] for num in self.cards[start:end]]
