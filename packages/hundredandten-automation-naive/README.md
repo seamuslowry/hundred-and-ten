@@ -2,14 +2,15 @@
 
 Naive baseline automation strategy for the card game Hundred and Ten.
 
-This package implements a simple rule-based player that operates entirely on [`GameState`](../hundredandten-state/) with no direct engine dependency. It serves as a reference implementation and starting point for future ML-trained strategies — any strategy that accepts a `GameState` and returns an `AvailableAction` can be dropped in its place.
+This package implements a simple rule-based player that operates entirely on [`GameState`](../hundredandten-state/) with no direct engine dependency. It accepts a `GameState` and returns an `AvailableAction` following a hard-coded strategy.
 
 ```python
-from hundredandten.automation.engineadapter import EngineAdapter
+from hundredandten.state import GameState
 from hundredandten.automation import naive
 
-engine_action = EngineAdapter.action_for(game, 'player_1', naive.action_for)
-game.act(engine_action)
+# construct a game state
+available_action = naive.action_for(game_state)
+print(available_action)
 ```
 
 ## Exports
