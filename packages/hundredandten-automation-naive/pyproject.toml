@@ -16,7 +16,10 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
 ]
-dependencies = ["hundredandten-state>=0.0.5,<1.0.0", "hundredandten-deck>=0.0.3,<1.0.0"]
+dependencies = [
+    "hundredandten-state>=0.0.5,<1.0.0",
+    "hundredandten-deck>=0.0.3,<1.0.0"
+]
 
 [dependency-groups]
 test = [
