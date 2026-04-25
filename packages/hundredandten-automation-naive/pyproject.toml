@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "hundredandten-automation-naive"
-version = "0.0.3"
+version = "0.0.4"
 description = "Naive strategy player for the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -16,7 +16,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
 ]
-dependencies = ["hundredandten-state>=0.0.0,<1.0.0", "hundredandten-deck>=0.0.0,<1.0.0"]
+dependencies = ["hundredandten-state>=0.0.5,<1.0.0", "hundredandten-deck>=0.0.3,<1.0.0"]
 
 [dependency-groups]
 test = [
