@@ -21,6 +21,7 @@ game = Game([
 |--------|-------------|
 | `Game` | Main entry point. Holds all game state and exposes `act`, `status`, `active_player`, `scores`, and `winner`. |
 | `Status` | Enum of game phases: `BIDDING`, `TRUMP_SELECTION`, `DISCARD`, `COMPLETED`, `COMPLETED_NO_BIDDERS`, `WON`. |
+| `Round` | A single round in the game. |
 | `Player` | A game participant, identified by a unique string. |
 | `Action` | Base type for all actions passed to `Game.act`. |
 | `Bid` | Action to place a bid or pass during `BIDDING`. |

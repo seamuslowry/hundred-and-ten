@@ -5,11 +5,14 @@ from .constants import BidAmount, Status
 from .errors import HundredAndTenError
 from .game import Game
 from .player import Player
+from .round import Round
 
 __all__ = [
     # Game
     "Game",
     "Status",
+    # Round
+    "Round",
     # Player
     "Player",
     # Actions
