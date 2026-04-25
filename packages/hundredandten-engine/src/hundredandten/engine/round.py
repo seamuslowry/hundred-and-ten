@@ -39,8 +39,8 @@ class Round:
 
     game_players: InitVar[list[Player]]
     dealer_identifier: InitVar[str]
-    seed: InitVar[str]
 
+    seed: str
     players: list[RoundPlayer] = field(init=False)
     _deck: Deck = field(init=False, repr=False)
     _bids: list[Bid] = field(default_factory=list, init=False, repr=False)
@@ -48,11 +48,9 @@ class Round:
     _discards: list[Discard] = field(default_factory=list, init=False, repr=False)
     _tricks: list[Trick] = field(default_factory=list, init=False, repr=False)
 
-    def __post_init__(
-        self, player_info: list[Player], dealer_identifier: str, seed: str
-    ) -> None:
+    def __post_init__(self, player_info: list[Player], dealer_identifier: str) -> None:
         # Create deck from seed
-        self._deck = Deck(seed=seed)
+        self._deck = Deck(seed=self.seed)
 
         # Create players RoundGroup by dealing hands from deck
         self.players = [
