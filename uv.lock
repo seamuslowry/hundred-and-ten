@@ -207,7 +207,7 @@ test = [{ name = "hundredandten-testing", editable = "packages/hundredandten-tes
 
 [[package]]
 name = "hundredandten-automation-naive"
-version = "0.0.4"
+version = "0.0.5"
 source = { editable = "packages/hundredandten-automation-naive" }
 dependencies = [
     { name = "hundredandten-deck" },
@@ -252,7 +252,7 @@ requires-dist = [{ name = "hundredandten-deck", editable = "packages/hundredandt
 
 [[package]]
 name = "hundredandten-state"
-version = "0.0.5"
+version = "0.0.6"
 source = { editable = "packages/hundredandten-state" }
 dependencies = [
     { name = "hundredandten-deck" },
@@ -267,10 +267,14 @@ version = "0.0.0"
 source = { editable = "packages/hundredandten-testing" }
 dependencies = [
     { name = "hundredandten-engine" },
+    { name = "hundredandten-state" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "hundredandten-engine", editable = "packages/hundredandten-engine" }]
+requires-dist = [
+    { name = "hundredandten-engine", editable = "packages/hundredandten-engine" },
+    { name = "hundredandten-state", editable = "packages/hundredandten-state" },
+]
 
 [[package]]
 name = "iniconfig"

@@ -12,7 +12,8 @@ authors = [
     { name = "Seamus Lowry" },
 ]
 dependencies = [
-    "hundredandten-engine>=0.0.0,<1.0.0"
+    "hundredandten-engine",
+    "hundredandten-state",
 ]
 
 [tool.uv.build-backend]
