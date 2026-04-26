@@ -227,7 +227,7 @@ class GameState:
 
                 return tuple(
                     AvailableBid(amount=a)
-                    for a in [BidAmount.PASS, *dealer_steal, *higher_bids]
+                    for a in sorted([BidAmount.PASS, *dealer_steal, *higher_bids])
                 )
             case Status.TRUMP_SELECTION:
                 return (
