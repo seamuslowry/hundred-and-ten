@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "hundredandten"
-version = "5.0.0"
+version = "5.0.0.post0"
 description = "An engine to play the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.11"
