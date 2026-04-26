@@ -39,7 +39,7 @@ def __suggested_bid(game_state: GameState) -> AvailableBid:
     available_bids = [b.amount for b in game_state.available_bids]
     willing_bids = [b for b in available_bids if b and b <= maximum_bid]
 
-    return AvailableBid(next(iter(willing_bids), BidAmount.PASS))
+    return AvailableBid(min(willing_bids, default=BidAmount.PASS))
 
 
 def __suggested_trump_selection(game_state: GameState) -> AvailableSelectTrump:
