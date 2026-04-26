@@ -1,5 +1,10 @@
-[![Code Quality](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/lint.yaml)
-[![100% Coverage](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml/badge.svg?branch=main)](https://github.com/seamuslowry/hundred-and-ten/actions/workflows/coverage.yaml)
+> [!WARNING]
+> **This package is deprecated and no longer maintained.**
+>
+> It has been split into multiple focused packages. The primary replacements are:
+>
+> - [`hundredandten-engine`](https://pypi.org/project/hundredandten-engine/) — core game engine
+> - [`hundredandten-automation-engineadapter`](https://pypi.org/project/hundredandten-automation-engineadapter/) — bridge between the engine and automation strategies
 
 # Hundred and Ten
 
