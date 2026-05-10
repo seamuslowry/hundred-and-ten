@@ -117,12 +117,13 @@ class Round:
         if self.status == Status.DISCARD:
             assert self.active_bidder
             # The dealer is the actual first actor in DISCARD — not a synthetic
-            # "last X" placeholder like the BIDDING branch uses. Return the dealer
-            # directly when no discards have been recorded yet, then progress
-            # clockwise from whoever last discarded.
-            if not self.discards:
-                return self.dealer
-            return player_after(self.players, self.discards[-1].identifier)
+            # "last X" placeholder like the BIDDING branch uses. The dealer goes
+            # first, then clockwise from whoever last discarded.
+            return (
+                self.dealer
+                if not self.discards
+                else player_after(self.players, self.discards[-1].identifier)
+            )
         # while playing tricks, active player needs to consider
         # trick number, trick status, and winner of last trick
         if self.status == Status.TRICKS:

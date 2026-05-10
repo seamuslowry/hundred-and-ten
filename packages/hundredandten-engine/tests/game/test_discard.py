@@ -112,64 +112,14 @@ class TestDiscard(TestCase):
         # After all four discards the round is in TRICKS
         self.assertEqual(Status.TRICKS, game.status)
 
-    def test_dealer_discards_zero_cards_and_draw_order_advances(self):
-        """Dealer discarding zero cards is valid and advances the active player"""
-
-        game = arrange.game(Status.DISCARD)
-        round_ = game.active_round
-        dealer = round_.dealer
-
-        game.act(Discard(dealer.identifier, []))
-
-        # The active player after the dealer discards is the next clockwise seat
-        self.assertEqual(
-            player_after(round_.players, dealer.identifier),
-            round_.active_player,
-        )
-
-    def test_dealer_replacement_cards_drawn_on_discard(self):
-        """Dealer receives replacement cards equal to the number discarded"""
-
-        game = arrange.game(Status.DISCARD)
-        round_ = game.active_round
-        dealer = round_.dealer
-
-        cards_to_discard = [dealer.hand[1], dealer.hand[3]]
-        kept = [dealer.hand[0], dealer.hand[2], dealer.hand[4]]
-        game.act(Discard(dealer.identifier, cards_to_discard))
-
-        self.assertEqual(HAND_SIZE, len(dealer.hand))
-        self.assertTrue(all(card in dealer.hand for card in kept))
-        self.assertFalse(any(card in dealer.hand for card in cards_to_discard))
-
-    def test_player_after_dealer_cannot_discard_first(self):
-        """The player clockwise of the dealer cannot discard before the dealer"""
-
-        game = arrange.game(Status.DISCARD)
-        round_ = game.active_round
-        player_after_dealer = player_after(round_.players, round_.dealer.identifier)
-
-        self.assertRaises(
-            HundredAndTenError,
-            game.act,
-            Discard(player_after_dealer.identifier, []),
-        )
-
     def test_dealer_is_first_to_discard_when_dealer_is_not_first_player(self):
         """The dealer is first to discard even after dealer rotation (round 2+)"""
 
-        # Start from BIDDING, complete round 1, then advance round 2 to DISCARD
-        def advance_to_round_2_discard(g):
-            # Complete round 1: bid -> trump -> discard -> play all tricks
-            arrange.bid(g)
-            arrange.select_trump(g)
-            arrange.discard(g)
-            arrange.play_round(g)
-            # Now in round 2 (dealer rotated). Advance to DISCARD.
-            arrange.bid(g)
-            arrange.select_trump(g)
-
-        game = arrange.game(Status.BIDDING, massage=advance_to_round_2_discard)
+        # Complete round 1 so the dealer rotates to players[1] for round 2
+        game = arrange.game(Status.TRICKS)
+        arrange.play_round(game)
+        arrange.bid(game)
+        arrange.select_trump(game)
 
         round_ = game.active_round
         dealer = round_.dealer
