@@ -23,4 +23,4 @@ jobs:
           for pkg in hundredandten-deck hundredandten-engine hundredandten-state hundredandten-automation-naive hundredandten-automation-engineadapter; do
             uv build --wheel --package "$pkg"
           done
-          uv publish
+          uv publish --check-url https://pypi.org/simple/
