@@ -207,7 +207,7 @@ test = [{ name = "hundredandten-testing", editable = "packages/hundredandten-tes
 
 [[package]]
 name = "hundredandten-automation-naive"
-version = "0.0.5"
+version = "0.0.6"
 source = { editable = "packages/hundredandten-automation-naive" }
 dependencies = [
     { name = "hundredandten-deck" },
@@ -236,7 +236,7 @@ test = [
 
 [[package]]
 name = "hundredandten-deck"
-version = "0.0.3"
+version = "0.0.4"
 source = { editable = "packages/hundredandten-deck" }
 
 [[package]]
@@ -252,7 +252,7 @@ requires-dist = [{ name = "hundredandten-deck", editable = "packages/hundredandt
 
 [[package]]
 name = "hundredandten-state"
-version = "0.0.6"
+version = "0.0.7"
 source = { editable = "packages/hundredandten-state" }
 dependencies = [
     { name = "hundredandten-deck" },

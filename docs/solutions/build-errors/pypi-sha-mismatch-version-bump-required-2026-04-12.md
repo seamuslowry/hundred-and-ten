@@ -85,6 +85,8 @@ Non-functional sections that **no longer** require a bump (wheels-only CI):
 - `[tool.ruff]`, `[tool.black]`, `[tool.pyright]`, `[tool.pytest.*]`
 - `[build-system]` (does not appear in wheel METADATA)
 
+> **Caveat:** switching to `--wheel` eliminates the sdist mismatch but does **not** eliminate all wheel mismatches. Wheel `METADATA` also contains a `Generator: uv X.Y.Z` line. If CI uses a different `uv` version between the original publish run and a re-run, the wheel SHA changes even for an unchanged package. Pin `uv-version` in `astral-sh/setup-uv` to prevent this. See [`wheel-sha-mismatch-unpinned-uv-version-2026-05-10.md`](wheel-sha-mismatch-unpinned-uv-version-2026-05-10.md).
+
 ## Version Bump Strategy (When Still Needed)
 
 **Under a dev release (`X.Y.Z.devN`):** increment the dev counter.
@@ -107,3 +109,5 @@ Do not combine the two suffixes — `0.0.1.dev2.post1` is not valid PEP 440.
   the wheels-only CI fix.
 - `docs/solutions/best-practices/uv-test-only-dependencies-and-decoupled-strategy-packages-2026-04-11.md`
   — covers `[dependency-groups]` scoping.
+- [`docs/solutions/build-errors/wheel-sha-mismatch-unpinned-uv-version-2026-05-10.md`](wheel-sha-mismatch-unpinned-uv-version-2026-05-10.md)
+  — companion problem: wheel SHA mismatch caused by unpinned `uv` version in CI. That failure mode persists even with `--wheel`-only builds.
