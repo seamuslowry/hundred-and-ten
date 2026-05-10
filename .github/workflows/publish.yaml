@@ -17,6 +17,10 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
+          # Pin to the same uv version used locally so the Generator: field in
+          # wheel METADATA is identical to the already-published wheels.
+          # Update this together with uv_build requires in each pyproject.toml.
+          uv-version: "0.11.2"
 
       - name: Build and Publish to PyPI
         run: |
