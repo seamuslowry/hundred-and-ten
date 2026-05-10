@@ -12,7 +12,7 @@ authors = [
     { name = "Seamus Lowry" },
 ]
 dependencies = [
-    "hundredandten-engine",
+    "hundredandten-engine>=0.0.7,<1.0.0",
     "hundredandten-state",
 ]
 

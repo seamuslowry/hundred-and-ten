@@ -23,8 +23,8 @@ dependencies = [
 
 [dependency-groups]
 test = [
-    "hundredandten-automation-engineadapter>=0.0.0,<1.0.0",
-    "hundredandten-engine>=0.0.0,<1.0.0",
+    "hundredandten-automation-engineadapter>=0.0.6,<1.0.0",
+    "hundredandten-engine>=0.0.7,<1.0.0",
     "hundredandten-testing>=0.0.0,<1.0.0",
 ]
 
