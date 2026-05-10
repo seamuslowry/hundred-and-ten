@@ -154,3 +154,27 @@ class TestDiscard(TestCase):
             game.act,
             Discard(player_after_dealer.identifier, []),
         )
+
+    def test_dealer_is_first_to_discard_when_dealer_is_not_first_player(self):
+        """The dealer is first to discard even after dealer rotation (round 2+)"""
+
+        # Start from BIDDING, complete round 1, then advance round 2 to DISCARD
+        def advance_to_round_2_discard(g):
+            # Complete round 1: bid -> trump -> discard -> play all tricks
+            arrange.bid(g)
+            arrange.select_trump(g)
+            arrange.discard(g)
+            arrange.play_round(g)
+            # Now in round 2 (dealer rotated). Advance to DISCARD.
+            arrange.bid(g)
+            arrange.select_trump(g)
+
+        game = arrange.game(Status.BIDDING, massage=advance_to_round_2_discard)
+
+        round_ = game.active_round
+        dealer = round_.dealer
+
+        # The rotated dealer should not be players[0]
+        self.assertNotEqual(dealer, round_.players[0])
+        # The active player at the start of DISCARD must still be the dealer
+        self.assertEqual(dealer, round_.active_player)
