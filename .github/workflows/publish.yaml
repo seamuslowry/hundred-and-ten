@@ -17,14 +17,13 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
-          # Pin to the same uv version used locally so the Generator: field in
-          # wheel METADATA is identical to the already-published wheels.
-          # Update this together with uv_build requires in each pyproject.toml.
-          uv-version: "0.11.2"
+          # Pin uv so the Generator: field in wheel METADATA is stable across
+          # runs. Update this together with uv_build requires in each pyproject.toml.
+          uv-version: "0.11.12"
 
       - name: Build and Publish to PyPI
         run: |
           for pkg in hundredandten-deck hundredandten-engine hundredandten-state hundredandten-automation-naive hundredandten-automation-engineadapter; do
             uv build --wheel --package "$pkg"
           done
-          uv publish --check-url https://pypi.org/simple/
+          uv publish
