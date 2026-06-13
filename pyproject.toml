@@ -5,7 +5,7 @@ members = ["packages/*"]
 lint = [
     "pylint==4.0.5",
     "pyright==1.1.410",
-    "ruff==0.15.16",
+    "ruff==0.15.17",
     "black==26.5.1",
 ]
 test = [
