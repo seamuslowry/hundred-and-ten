@@ -192,7 +192,7 @@ test = [{ name = "hundredandten-testing", editable = "packages/hundredandten-tes
 
 [[package]]
 name = "hundredandten-automation-naive"
-version = "0.0.6"
+version = "0.0.7"
 source = { editable = "packages/hundredandten-automation-naive" }
 dependencies = [
     { name = "hundredandten-deck" },
