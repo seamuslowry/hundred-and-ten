@@ -1,7 +1,7 @@
 """Track a trick"""
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable, Optional
 
 from hundredandten.deck import Card, CardSuit, SelectableSuit
 from hundredandten.engine.errors import HundredAndTenError
@@ -55,14 +55,14 @@ class Trick:
         )
 
     @property
-    def leading_card(self) -> Optional[Card]:
+    def leading_card(self) -> Card | None:
         """The leading card of this trick"""
         if not self.plays:
             return None
         return self.plays[0].card
 
     @property
-    def weak_trump(self) -> Optional[CardSuit]:
+    def weak_trump(self) -> CardSuit | None:
         """The leading card of this trick"""
         if self.leading_card and self.leading_card.suit != self.round_trump:
             return self.leading_card.suit
@@ -70,5 +70,5 @@ class Trick:
 
     def __winning_play(
         self, filter_fn: Callable[[Play], bool], key_fn: Callable[[Play], int]
-    ) -> Optional[Play]:
+    ) -> Play | None:
         return max(list(filter(filter_fn, self.plays)), key=key_fn, default=None)

@@ -1,6 +1,6 @@
 """Engine adapter for wiring automation strategies to the Hundred and Ten game engine"""
 
-from typing import Callable
+from collections.abc import Callable
 
 from hundredandten.deck import ALL_CARDS, Card
 from hundredandten.engine import Game

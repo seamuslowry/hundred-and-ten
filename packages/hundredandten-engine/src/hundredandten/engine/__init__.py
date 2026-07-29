@@ -8,20 +8,20 @@ from .player import Player
 from .round import Round
 
 __all__ = [
-    # Game
-    "Game",
-    "Status",
-    # Round
-    "Round",
-    # Player
-    "Player",
     # Actions
     "Action",
     "Bid",
     "BidAmount",
-    "SelectTrump",
     "Discard",
-    "Play",
+    # Game
+    "Game",
     # Errors
     "HundredAndTenError",
+    "Play",
+    # Player
+    "Player",
+    # Round
+    "Round",
+    "SelectTrump",
+    "Status",
 ]

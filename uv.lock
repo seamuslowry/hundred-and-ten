@@ -167,7 +167,7 @@ wheels = [
 
 [[package]]
 name = "hundredandten-automation-engineadapter"
-version = "0.0.6"
+version = "0.0.7"
 source = { editable = "packages/hundredandten-automation-engineadapter" }
 dependencies = [
     { name = "hundredandten-deck" },
@@ -226,7 +226,7 @@ source = { editable = "packages/hundredandten-deck" }
 
 [[package]]
 name = "hundredandten-engine"
-version = "0.0.7"
+version = "0.0.8"
 source = { editable = "packages/hundredandten-engine" }
 dependencies = [
     { name = "hundredandten-deck" },

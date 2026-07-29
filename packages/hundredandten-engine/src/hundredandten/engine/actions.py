@@ -1,7 +1,6 @@
 """All the actions a player can take to interact with the game"""
 
 from dataclasses import dataclass, field
-from typing import Union
 
 from hundredandten.deck import Card, SelectableSuit
 
@@ -44,4 +43,4 @@ class Play:
     card: Card
 
 
-type Action = Union[Bid, SelectTrump, Discard, Play]
+type Action = Bid | SelectTrump | Discard | Play

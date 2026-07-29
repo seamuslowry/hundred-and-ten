@@ -1,6 +1,6 @@
 """Helpers to set up a game for testing"""
 
-from typing import Callable, Optional
+from collections.abc import Callable
 from uuid import uuid4
 
 from hundredandten.deck import SelectableSuit
@@ -16,7 +16,7 @@ from hundredandten.engine.player import Player
 def game(
     status: Status,
     massage: Callable[[Game], None] = lambda f_game: None,
-    seed: Optional[str] = None,
+    seed: str | None = None,
 ) -> Game:
     """
     Return a game in the requested status.
@@ -29,7 +29,7 @@ def game(
 def __game(
     status: Status,
     massage: Callable[[Game], None] = lambda f_game: None,
-    seed: Optional[str] = None,
+    seed: str | None = None,
 ) -> Game:
     """
     Return a game in the requested status.
@@ -95,11 +95,11 @@ def play_trick(game_to_play: Game) -> None:
     starting_active_trick = game_to_play.active_round.active_trick
     while len(starting_active_trick.plays) < len(game_to_play.players):
         active_player = game_to_play.active_round.active_player
-        trump_cards = list(
+        trump_cards = [
             card
             for card in active_player.hand
             if card.trump_for_selection(game_to_play.active_round.trump)
-        )
+        ]
         game_to_play.act(
             Play(active_player.identifier, next(iter(trump_cards + active_player.hand)))
         )
@@ -111,42 +111,37 @@ def play_round(game_to_play: Game) -> None:
         play_trick(game_to_play)
 
 
-def __get_bidding_game(seed: Optional[str]) -> Game:
+def __get_bidding_game(seed: str | None) -> Game:
     """Returns a game with no actions taken"""
     new_game = Game(
-        players=list(
-            map(
-                lambda identifier: Player(str(identifier)),
-                range(4),
-            )
-        ),
+        players=[Player(str(identifier)) for identifier in range(4)],
         seed=seed or str(uuid4()),
     )
     return new_game
 
 
-def __get_completed_no_bidders_game(seed: Optional[str]) -> Game:
+def __get_completed_no_bidders_game(seed: str | None) -> Game:
     """Returns a game in the completed no bidders status"""
     new_game = __get_bidding_game(seed)
     pass_round(new_game)
     return new_game
 
 
-def __get_trump_selection_game(seed: Optional[str]) -> Game:
+def __get_trump_selection_game(seed: str | None) -> Game:
     """Return a game in the trump selection status"""
     new_game = __get_bidding_game(seed)
     bid(new_game)
     return new_game
 
 
-def __get_discard_game(seed: Optional[str]) -> Game:
+def __get_discard_game(seed: str | None) -> Game:
     """Return a game in the discard status"""
     new_game = __get_trump_selection_game(seed)
     select_trump(new_game)
     return new_game
 
 
-def __get_tricks_game(seed: Optional[str]) -> Game:
+def __get_tricks_game(seed: str | None) -> Game:
     """Return a game in the tricks status"""
     new_game = __get_discard_game(seed)
     discard(new_game)
@@ -154,7 +149,7 @@ def __get_tricks_game(seed: Optional[str]) -> Game:
     return new_game
 
 
-def __get_won_game(seed: Optional[str]) -> Game:
+def __get_won_game(seed: str | None) -> Game:
     """Return a game in the won status"""
     new_game = __get_bidding_game(seed)
     while new_game.status != Status.WON:
