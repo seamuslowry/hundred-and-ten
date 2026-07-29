@@ -1,9 +1,9 @@
 """Represent a game of Hundred and Ten"""
 
 import hashlib
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from random import Random
-from typing import Optional, Sequence
 from uuid import UUID, uuid4
 
 from .actions import Action
@@ -66,7 +66,7 @@ class Game:
         )
 
     @property
-    def winner(self) -> Optional[Player]:
+    def winner(self) -> Player | None:
         """
         The winner of the game
         """
@@ -77,14 +77,10 @@ class Game:
         winning_scores = [
             score for score in self.score_history if score.value >= WINNING_SCORE
         ]
-        ordered_winning_players = list(
-            map(
-                lambda score: player_by_identifier(
-                    self.active_round.players, score.identifier
-                ),
-                winning_scores,
-            )
-        )
+        ordered_winning_players = [
+            player_by_identifier(self.active_round.players, score.identifier)
+            for score in winning_scores
+        ]
 
         winner = (
             self.active_round.active_bidder

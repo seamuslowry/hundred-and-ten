@@ -26,12 +26,7 @@ class TestAutomatedPlay(TestCase):
         """When playing with all automated actiosn, the game will complete"""
         game = Game(
             seed=AUTOMATED_SEED,
-            players=list(
-                map(
-                    lambda identifier: Player(str(identifier)),
-                    range(4),
-                )
-            ),
+            players=[Player(str(identifier)) for identifier in range(4)],
         )
 
         while game.status != Status.WON:

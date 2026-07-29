@@ -3,7 +3,6 @@
 from dataclasses import InitVar, dataclass, field
 from functools import cached_property
 from itertools import chain
-from typing import Optional
 
 from hundredandten.deck import Deck, SelectableSuit
 
@@ -44,7 +43,7 @@ class Round:
     players: list[RoundPlayer] = field(init=False)
     _deck: Deck = field(init=False, repr=False)
     _bids: list[Bid] = field(default_factory=list, init=False, repr=False)
-    _select_trump: Optional[SelectTrump] = field(default=None, init=False, repr=False)
+    _select_trump: SelectTrump | None = field(default=None, init=False, repr=False)
     _discards: list[Discard] = field(default_factory=list, init=False, repr=False)
     _tricks: list[Trick] = field(default_factory=list, init=False, repr=False)
 
@@ -67,7 +66,7 @@ class Round:
         return self._bids
 
     @property
-    def selection(self) -> Optional[SelectTrump]:
+    def selection(self) -> SelectTrump | None:
         """The trump selection, if any."""
         return self._select_trump
 
@@ -151,7 +150,7 @@ class Round:
         return [p for p in self.players if p != self.active_player]
 
     @cached_property
-    def active_bid(self) -> Optional[BidAmount]:
+    def active_bid(self) -> BidAmount | None:
         """The maximum bid submitted this round"""
         return max(self.bids).amount if self.bids else None
 
@@ -165,7 +164,7 @@ class Round:
         ]
 
     @cached_property
-    def active_bidder(self) -> Optional[RoundPlayer]:
+    def active_bidder(self) -> RoundPlayer | None:
         """The active bidder this round."""
 
         if not self.active_bid or len(self.bidders) != 1:
@@ -180,7 +179,7 @@ class Round:
         return self.tricks[-1]
 
     @cached_property
-    def trump(self) -> Optional[SelectableSuit]:
+    def trump(self) -> SelectableSuit | None:
         """The selected trump"""
         if not self.selection:
             return None
@@ -233,17 +232,15 @@ class Round:
             trump_wins, key=lambda play: play.card.trump_value, default=None
         )
 
-        base_scores = list(
-            map(
-                lambda play: Score(
-                    play.identifier,
-                    TRICK_VALUE +
-                    # treat the highest value play as two tricks
-                    (TRICK_VALUE if play == highest_play else 0),
-                ),
-                winning_plays,
+        base_scores = [
+            Score(
+                play.identifier,
+                TRICK_VALUE +
+                # treat the highest value play as two tricks
+                (TRICK_VALUE if play == highest_play else 0),
             )
-        )
+            for play in winning_plays
+        ]
 
         # use default values here so scores can be calculated before tricks are played
         # should return all zeros
@@ -257,7 +254,7 @@ class Round:
         non_bidder_base_scores = [
             score for score in base_scores if score not in bidder_base_scores
         ]
-        bidder_base_score = sum(map(lambda score: score.value, bidder_base_scores))
+        bidder_base_score = sum(score.value for score in bidder_base_scores)
 
         shot_the_moon = self.active_bid == BidAmount.SHOOT_THE_MOON and all(
             score.identifier == bidder_identifier for score in base_scores
@@ -398,7 +395,7 @@ class Round:
             )
         )
 
-    def __current_bid(self, identifier: str) -> Optional[Bid]:
+    def __current_bid(self, identifier: str) -> Bid | None:
         """Return the most recent bid for the provided player"""
         loc_index = max(
             (loc for loc, val in enumerate(self.bids) if val.identifier == identifier),
