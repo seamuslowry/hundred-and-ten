@@ -1,10 +1,10 @@
 [build-system]
-requires = ["uv_build>=0.11.32,<0.12"]
+requires = ["uv_build>=0.11.32,<0.13"]
 build-backend = "uv_build"
 
 [project]
 name = "hundredandten-deck"
-version = "0.0.4"
+version = "0.0.5"
 description = "Card domain primitives for the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.12"

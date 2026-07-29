@@ -1,10 +1,10 @@
 [build-system]
-requires = ["uv_build>=0.11.32,<0.12"]
+requires = ["uv_build>=0.11.32,<0.13"]
 build-backend = "uv_build"
 
 [project]
 name = "hundredandten-engine"
-version = "0.0.8"
+version = "0.0.9"
 description = "An engine to play the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.12"
