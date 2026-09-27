@@ -2,6 +2,11 @@
 members = ["packages/*"]
 
 [dependency-groups]
+# Pins the uv used in CI (setup-uv reads it via `version-file: pyproject.toml`) so dependabot
+# keeps it current. Keep in lockstep with `uv_build==` in each package's build-system.
+build = [
+    "uv==0.12.19",
+]
 lint = [
     "pylint==4.0.9",
     "pyright==1.1.414",
