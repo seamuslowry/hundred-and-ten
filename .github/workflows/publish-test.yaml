@@ -6,6 +6,28 @@ on:
       - main
 
 jobs:
+  # Builds the real (non-dev) versions exactly as publish.yaml will on merge and checks them
+  # against PyPI without uploading. Fails if a version already exists with a different hash,
+  # i.e. the package changed (or uv_build was bumped) without a version bump.
+  pypi-dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          version-file: pyproject.toml
+
+      - name: Build
+        run: |
+          for pkg in hundredandten-deck hundredandten-engine hundredandten-state hundredandten-automation-naive hundredandten-automation-engineadapter; do
+            uv build --wheel --package "$pkg"
+          done
+
+      - name: Dry-run publish to PyPI
+        run: uv publish --dry-run --trusted-publishing never
+
   publish:
     environment: test
     runs-on: ubuntu-latest
@@ -17,11 +39,19 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
+          version-file: pyproject.toml
 
-      - name: Build and Publish to Test PyPI
+      - name: Set dev versions
         run: |
           for pkg in hundredandten-deck hundredandten-engine hundredandten-state hundredandten-automation-naive hundredandten-automation-engineadapter; do
-            uv version --package "$pkg" --bump patch --bump dev=${{ github.run_number }}
+            uv version --package "$pkg" --bump patch --bump dev=${{ github.run_number }} --frozen
+          done
+
+      - name: Build
+        run: |
+          for pkg in hundredandten-deck hundredandten-engine hundredandten-state hundredandten-automation-naive hundredandten-automation-engineadapter; do
             uv build --wheel --package "$pkg"
           done
-          uv publish --index testpypi
+
+      - name: Publish to Test PyPI
+        run: uv publish --index testpypi

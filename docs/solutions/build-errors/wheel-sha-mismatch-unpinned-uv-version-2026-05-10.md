@@ -27,6 +27,27 @@ tags:
 
 # PyPI wheel SHA mismatch caused by unpinned uv version in CI
 
+> **Updated 2026-09-27: pin `uv_build` exactly, and let dependabot drive both pins.** The old
+> setup (CI pinned `uv==0.12.0`, packages required `uv_build>=X,<0.13`) broke once dependabot
+> raised the `uv_build>=` floor above the CI pin. `uv build` only uses its built-in backend when
+> uv's own version satisfies `build-system.requires`. Otherwise it downloads the *latest*
+> compatible `uv_build` ([uv docs](https://docs.astral.sh/uv/concepts/build-backend/)), so the
+> `Generator:` line drifted with every `uv_build` release (main's Publish failed from #208 onward).
+>
+> Current setup:
+>
+> - Every package has `requires = ["uv_build==X.Y.Z"]` (exact). The wheel bytes depend only on
+>   this pin, not on which uv runs the build (verified: identical SHA256s from uv 0.12.19 and uv
+>   0.11.2).
+> - The root `pyproject.toml` has a `build = ["uv==X.Y.Z"]` dependency group. All workflows
+>   install that uv via `astral-sh/setup-uv` with `version-file: pyproject.toml`.
+> - Dependabot bumps both pins in its weekly `dev-dependencies` group PR (build-system requires
+>   and dependency groups count as development dependencies).
+> - **Manual step on those PRs:** a new `uv_build` changes every wheel hash, so bump the patch
+>   version of every published package (`uv version --package <pkg> --bump patch`) in the same PR.
+>
+> The CI-pin-only guidance below is historical.
+
 ## Problem
 
 Wheel builds are not byte-for-byte reproducible when the `uv` version is not pinned in CI. PyPI rejects re-uploads of a wheel filename that already exists with a different SHA, causing publish to fail for unchanged packages.

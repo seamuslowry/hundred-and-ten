@@ -130,6 +130,11 @@ uv build --all-packages
 - **Type checker**: pyright
 - **Always run** `uv run black . && uv run ruff check --fix` before committing
 
+### Build Tooling & Publishing
+- `uv_build` is pinned exactly (`uv_build==X.Y.Z`) in every package, and CI's uv is pinned via the root `build` dependency group (`uv==X.Y.Z`). Dependabot bumps both.
+- A `uv_build` bump changes every wheel hash, so **bump the patch version of every published package in the same PR**. Otherwise PyPI rejects the re-upload. See `docs/solutions/build-errors/wheel-sha-mismatch-unpinned-uv-version-2026-05-10.md`.
+- CI builds and publishes an explicit list of packages. Internal packages also carry `classifiers = ["Private :: Do Not Upload"]` so PyPI rejects them if they are ever uploaded by mistake.
+
 ### Commit Messages
 - Conventional commit format: `type(scope): description`
 - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `perf`, `ci`
