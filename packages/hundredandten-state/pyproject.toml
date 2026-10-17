@@ -1,10 +1,10 @@
 [build-system]
-requires = ["uv_build==0.12.23"]
+requires = ["uv_build==0.13.1"]
 build-backend = "uv_build"
 
 [project]
 name = "hundredandten-state"
-version = "0.0.10"
+version = "0.0.11"
 description = "Player observation layer for the game Hundred and Ten"
 readme = "README.md"
 requires-python = ">=3.12"
